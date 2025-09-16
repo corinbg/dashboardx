@@ -158,6 +158,15 @@ export function RequestsPage() {
 
     return true;
   }).sort((a, b) => {
+    // Sort by request time (most recent first) - PRIMARY CRITERION
+    const timeA = new Date(a.richiestaAt).getTime();
+    const timeB = new Date(b.richiestaAt).getTime();
+    
+    // If dates are different, sort by date
+    if (timeA !== timeB) {
+      return timeB - timeA;
+    }
+    
     // Sort by completion status (completed last)
     if (a.stato === 'Completato' && b.stato !== 'Completato') return 1;
     if (b.stato === 'Completato' && a.stato !== 'Completato') return -1;
@@ -167,12 +176,9 @@ export function RequestsPage() {
     const bUrgent = b.Urgenza === 'true' || b.Urgenza === 'Sì';
     if (aUrgent && !bUrgent) return -1;
     if (bUrgent && !aUrgent) return 1;
-
-    // Sort by request time (most recent first)
-    const timeA = new Date(a.richiestaAt).getTime();
-    const timeB = new Date(b.richiestaAt).getTime();
-
-    return timeB - timeA;
+    
+    // If everything else is equal, maintain current order
+    return 0;
   });
 
   // Get period description for the header
