@@ -12,8 +12,7 @@ const tabs = [
   { id: 'richieste', label: 'Requests' },
   { id: 'clienti', label: 'Clients' },
   { id: 'checklist', label: 'Checklist' },
-  { id: 'calendario', label: 'Calendar' },
-  { id: 'conversazioni', label: 'Conversazioni' }
+  { id: 'calendario', label: 'Calendar' }
 ];
 
 export function Navbar({ activeTab, onTabChange }: NavbarProps) {
