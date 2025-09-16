@@ -46,6 +46,60 @@ export function ConversazioniPage() {
     }
   }, [conversationData?.messages, shouldScrollToBottom]);
 
+  // Sottoscrizione ai messaggi in tempo reale
+  useEffect(() => {
+    if (!conversationData?.conversation?.id) {
+      return;
+    }
+
+    const conversationId = conversationData.conversation.id;
+    console.log(`🔔 Subscribing to real-time messages for conversation: ${conversationId}`);
+
+    const subscription = supabase
+      .channel('messages-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`
+        },
+        (payload) => {
+          console.log('🔔 Nuovo messaggio ricevuto:', payload.new);
+          
+          const newMessage = payload.new as Message;
+          
+          // Aggiorna lo stato aggiungendo il nuovo messaggio
+          setConversationData(prev => {
+            if (!prev) return prev;
+            
+            // Verifica che il messaggio non sia già presente (evita duplicati)
+            const messageExists = prev.messages.some(msg => msg.id === newMessage.id);
+            if (messageExists) {
+              return prev;
+            }
+            
+            return {
+              ...prev,
+              messages: [...prev.messages, newMessage],
+              total_messages: prev.total_messages + 1
+            };
+          });
+          
+          // Attiva lo scroll automatico per il nuovo messaggio
+          setShouldScrollToBottom(true);
+        }
+      )
+      .subscribe();
+
+    // Cleanup function per evitare memory leak
+    return () => {
+      console.log(`🔔 Unsubscribing from messages for conversation: ${conversationId}`);
+      subscription.unsubscribe();
+    };
+  }, [conversationData?.conversation?.id]);
+
   const formatPhoneNumber = (phone: string) => {
     // Remove all non-digit characters
     const digits = phone.replace(/\D/g, '');
