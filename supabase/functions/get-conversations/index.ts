@@ -17,15 +17,15 @@ Deno.serve(async (req: Request) => {
 
   try {
     // Get environment variables
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const supabaseUrl = Deno.env.get("MY_SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("MY_SUPABASE_ANON_KEY");
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error("Missing Supabase environment variables");
     }
 
-    // Create Supabase client with service role key
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Create Supabase client with anon key
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // Parse request body
     const { user_id, limit = 30, before_timestamp, conversation_id } = await req.json();
