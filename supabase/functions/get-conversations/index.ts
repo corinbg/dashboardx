@@ -105,22 +105,18 @@ Deno.serve(async (req: Request) => {
     }
 
     // Check if there are more messages in this conversation
-    const { count: totalMessages } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('conversation_id', targetConversationId);
-
-    const hasMore = (totalMessages || 0) > messages.length;
+    // If we got exactly the limit number of messages, there might be more
+    // If we got less than the limit, we've reached the beginning of the conversation
+    const hasMore = messages.length === limit;
 
     // Check if there are previous conversations
-    const { data: previousConversations } = await supabase
+    const { data: allConversations } = await supabase
       .from('conversations')
-      .select('id')
+      .select('id, started_at, is_closed')
       .eq('user_id', user_id)
-      .lt('started_at', conversation.started_at)
-      .limit(1);
+      .order('started_at', { ascending: false });
 
-    const hasPreviousConversation = (previousConversations?.length || 0) > 0;
+    const hasPreviousConversation = (allConversations?.length || 0) > 1;
 
     // Reverse messages to show oldest first in the response
     const orderedMessages = messages.reverse();
@@ -132,8 +128,8 @@ Deno.serve(async (req: Request) => {
         conversation,
         messages: orderedMessages,
         has_more: hasMore,
-        has_previous_conversation: hasPreviousConversation,
-        total_messages: totalMessages
+        all_conversations: allConversations || [],
+        has_previous_conversation: hasPreviousConversation
       }),
       { 
         status: 200, 
