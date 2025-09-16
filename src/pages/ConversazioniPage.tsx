@@ -21,8 +21,8 @@ interface ConversationData {
   conversation: Conversation | null;
   messages: Message[];
   has_more: boolean;
+  all_conversations: Conversation[];
   has_previous_conversation: boolean;
-  total_messages: number;
 }
 
 export function ConversazioniPage() {
@@ -30,6 +30,7 @@ export function ConversazioniPage() {
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [conversationData, setConversationData] = useState<ConversationData | null>(null);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -82,8 +83,7 @@ export function ConversazioniPage() {
             
             return {
               ...prev,
-              messages: [...prev.messages, newMessage],
-              total_messages: prev.total_messages + 1
+              messages: [...prev.messages, newMessage]
             };
           });
           
@@ -112,7 +112,7 @@ export function ConversazioniPage() {
     return phone;
   };
 
-  const searchConversations = async (resetScroll = true) => {
+  const searchConversations = async (resetScroll = true, specificConversationId?: string) => {
     if (!phoneNumber.trim()) {
       setError('Inserisci un numero di telefono');
       return;
@@ -124,13 +124,19 @@ export function ConversazioniPage() {
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber.trim());
       
-      console.log(`🔍 Searching conversations for: ${formattedPhone}`);
+      console.log(`🔍 Searching conversations for: ${formattedPhone}${specificConversationId ? ` (conversation: ${specificConversationId})` : ''}`);
+
+      const requestBody: any = { 
+        user_id: formattedPhone,
+        limit: 30
+      };
+      
+      if (specificConversationId) {
+        requestBody.conversation_id = specificConversationId;
+      }
 
       const { data, error: functionError } = await supabase.functions.invoke('get-conversations', {
-        body: { 
-          user_id: formattedPhone,
-          limit: 30
-        }
+        body: requestBody
       });
 
       if (functionError) {
@@ -138,6 +144,7 @@ export function ConversazioniPage() {
       }
 
       setConversationData(data);
+      setCurrentConversationId(data.conversation?.id || null);
       if (resetScroll) {
         setShouldScrollToBottom(true);
       }
@@ -214,6 +221,12 @@ export function ConversazioniPage() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       searchConversations();
+    }
+  };
+
+  const handleConversationChange = (conversationId: string) => {
+    if (conversationId !== currentConversationId) {
+      searchConversations(true, conversationId);
     }
   };
 
@@ -318,11 +331,29 @@ export function ConversazioniPage() {
                   }`}>
                     {conversationData.conversation.is_closed ? 'Chiusa' : 'Attiva'}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {conversationData.total_messages} messaggi
-                  </span>
                 </div>
               </div>
+              
+              {/* Conversation Selector */}
+              {conversationData.all_conversations.length > 1 && (
+                <div className="mt-4">
+                  <label htmlFor="conversation-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Seleziona conversazione:
+                  </label>
+                  <select
+                    id="conversation-select"
+                    value={currentConversationId || ''}
+                    onChange={(e) => handleConversationChange(e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  >
+                    {conversationData.all_conversations.map((conv) => (
+                      <option key={conv.id} value={conv.id}>
+                        {formatTimestamp(conv.started_at)} - {conv.is_closed ? 'Chiusa' : 'Attiva'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Load More Button */}
@@ -378,19 +409,6 @@ export function ConversazioniPage() {
               ))}
               <div ref={messagesEndRef} />
             </div>
-
-            {/* Previous Conversation Button */}
-            {conversationData.has_previous_conversation && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 text-center">
-                <button
-                  onClick={() => {/* TODO: Implement load previous conversation */}}
-                  className="inline-flex items-center px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Carica conversazione precedente
-                </button>
-              </div>
-            )}
           </div>
         )}
       </main>
