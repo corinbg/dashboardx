@@ -28,9 +28,7 @@ const customFetch: typeof fetch = (input, init = {}) => {
 };
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
-  global: { 
-    fetch: customFetch 
-  }
+  // Remove custom fetch that may interfere with Edge Functions
 })
 
 export type Database = {
