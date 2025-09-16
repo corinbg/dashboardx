@@ -9,6 +9,7 @@ import { RequestsPage } from './pages/RequestsPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
+import { ConversazioniPage } from './pages/ConversazioniPage';
 
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
@@ -50,6 +51,8 @@ function AppContent({ activeTab, setActiveTab }: { activeTab: string; setActiveT
         return <ChecklistPage />;
       case 'calendario':
         return <CalendarPage />;
+      case 'conversazioni':
+        return <ConversazioniPage />;
       default:
         return <RequestsPage />;
     }
