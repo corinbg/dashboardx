@@ -62,7 +62,12 @@ function AppContent({
   const renderContent = () => {
     switch (activeTab) {
       case 'richieste':
-        return <RequestsPage />;
+        return (
+          <RequestsPage 
+            onTabChange={setActiveTab}
+            setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+          />
+        );
       case 'clienti':
         return (
           <ClientsPage 
@@ -82,7 +87,12 @@ function AppContent({
           />
         );
       default:
-        return <RequestsPage />;
+        return (
+          <RequestsPage 
+            onTabChange={setActiveTab}
+            setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+          />
+        );
     }
   };
 

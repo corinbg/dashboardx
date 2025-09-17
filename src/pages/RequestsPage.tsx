@@ -10,7 +10,12 @@ import { ClientProfile } from '../components/Clients/ClientProfile';
 import { ViewToggle } from '../components/UI/ViewToggle';
 import { EmptyState } from '../components/UI/EmptyState';
 
-export function RequestsPage() {
+interface RequestsPageProps {
+  onTabChange: (tab: string) => void;
+  setConversationSearchPhoneNumber: (phone: string | null) => void;
+}
+
+export function RequestsPage({ onTabChange, setConversationSearchPhoneNumber }: RequestsPageProps) {
   const { requests, clients, loading } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     // Default to card view on mobile devices
@@ -308,8 +313,8 @@ export function RequestsPage() {
         requests={requests}
         isOpen={clientModalOpen}
         onClose={closeClientModal}
-        onTabChange={() => {}} // Empty function since we're not changing tabs from requests page
-        setConversationSearchPhoneNumber={() => {}} // Empty function since conversations navigation not needed here
+        onTabChange={onTabChange}
+        setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
       />
     </div>
   );
