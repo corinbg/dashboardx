@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { Request, Client, ChecklistItem } from '../types';
 import { getRequests, updateRequestStatus } from '../services/requestsService';
-import { getClients, syncClientsFromRequests } from '../services/clientsService';
+import { getClients } from '../services/clientsService';
 import { getChecklistItems, createChecklistItem as createChecklistItemService, toggleChecklistItem as toggleChecklistItemService } from '../services/checklistService';
 
 interface AppContextType {
@@ -34,10 +34,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(true);
     try {
-      // Auto-sync clients from requests first
-      console.log('Auto-syncing clients from requests...');
-      await syncClientsFromRequests();
-      
       const [requestsData, clientsData, checklistData] = await Promise.all([
         getRequests(),
         getClients(),

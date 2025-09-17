@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Search, Filter, ChevronDown, ChevronUp, User, Phone, MapPin, Home, RefreshCw, Users, AlertCircle, CheckCircle } from 'lucide-react';
+import { Search, Filter, ChevronDown, ChevronUp, User, Phone, MapPin, Home, Users } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { Client, ViewMode } from '../types';
 import { ClientProfile } from '../components/Clients/ClientProfile';
 import { EmptyState } from '../components/UI/EmptyState';
 import { ViewToggle } from '../components/UI/ViewToggle';
-import { syncClientsFromRequests } from '../services/clientsService';
 
 export function ClientsPage() {
   const { clients, requests, loading, refreshData } = useApp();
@@ -16,9 +15,6 @@ export function ClientsPage() {
     return window.innerWidth < 768 ? 'card' : 'table';
   });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [syncResult, setSyncResult] = useState<{ created: number; updated: number; errors: number } | null>(null);
-  const [showSyncResult, setShowSyncResult] = useState(false);
 
   const getClientRequestCount = (client: Client) => {
     return requests.filter(req => 
@@ -46,36 +42,6 @@ export function ClientsPage() {
     setSelectedClient(null);
   };
 
-  const handleSyncClients = async () => {
-    setSyncing(true);
-    setSyncResult(null);
-    setShowSyncResult(false);
-
-    try {
-      const result = await syncClientsFromRequests();
-      
-      if (result.success) {
-        setSyncResult({ created: result.created, updated: result.updated, errors: result.errors });
-        setShowSyncResult(true);
-        
-        // Refresh data to show new clients
-        await refreshData();
-        
-        // Auto-hide result after 5 seconds
-        setTimeout(() => {
-          setShowSyncResult(false);
-        }, 5000);
-      } else {
-        alert('Errore durante la sincronizzazione. Controlla la console per i dettagli.');
-      }
-    } catch (error) {
-      console.error('Error syncing clients:', error);
-      alert('Errore durante la sincronizzazione.');
-    } finally {
-      setSyncing(false);
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -98,91 +64,9 @@ export function ClientsPage() {
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
-            <button
-              onClick={handleSyncClients}
-              disabled={syncing}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title="Sync clients from requests"
-            >
-              {syncing ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Override from requests</span>
-                  <span className="sm:hidden">Sync</span>
-                </>
-              )}
-            </button>
             <ViewToggle view={viewMode} onViewChange={setViewMode} />
           </div>
         </div>
-
-        {/* Sync Result Notification */}
-        {showSyncResult && syncResult && (
-          <div className={`mb-6 rounded-md p-4 border ${
-            syncResult.errors > 0 
-              ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
-              : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-          }`}>
-            <div className="flex">
-              <div className="flex-shrink-0">
-                {syncResult.errors > 0 ? (
-                  <AlertCircle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
-                ) : (
-                  <CheckCircle className="h-5 w-5 text-green-400" aria-hidden="true" />
-                )}
-              </div>
-              <div className="ml-3">
-                <h3 className={`text-sm font-medium ${
-                  syncResult.errors > 0
-                    ? 'text-yellow-800 dark:text-yellow-200'
-                    : 'text-green-800 dark:text-green-200'
-                }`}>
-                  Synchronization completed
-                </h3>
-                <div className={`mt-2 text-sm space-y-1 ${
-                  syncResult.errors > 0
-                    ? 'text-yellow-700 dark:text-yellow-300'
-                    : 'text-green-700 dark:text-green-300'
-                }`}>
-                  {syncResult.created > 0 && (
-                    <p>✅ {syncResult.created} new clients created</p>
-                  )}
-                  {syncResult.updated > 0 && (
-                    <p>🔄 {syncResult.updated} clients updated</p>
-                  )}
-                  {syncResult.created === 0 && syncResult.updated === 0 && syncResult.errors === 0 && (
-                    <p>ℹ️ Client database already synchronized</p>
-                  )}
-                  {syncResult.errors > 0 && (
-                    <p>⚠️ {syncResult.errors} errors during processing</p>
-                  )}
-                </div>
-              </div>
-              <div className="ml-auto pl-3">
-                <div className="-mx-1.5 -my-1.5">
-                  <button
-                    onClick={() => setShowSyncResult(false)}
-                    className={`inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                      syncResult.errors > 0
-                        ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 focus:ring-yellow-600 focus:ring-offset-yellow-50 dark:focus:ring-offset-yellow-900/20'
-                        : 'bg-green-50 dark:bg-green-900/20 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/40 focus:ring-green-600 focus:ring-offset-green-50 dark:focus:ring-offset-green-900/20'
-                    }`}
-                  >
-                    <span className="sr-only">Close</span>
-                    <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-6 rounded-lg shadow-sm">
@@ -227,7 +111,7 @@ export function ClientsPage() {
           <EmptyState
             type="clients"
             title={searchTerm ? "No clients found" : "No clients"}
-            description={searchTerm ? "Try modifying your search terms." : "There are no registered clients yet. Use the 'Sync from requests' button to auto-populate from the requests list."}
+            description={searchTerm ? "Try modifying your search terms." : "There are no registered clients yet."}
           />
         ) : (
           <>
