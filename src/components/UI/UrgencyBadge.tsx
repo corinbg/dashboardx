@@ -13,7 +13,7 @@ export function UrgencyBadge({ urgent, size = 'md' }: UrgencyBadgeProps) {
   if (urgent) {
     return (
       <span 
-        className={`inline-flex items-center font-medium rounded-full bg-gradient-to-r from-danger-500 to-danger-600 text-white shadow-soft animate-pulse-soft border border-danger-300 dark:border-danger-700 ${sizeClasses}`}
+        className={`inline-flex items-center font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 ${sizeClasses}`}
         role="status"
         aria-label="Urgent request"
       >
@@ -24,7 +24,7 @@ export function UrgencyBadge({ urgent, size = 'md' }: UrgencyBadgeProps) {
 
   return (
     <span 
-      className={`inline-flex items-center font-medium rounded-full bg-gradient-to-r from-gray-100 to-gray-50 text-gray-600 border border-gray-200 dark:from-gray-700 dark:to-gray-600 dark:text-gray-400 dark:border-gray-600 ${sizeClasses}`}
+      className={`inline-flex items-center font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 ${sizeClasses}`}
       role="status"
       aria-label="Non-urgent request"
     >

@@ -35,7 +35,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent dark:from-primary-400 dark:to-accent-400">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               Plumber Assistant
             </h1>
           </div>
@@ -47,10 +47,10 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-soft'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 hover:text-primary-700 dark:hover:text-primary-300'
+                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
                   disabled={tab.id === 'calendario'}
                   title={tab.id === 'calendario' ? 'Feature coming soon' : undefined}
@@ -83,7 +83,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
             {/* Dark mode toggle */}
             <button
               onClick={toggleDarkMode}
-              className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               title="Toggle color mode"
               aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
@@ -97,7 +97,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
               </span>
               <button
                 onClick={handleSignOut}
-                className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-danger-600 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-danger-500"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 title="Sign out"
                 aria-label="Sign out from application"
               >
@@ -109,7 +109,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
             <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-menu"
                 aria-label="Open menu"

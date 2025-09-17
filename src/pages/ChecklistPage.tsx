@@ -55,18 +55,18 @@ export function ChecklistPage() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:from-white dark:to-gray-200">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Checklist
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Manage your daily activities
           </p>
           {!user && (
-            <div className="mt-4 p-4 bg-gradient-to-r from-warning-50 to-warning-25 dark:from-warning-900/20 dark:to-warning-800/10 border border-warning-200 dark:border-warning-800 rounded-xl">
+            <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
               <div className="flex">
-                <AlertCircle className="h-5 w-5 text-warning-500" aria-hidden="true" />
+                <AlertCircle className="h-5 w-5 text-amber-400" aria-hidden="true" />
                 <div className="ml-3">
-                  <p className="text-sm text-warning-700 dark:text-warning-200 font-medium">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
                     You must be authenticated to use the checklist
                   </p>
                 </div>
@@ -88,13 +88,13 @@ export function ChecklistPage() {
                 placeholder="Add new activity..."
                 value={newItemText}
                 onChange={(e) => setNewItemText(e.target.value)}
-                className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 sm:text-sm"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
             <button
               type="submit"
               disabled={!newItemText.trim() || isAdding || !user}
-              className="inline-flex items-center px-6 py-3 border border-transparent shadow-soft text-sm font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 min-w-[120px] justify-center"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[100px] justify-center"
               aria-label="Add activity"
             >
               {isAdding ? (
@@ -114,7 +114,7 @@ export function ChecklistPage() {
 
         {/* Todo Items */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             To do ({todoItems.length})
           </h2>
           {todoItems.length === 0 ? (
