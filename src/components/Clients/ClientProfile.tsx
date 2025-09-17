@@ -45,13 +45,6 @@ export function ClientProfile({
     });
   };
 
-  const mockNotes = [
-    'Cliente affidabile, sempre presente agli appuntamenti',
-    'Richiede preventivo prima di ogni intervento',
-    'Casa con impianto idraulico datato, necessità frequenti',
-    'Pagamento sempre puntuale'
-  ];
-
   return (
     <>
       {/* Backdrop */}
@@ -202,15 +195,20 @@ export function ClientProfile({
                         <div className="flex items-center space-x-2 mb-2">
                           <Wrench className="h-4 w-4 text-gray-400" aria-hidden="true" />
                           <span className="text-sm text-gray-600 dark:text-gray-300">
-                            {request.tipoIntervento}
+                            {request.Problema}
                           </span>
                         </div>
                         
                         <div className="flex items-start space-x-2">
                           <FileText className="h-4 w-4 text-gray-400 mt-0.5" aria-hidden="true" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {mockNotes[index % mockNotes.length]}
-                          </span>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            <div className="mb-1">
+                              <span className="font-medium">Location:</span> {request.Luogo}
+                            </div>
+                            <div>
+                              <span className="font-medium">Callback preference:</span> {request.PreferenzaRicontatto}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}
