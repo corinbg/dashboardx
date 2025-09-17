@@ -34,23 +34,23 @@ export function ChecklistItemComponent({ item, onToggle }: ChecklistItemProps) {
   };
 
   return (
-    <div className="flex items-start space-x-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-sm transition-shadow">
+    <div className="flex items-start space-x-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-soft hover:border-primary-200 dark:hover:border-primary-700 transition-all duration-200">
       <button
         onClick={handleToggle}
         disabled={isToggling}
-        className={`flex-shrink-0 w-5 h-5 border-2 rounded-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-60 ${
+        className={`flex-shrink-0 w-6 h-6 border-2 rounded-lg flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 disabled:opacity-60 shadow-sm ${
           item.completata
-            ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
-            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+            ? 'bg-gradient-to-r from-success-500 to-success-600 border-success-500 text-white hover:from-success-600 hover:to-success-700'
+            : 'border-gray-300 dark:border-gray-600 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-gray-700'
         }`}
         title={item.completata ? 'Mark as not completed' : 'Mark as completed'}
         aria-label={item.completata ? 'Mark as not completed' : 'Mark as completed'}
       >
         {isToggling ? (
-          <Loader className="h-3 w-3 animate-spin" aria-hidden="true" />
+          <Loader className="h-4 w-4 animate-spin" aria-hidden="true" />
         ) : (
           item.completata && (
-          <Check className="h-3 w-3" aria-hidden="true" />
+          <Check className="h-4 w-4" aria-hidden="true" />
           )
         )}
       </button>
