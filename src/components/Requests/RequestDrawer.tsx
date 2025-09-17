@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag } from 'lucide-react';
+import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink } from 'lucide-react';
 import { Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 import { UrgencyBadge } from '../UI/UrgencyBadge';
@@ -10,9 +10,10 @@ interface RequestDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   onStatusUpdate?: (request: Request) => void;
+  onViewClientProfile?: (request: Request) => void;
 }
 
-export function RequestDrawer({ request, isOpen, onClose, onStatusUpdate }: RequestDrawerProps) {
+export function RequestDrawer({ request, isOpen, onClose, onStatusUpdate, onViewClientProfile }: RequestDrawerProps) {
   const [updating, setUpdating] = React.useState<string | null>(null);
   const { updateRequestStatus } = useApp();
   
@@ -85,9 +86,20 @@ export function RequestDrawer({ request, isOpen, onClose, onStatusUpdate }: Requ
               <div className="flex items-center space-x-2">
                 <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {request.Nome}
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {request.Nome}
+                    </p>
+                    {onViewClientProfile && request.Numero && (
+                      <button
+                        onClick={() => onViewClientProfile(request)}
+                        className="inline-flex items-center text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        title="View client profile"
+                      >
+                        <ExternalLink className="h-3 w-3 ml-1" />
+                      </button>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Client</p>
                 </div>
               </div>
@@ -95,12 +107,23 @@ export function RequestDrawer({ request, isOpen, onClose, onStatusUpdate }: Requ
               <div className="flex items-center space-x-2">
                 <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 <div>
-                  <a 
-                    href={`tel:${request.Numero}`}
-                    className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    {request.Numero}
-                  </a>
+                  <div className="flex items-center space-x-2">
+                    <a 
+                      href={`tel:${request.Numero}`}
+                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {request.Numero}
+                    </a>
+                    {onViewClientProfile && request.Numero && (
+                      <button
+                        onClick={() => onViewClientProfile(request)}
+                        className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title="View client profile"
+                      >
+                        View client
+                      </button>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
                 </div>
               </div>

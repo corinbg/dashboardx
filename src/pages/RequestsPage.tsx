@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ViewMode, FilterState, UrgencyFilter, Request, DatePeriodFilter } from '../types';
+import { ViewMode, FilterState, UrgencyFilter, Request, DatePeriodFilter, Client } from '../types';
 import { useApp } from '../contexts/AppContext';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { RequestsFilters } from '../components/Requests/RequestsFilters';
 import { RequestTable } from '../components/Requests/RequestTable';
 import { RequestCards } from '../components/Requests/RequestCards';
 import { RequestDrawer } from '../components/Requests/RequestDrawer';
+import { ClientProfile } from '../components/Clients/ClientProfile';
 import { ViewToggle } from '../components/UI/ViewToggle';
 import { EmptyState } from '../components/UI/EmptyState';
 
 export function RequestsPage() {
-  const { requests, loading } = useApp();
+  const { requests, clients, loading } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     // Default to card view on mobile devices
     return window.innerWidth < 768 ? 'card' : 'table';
@@ -25,6 +26,8 @@ export function RequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [clientModalOpen, setClientModalOpen] = useState(false);
   
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -110,6 +113,30 @@ export function RequestsPage() {
     setSelectedRequest(null);
   };
 
+  const handleViewClientProfileFromRequest = (request: Request) => {
+    if (!request.Numero) return;
+    
+    // Normalize phone numbers for comparison
+    const normalizePhone = (phone: string) => phone.replace(/\s+/g, '');
+    const requestPhone = normalizePhone(request.Numero);
+    
+    // Find the client with matching phone number
+    const foundClient = clients.find(client => 
+      client.telefono && normalizePhone(client.telefono) === requestPhone
+    );
+    
+    if (foundClient) {
+      // Close request drawer and open client profile
+      closeDrawer();
+      setSelectedClient(foundClient);
+      setClientModalOpen(true);
+    }
+  };
+
+  const closeClientModal = () => {
+    setClientModalOpen(false);
+    setSelectedClient(null);
+  };
   const handleStatusUpdate = (updatedRequest: Request) => {
     // Update the selected request immediately for instant UI feedback
     setSelectedRequest(updatedRequest);
@@ -272,6 +299,17 @@ export function RequestsPage() {
         isOpen={drawerOpen}
         onClose={closeDrawer}
         onStatusUpdate={handleStatusUpdate}
+        onViewClientProfile={handleViewClientProfileFromRequest}
+      />
+
+      {/* Client Profile Modal */}
+      <ClientProfile
+        client={selectedClient}
+        requests={requests}
+        isOpen={clientModalOpen}
+        onClose={closeClientModal}
+        onTabChange={() => {}} // Empty function since we're not changing tabs from requests page
+        setConversationSearchPhoneNumber={() => {}} // Empty function since conversations navigation not needed here
       />
     </div>
   );
