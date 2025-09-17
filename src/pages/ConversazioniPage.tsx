@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTriangle } from 'lucide-react';
+import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTriangle, User, MapPin } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useApp } from '../contexts/AppContext';
 
 interface ConversazioniPageProps {
   initialPhoneNumber?: string | null;
@@ -31,7 +32,11 @@ interface ConversationData {
 }
 
 export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: ConversazioniPageProps) {
+  const { clients } = useApp();
   const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber || '');
+  const [clientSearchTerm, setClientSearchTerm] = useState('');
+  const [filteredClients, setFilteredClients] = useState<any[]>([]);
+  const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [conversationData, setConversationData] = useState<ConversationData | null>(null);
@@ -40,6 +45,42 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+
+  // Handle client search
+  const handleClientSearch = (searchTerm: string) => {
+    setClientSearchTerm(searchTerm);
+    
+    if (searchTerm.trim().length < 2) {
+      setFilteredClients([]);
+      setShowClientDropdown(false);
+      return;
+    }
+
+    const filtered = clients.filter(client => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        (client.nominativo || '').toLowerCase().includes(searchLower) ||
+        (client.luogo || '').toLowerCase().includes(searchLower) ||
+        (client.indirizzo || '').toLowerCase().includes(searchLower) ||
+        (client.telefono || '').toLowerCase().includes(searchLower)
+      );
+    });
+
+    setFilteredClients(filtered.slice(0, 10)); // Limit to first 10 results
+    setShowClientDropdown(filtered.length > 0);
+  };
+
+  const handleClientSelect = (client: any) => {
+    if (client.telefono) {
+      setPhoneNumber(client.telefono);
+      setClientSearchTerm('');
+      setFilteredClients([]);
+      setShowClientDropdown(false);
+      
+      // Auto-search conversations for selected client
+      searchConversations(true, undefined, client.telefono);
+    }
+  };
 
   // Handle initial phone number from props
   useEffect(() => {
@@ -260,12 +301,72 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
         </div>
 
         {/* Search */}
-        <div className="mb-8 max-w-md">
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
+          {/* Client Search */}
           <div className="relative">
+            <label htmlFor="client-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Cerca Cliente
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-4 w-4 text-gray-400" aria-hidden="true" />
+              </div>
+              <input
+                id="client-search"
+                type="text"
+                placeholder="Nome, luogo, indirizzo..."
+                value={clientSearchTerm}
+                onChange={(e) => handleClientSearch(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                aria-label="Cerca cliente"
+              />
+            </div>
+            
+            {/* Client Dropdown */}
+            {showClientDropdown && filteredClients.length > 0 && (
+              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                {filteredClients.map((client) => (
+                  <button
+                    key={client.id}
+                    onClick={() => handleClientSelect(client)}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:outline-none first:rounded-t-md last:rounded-b-md"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <User className="h-4 w-4 text-gray-400" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {client.nominativo || 'N/A'}
+                        </p>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-2">
+                          <span>{client.telefono || 'N/A'}</span>
+                          {client.luogo && (
+                            <>
+                              <span>•</span>
+                              <span className="flex items-center">
+                                <MapPin className="h-3 w-3 mr-1" />
+                                {client.luogo}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Phone Search */}
+          <div className="relative">
+            <label htmlFor="phone-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Cerca per Telefono
+            </label>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Phone className="h-4 w-4 text-gray-400" aria-hidden="true" />
             </div>
             <input
+              id="phone-search"
               type="text"
               placeholder="Numero di telefono (es. 320 1234567)"
               value={phoneNumber}
@@ -275,7 +376,10 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
               aria-label="Numero di telefono"
             />
           </div>
-          <div className="mt-2 flex">
+        </div>
+        
+        <div className="mb-8 max-w-md">
+          <div className="flex">
             <button
               onClick={() => searchConversations()}
               disabled={loading}
