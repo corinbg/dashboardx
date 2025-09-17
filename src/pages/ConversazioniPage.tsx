@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+interface ConversazioniPageProps {
+  initialPhoneNumber?: string | null;
+  onPhoneNumberCleared?: () => void;
+}
+
 interface Conversation {
   id: string;
   user_id: string;
@@ -25,8 +30,8 @@ interface ConversationData {
   has_previous_conversation: boolean;
 }
 
-export function ConversazioniPage() {
-  const [phoneNumber, setPhoneNumber] = useState('');
+export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: ConversazioniPageProps) {
+  const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber || '');
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [conversationData, setConversationData] = useState<ConversationData | null>(null);
@@ -35,6 +40,15 @@ export function ConversazioniPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+
+  // Handle initial phone number from props
+  useEffect(() => {
+    if (initialPhoneNumber) {
+      console.log(`🔄 Auto-searching conversations for: ${initialPhoneNumber}`);
+      searchConversations(true, undefined, initialPhoneNumber);
+      onPhoneNumberCleared?.();
+    }
+  }, [initialPhoneNumber]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -112,8 +126,9 @@ export function ConversazioniPage() {
     return phone;
   };
 
-  const searchConversations = async (resetScroll = true, specificConversationId?: string) => {
-    if (!phoneNumber.trim()) {
+  const searchConversations = async (resetScroll = true, specificConversationId?: string, phoneNumToSearch?: string) => {
+    const phoneToSearch = phoneNumToSearch || phoneNumber;
+    if (!phoneToSearch.trim()) {
       setError('Inserisci un numero di telefono');
       return;
     }
@@ -122,7 +137,7 @@ export function ConversazioniPage() {
     setError(null);
 
     try {
-      const formattedPhone = formatPhoneNumber(phoneNumber.trim());
+      const formattedPhone = formatPhoneNumber(phoneToSearch.trim());
       
       console.log(`🔍 Searching conversations for: ${formattedPhone}${specificConversationId ? ` (conversation: ${specificConversationId})` : ''}`);
 

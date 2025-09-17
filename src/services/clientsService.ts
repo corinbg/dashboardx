@@ -14,10 +14,13 @@ export async function getClients(): Promise<Client[]> {
 
   return data.map(row => ({
     id: row.id,
-    nominativo: row.nominativo || '',
-    telefono: row.telefono || '',
-    luogo: row.luogo || undefined,
-    indirizzo: row.indirizzo || undefined,
+    nominativo: row.nominativo,
+    telefono: row.telefono,
+    luogo: row.luogo,
+    indirizzo: row.indirizzo,
+    user_id: row.user_id,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
   }));
 }
 
@@ -34,8 +37,8 @@ export async function createClient(client: Omit<Client, 'id'>): Promise<string |
     .insert({
       nominativo: client.nominativo,
       telefono: client.telefono,
-      luogo: client.luogo || null,
-      indirizzo: client.indirizzo || null,
+      luogo: client.luogo,
+      indirizzo: client.indirizzo,
       user_id: user.id,
     })
     .select('id')
@@ -55,8 +58,8 @@ export async function updateClient(id: string, updates: Partial<Omit<Client, 'id
     .update({
       nominativo: updates.nominativo,
       telefono: updates.telefono,
-      luogo: updates.luogo || null,
-      indirizzo: updates.indirizzo || null,
+      luogo: updates.luogo,
+      indirizzo: updates.indirizzo,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id);

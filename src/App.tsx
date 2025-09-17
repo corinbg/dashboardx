@@ -14,6 +14,7 @@ import { ConversazioniPage } from './pages/ConversazioniPage';
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('richieste');
+  const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
 
   // Show loading while authentication state is being determined
   if (authLoading) {
@@ -35,24 +36,51 @@ function MainApp() {
   // Show main application if user is authenticated
   return (
     <AppProvider>
-      <AppContent activeTab={activeTab} setActiveTab={setActiveTab} />
+      <AppContent 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        conversationSearchPhoneNumber={conversationSearchPhoneNumber}
+        setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+      />
     </AppProvider>
   );
 }
 
-function AppContent({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) {
+interface AppContentProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  conversationSearchPhoneNumber: string | null;
+  setConversationSearchPhoneNumber: (phone: string | null) => void;
+}
+
+function AppContent({ 
+  activeTab, 
+  setActiveTab, 
+  conversationSearchPhoneNumber, 
+  setConversationSearchPhoneNumber 
+}: AppContentProps) {
   const renderContent = () => {
     switch (activeTab) {
       case 'richieste':
         return <RequestsPage />;
       case 'clienti':
-        return <ClientsPage />;
+        return (
+          <ClientsPage 
+            onTabChange={setActiveTab}
+            setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+          />
+        );
       case 'checklist':
         return <ChecklistPage />;
       case 'calendario':
         return <CalendarPage />;
       case 'conversazioni':
-        return <ConversazioniPage />;
+        return (
+          <ConversazioniPage 
+            initialPhoneNumber={conversationSearchPhoneNumber}
+            onPhoneNumberCleared={() => setConversationSearchPhoneNumber(null)}
+          />
+        );
       default:
         return <RequestsPage />;
     }

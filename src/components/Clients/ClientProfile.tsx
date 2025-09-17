@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText } from 'lucide-react';
+import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle } from 'lucide-react';
 import { Client, Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 
@@ -8,14 +8,32 @@ interface ClientProfileProps {
   requests: Request[];
   isOpen: boolean;
   onClose: () => void;
+  onTabChange: (tab: string) => void;
+  setConversationSearchPhoneNumber: (phone: string | null) => void;
 }
 
-export function ClientProfile({ client, requests, isOpen, onClose }: ClientProfileProps) {
+export function ClientProfile({ 
+  client, 
+  requests, 
+  isOpen, 
+  onClose, 
+  onTabChange, 
+  setConversationSearchPhoneNumber 
+}: ClientProfileProps) {
   if (!isOpen || !client) return null;
 
   const clientRequests = requests.filter(req => 
+    req.Numero && client.telefono &&
     req.Numero.replace(/\s+/g, '') === client.telefono.replace(/\s+/g, '')
   );
+
+  const handleViewConversations = () => {
+    if (client.telefono) {
+      setConversationSearchPhoneNumber(client.telefono);
+      onTabChange('conversazioni');
+      onClose();
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', {
@@ -57,13 +75,25 @@ export function ClientProfile({ client, requests, isOpen, onClose }: ClientProfi
               <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-white">
                 Client Profile
               </h2>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label="Close client profile"
-              >
-                <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-              </button>
+              <div className="flex items-center space-x-2">
+                {client.telefono && (
+                  <button
+                    onClick={handleViewConversations}
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    title="View conversations"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-1" />
+                    Conversations
+                  </button>
+                )}
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Close client profile"
+                >
+                  <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
             </div>
 
             {/* Content */}
@@ -80,7 +110,7 @@ export function ClientProfile({ client, requests, isOpen, onClose }: ClientProfi
                       <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {client.nominativo}
+                          {client.indirizzo || 'N/A'}
                         </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Full name</p>
                       </div>

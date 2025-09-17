@@ -1,5 +1,15 @@
-export type { Client } from '../mocks/clients';
 export type { ChecklistItem } from '../mocks/checklist';
+
+export interface Client {
+  id: string;
+  nominativo: string | null;
+  telefono: string | null;
+  luogo: string | null;
+  indirizzo: string | null;
+  user_id: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
 
 export interface Request {
   id: string;

@@ -6,7 +6,12 @@ import { ClientProfile } from '../components/Clients/ClientProfile';
 import { EmptyState } from '../components/UI/EmptyState';
 import { ViewToggle } from '../components/UI/ViewToggle';
 
-export function ClientsPage() {
+interface ClientsPageProps {
+  onTabChange: (tab: string) => void;
+  setConversationSearchPhoneNumber: (phone: string | null) => void;
+}
+
+export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: ClientsPageProps) {
   const { clients, requests, loading, refreshData } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -18,7 +23,7 @@ export function ClientsPage() {
 
   const getClientRequestCount = (client: Client) => {
     return requests.filter(req => 
-      req.Numero && client.telefono && 
+      req.Numero && client.telefono &&
       req.Numero.replace(/\s+/g, '') === client.telefono.replace(/\s+/g, '')
     ).length;
   };
@@ -27,8 +32,8 @@ export function ClientsPage() {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
     return (
-      client.nominativo.toLowerCase().includes(searchLower) ||
-      client.telefono.toLowerCase().includes(searchLower)
+      (client.nominativo || '').toLowerCase().includes(searchLower) ||
+      (client.telefono || '').toLowerCase().includes(searchLower)
     );
   });
 
@@ -151,7 +156,7 @@ export function ClientsPage() {
                       className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors"
                       tabIndex={0}
                       role="button"
-                      aria-label={`View profile of ${client.nominativo}`}
+                      aria-label={`View profile of ${client.nominativo || 'Unknown'}`}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
@@ -160,22 +165,26 @@ export function ClientsPage() {
                       }}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        {client.nominativo}
+                        {client.nominativo || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        <a 
-                          href={`tel:${client.telefono}`}
-                          className="text-blue-600 dark:text-blue-400 hover:underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {client.telefono}
-                        </a>
+                        {client.telefono ? (
+                          <a 
+                            href={`tel:${client.telefono}`}
+                            className="text-blue-600 dark:text-blue-400 hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {client.telefono}
+                          </a>
+                        ) : (
+                          'N/A'
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {client.luogo || '-'}
+                        {client.luogo || 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                        {client.indirizzo || '-'}
+                        {client.indirizzo || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
@@ -195,7 +204,7 @@ export function ClientsPage() {
                   onClick={() => handleClientClick(client)}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   role="button"
-                  aria-label={`View profile of ${client.nominativo}`}
+                  aria-label={`View profile of ${client.nominativo || 'Unknown'}`}
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -209,7 +218,7 @@ export function ClientsPage() {
                     <div className="flex items-center">
                       <User className="h-4 w-4 text-gray-400 mr-2" aria-hidden="true" />
                       <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {client.nominativo}
+                        {client.nominativo || 'N/A'}
                       </h3>
                     </div>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
@@ -220,13 +229,17 @@ export function ClientsPage() {
                   {/* Phone */}
                   <div className="flex items-center mb-2">
                     <Phone className="h-4 w-4 text-gray-400 mr-2" aria-hidden="true" />
-                    <a 
-                      href={`tel:${client.telefono}`}
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {client.telefono}
-                    </a>
+                    {client.telefono ? (
+                      <a 
+                        href={`tel:${client.telefono}`}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {client.telefono}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-gray-500 dark:text-gray-400">N/A</span>
+                    )}
                   </div>
 
                   {/* Location */}
@@ -262,6 +275,8 @@ export function ClientsPage() {
         requests={requests}
         isOpen={modalOpen}
         onClose={closeModal}
+        onTabChange={onTabChange}
+        setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
       />
     </div>
   );
