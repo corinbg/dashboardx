@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, ChevronDown, ChevronUp, User, Phone, MapPin, Home, Users } from 'lucide-react';
+import { Search, Filter, ChevronDown, ChevronUp, User, Phone, MapPin, Home, Users, MessageCircle } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { Client, ViewMode } from '../types';
 import { ClientProfile } from '../components/Clients/ClientProfile';
@@ -45,6 +45,13 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
   const closeModal = () => {
     setModalOpen(false);
     setSelectedClient(null);
+  };
+
+  const handleViewConversationsFromClientList = (client: Client) => {
+    if (client.telefono) {
+      setConversationSearchPhoneNumber(client.telefono);
+      onTabChange('conversazioni');
+    }
   };
 
   if (loading) {
@@ -146,6 +153,9 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Total requests
                     </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Conversations
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -190,6 +200,20 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
                           {getClientRequestCount(client)}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewConversationsFromClientList(client);
+                          }}
+                          disabled={!client.telefono}
+                          className="inline-flex items-center px-2 py-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          title={client.telefono ? "View conversations" : "No phone number"}
+                        >
+                          <MessageCircle className="h-3 w-3 mr-1" />
+                          Chat
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -261,6 +285,22 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                       </p>
                     </div>
                   )}
+
+                  {/* Conversations Button */}
+                  <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewConversationsFromClientList(client);
+                      }}
+                      disabled={!client.telefono}
+                      className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title={client.telefono ? "View conversations" : "No phone number available"}
+                    >
+                      <MessageCircle className="h-3 w-3 mr-1" />
+                      View Conversations
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
