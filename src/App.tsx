@@ -10,11 +10,21 @@ import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
+import { EmailConfirmationPage } from './pages/EmailConfirmationPage';
 
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('richieste');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
+
+  // Check if we're on the email confirmation route
+  const isEmailConfirmationRoute = window.location.pathname === '/email-confirm' || 
+    window.location.search.includes('request_id');
+
+  // Show email confirmation page if on that route
+  if (isEmailConfirmationRoute) {
+    return <EmailConfirmationPage />;
+  }
 
   // Show loading while authentication state is being determined
   if (authLoading) {
