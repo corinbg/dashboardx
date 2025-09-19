@@ -10,7 +10,6 @@ import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
-import { EmailConfirmPage } from './pages/EmailConfirmPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 
 // Funzione per controllare se siamo sulla route di conferma email
