@@ -17,9 +17,17 @@ function MainApp() {
   const [activeTab, setActiveTab] = useState('richieste');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
 
-  // Check if we're on the email confirmation route
-  const isEmailConfirmationRoute = window.location.pathname === '/email-confirm' || 
-    window.location.search.includes('request_id');
+  // Check if we're on the email confirmation route - more robust detection
+  const checkEmailConfirmationRoute = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestId = urlParams.get('request_id');
+    const status = urlParams.get('status');
+    
+    // Show confirmation page if both required parameters are present
+    return requestId && status;
+  };
+  
+  const isEmailConfirmationRoute = checkEmailConfirmationRoute();
 
   // Show email confirmation page if on that route
   if (isEmailConfirmationRoute) {
