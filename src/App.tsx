@@ -5,46 +5,16 @@ import { useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
 import { Navbar } from './components/Layout/Navbar';
 import { LoginForm } from './components/Auth/LoginForm';
-import EmailConfirmPage from './pages/EmailConfirmationPage';
 import { RequestsPage } from './pages/RequestsPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
 
-// Funzione per controllare se siamo sulla route di conferma email
-function checkEmailConfirmationRoute() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const requestId = urlParams.get('request_id');
-  const statusParam = urlParams.get('status');
-  
-  console.log('🔍 DEBUG: window.location.href =', window.location.href);
-  console.log('🔍 DEBUG: window.location.search =', window.location.search);
-  console.log('🔍 DEBUG: requestId =', requestId);
-  console.log('🔍 DEBUG: statusParam =', statusParam);
-  console.log('🔍 DEBUG: Both present?', !!(requestId && statusParam));
-  
-  return requestId && statusParam;
-}
-
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('richieste');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
-
-  // Controlla se siamo sulla route di conferma email PRIMA di ogni altro controllo
-  const isEmailConfirmationRoute = checkEmailConfirmationRoute();
-  
-  if (isEmailConfirmationRoute) {
-    // Estrai i parametri per la pagina di conferma
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchParams = {
-      request_id: urlParams.get('request_id'),
-      status: urlParams.get('status'),
-    };
-    
-    return <EmailConfirmPage searchParams={searchParams} />;
-  }
 
   // Show loading while authentication state is being determined
   if (authLoading) {
