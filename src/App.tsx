@@ -19,12 +19,19 @@ function MainApp() {
 
   // Check if we're on the email confirmation route - more robust detection
   const checkEmailConfirmationRoute = () => {
+    console.log('🔍 DEBUG: window.location.href =', window.location.href);
+    console.log('🔍 DEBUG: window.location.search =', window.location.search);
+    
     const urlParams = new URLSearchParams(window.location.search);
     const requestId = urlParams.get('request_id');
-    const status = urlParams.get('status');
+    const statusParam = urlParams.get('status');
+    
+    console.log('🔍 DEBUG: requestId =', requestId);
+    console.log('🔍 DEBUG: statusParam =', statusParam);
+    console.log('🔍 DEBUG: Both present?', requestId && statusParam);
     
     // Show confirmation page if both required parameters are present
-    return requestId && status;
+    return requestId && statusParam;
   };
   
   const isEmailConfirmationRoute = checkEmailConfirmationRoute();
