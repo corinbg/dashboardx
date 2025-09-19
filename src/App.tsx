@@ -10,6 +10,7 @@ import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
+import { EmailConfirmPage } from './pages/EmailConfirmPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 
 // Funzione per controllare se siamo sulla route di conferma email
@@ -30,10 +31,22 @@ function isEmailConfirmRoute(): boolean {
   return isCorrectPath;
 }
 
+// Funzione per controllare se siamo sulla route di conferma email
+function isEmailConfirmRoute(): boolean {
+  const path = window.location.pathname;
+  return path === '/email-confirm' || path === '/email-confirm/';
+}
+
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('richieste');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
+
+  // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
+  if (isEmailConfirmRoute()) {
+    console.log('📧 Rendering Email Confirmation Page');
+    return <EmailConfirmPage />;
+  }
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi altra logica
   if (isEmailConfirmRoute()) {
