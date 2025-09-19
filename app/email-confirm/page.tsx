@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, BookOpen, Wrench, AlertCircle } from 'lucide-react';
 
-export function EmailConfirmationPage() {
+interface EmailConfirmPageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default function EmailConfirmPage({ searchParams }: EmailConfirmPageProps) {
   const [status, setStatus] = useState<string>('loading');
   const [message, setMessage] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -9,10 +13,13 @@ export function EmailConfirmationPage() {
   useEffect(() => {
     const handleConfirmation = async () => {
       try {
-        // Leggi i parametri dall'URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const requestId = urlParams.get('request_id');
-        const statusParam = urlParams.get('status');
+        // Estrai i parametri da searchParams
+        const requestId = typeof searchParams?.request_id === 'string' ? searchParams.request_id : null;
+        const statusParam = typeof searchParams?.status === 'string' ? searchParams.status : null;
+
+        console.log('🔍 DEBUG: searchParams =', searchParams);
+        console.log('🔍 DEBUG: requestId =', requestId);
+        console.log('🔍 DEBUG: statusParam =', statusParam);
 
         if (!requestId || !statusParam) {
           setError('Parametri mancanti nell\'URL');
@@ -55,7 +62,7 @@ export function EmailConfirmationPage() {
     };
 
     handleConfirmation();
-  }, []);
+  }, [searchParams]);
 
   const getIcon = () => {
     switch (status) {

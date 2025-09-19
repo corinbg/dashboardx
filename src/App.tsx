@@ -10,36 +10,11 @@ import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
-import { EmailConfirmationPage } from './pages/EmailConfirmationPage';
 
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('richieste');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
-
-  // Check if we're on the email confirmation route - more robust detection
-  const checkEmailConfirmationRoute = () => {
-    console.log('🔍 DEBUG: window.location.href =', window.location.href);
-    console.log('🔍 DEBUG: window.location.search =', window.location.search);
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const requestId = urlParams.get('request_id');
-    const statusParam = urlParams.get('status');
-    
-    console.log('🔍 DEBUG: requestId =', requestId);
-    console.log('🔍 DEBUG: statusParam =', statusParam);
-    console.log('🔍 DEBUG: Both present?', requestId && statusParam);
-    
-    // Show confirmation page if both required parameters are present
-    return requestId && statusParam;
-  };
-  
-  const isEmailConfirmationRoute = checkEmailConfirmationRoute();
-
-  // Show email confirmation page if on that route
-  if (isEmailConfirmationRoute) {
-    return <EmailConfirmationPage />;
-  }
 
   // Show loading while authentication state is being determined
   if (authLoading) {
