@@ -11,9 +11,19 @@ interface RequestDrawerProps {
   onClose: () => void;
   onStatusUpdate?: (request: Request) => void;
   onViewClientProfile?: (request: Request) => void;
+  onTabChange?: (tab: string) => void;
+  setConversationSearchPhoneNumber?: (phone: string | null) => void;
 }
 
-export function RequestDrawer({ request, isOpen, onClose, onStatusUpdate, onViewClientProfile }: RequestDrawerProps) {
+export function RequestDrawer({ 
+  request, 
+  isOpen, 
+  onClose, 
+  onStatusUpdate, 
+  onViewClientProfile,
+  onTabChange,
+  setConversationSearchPhoneNumber 
+}: RequestDrawerProps) {
   const [updating, setUpdating] = React.useState<string | null>(null);
   const { updateRequestStatus } = useApp();
   
@@ -43,6 +53,14 @@ export function RequestDrawer({ request, isOpen, onClose, onStatusUpdate, onView
       } finally {
         setUpdating(null);
       }
+    }
+  };
+
+  const handleViewConversations = () => {
+    if (request?.Numero && setConversationSearchPhoneNumber && onTabChange) {
+      setConversationSearchPhoneNumber(request.Numero);
+      onTabChange('conversazioni');
+      onClose(); // Chiudi il drawer
     }
   };
 
@@ -114,15 +132,27 @@ export function RequestDrawer({ request, isOpen, onClose, onStatusUpdate, onView
                     >
                       {request.Numero}
                     </a>
-                    {onViewClientProfile && request.Numero && (
-                      <button
-                        onClick={() => onViewClientProfile(request)}
-                        className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        title="View client profile"
-                      >
-                        View client
-                      </button>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {onViewClientProfile && request.Numero && (
+                        <button
+                          onClick={() => onViewClientProfile(request)}
+                          className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          title="View client profile"
+                        >
+                          View client
+                        </button>
+                      )}
+                      {request.Numero && setConversationSearchPhoneNumber && onTabChange && (
+                        <button
+                          onClick={handleViewConversations}
+                          className="inline-flex items-center text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+                          title="View conversations with this client"
+                        >
+                          <MessageCircle className="h-3 w-3 mr-1" />
+                          Conversations
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
                 </div>

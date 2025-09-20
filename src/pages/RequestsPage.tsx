@@ -331,6 +331,8 @@ export function RequestsPage({
         onClose={closeDrawer}
         onStatusUpdate={handleStatusUpdate}
         onViewClientProfile={handleViewClientProfileFromRequest}
+        onTabChange={onTabChange}
+        setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
       />
 
       {/* Client Profile Modal */}
