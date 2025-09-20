@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink } from 'lucide-react';
+import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink, MessageCircle } from 'lucide-react';
 import { Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 import { UrgencyBadge } from '../UI/UrgencyBadge';
