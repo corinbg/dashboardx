@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink } from 'lucide-react';
 import { Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
@@ -24,7 +24,7 @@ export function RequestDrawer({
   onTabChange,
   setConversationSearchPhoneNumber 
 }: RequestDrawerProps) {
-  const [updating, setUpdating] = React.useState<string | null>(null);
+  const [updating, setUpdating] = useState<string | null>(null);
   const { updateRequestStatus } = useApp();
   
   if (!isOpen || !request) return null;
