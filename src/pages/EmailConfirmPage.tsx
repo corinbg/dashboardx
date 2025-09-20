@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const EmailConfirmPage: React.FC = () => {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'missing-params'>('loading');
+  const [status, setStatus] = useState<'success' | 'error' | 'missing-params'>('missing-params');
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
@@ -81,7 +81,6 @@ const EmailConfirmPage: React.FC = () => {
       <div style={cardStyle}>
         {/* Logo/Icon */}
         <div style={iconStyle}>
-          {status === 'loading' && '⏳'}
           {status === 'success' && '✅'}
           {status === 'error' && '⚠️'}
           {status === 'missing-params' && '❌'}
@@ -89,7 +88,6 @@ const EmailConfirmPage: React.FC = () => {
 
         {/* Titolo */}
         <h1 style={titleStyle}>
-          {status === 'loading' && 'Aggiornamento in corso...'}
           {status === 'success' && 'Conferma Riuscita'}
           {status === 'error' && 'Errore'}
           {status === 'missing-params' && 'Parametri Mancanti'}
@@ -97,21 +95,15 @@ const EmailConfirmPage: React.FC = () => {
 
         {/* Messaggio */}
         <p style={messageStyle}>
-          {status === 'loading' && 'Stiamo aggiornando lo stato della tua richiesta...'}
-          {(status === 'success' || status === 'error' || status === 'missing-params') && message}
+          {message}
         </p>
 
-        {/* Spinner per loading */}
-        {status === 'loading' && <div style={spinnerStyle}></div>}
-
         {/* Footer informativo */}
-        {status !== 'loading' && (
-          <div style={footerStyle}>
-            <p style={footerTextStyle}>
-              Puoi chiudere questa finestra
-            </p>
-          </div>
-        )}
+        <div style={footerStyle}>
+          <p style={footerTextStyle}>
+            Puoi chiudere questa finestra
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -159,16 +151,6 @@ const messageStyle: React.CSSProperties = {
   fontSize: '1rem',
   lineHeight: '1.5',
   marginBottom: '20px',
-};
-
-const spinnerStyle: React.CSSProperties = {
-  width: '32px',
-  height: '32px',
-  border: '3px solid #333',
-  borderTop: '3px solid #ffffff',
-  borderRadius: '50%',
-  animation: 'spin 1s linear infinite',
-  margin: '20px auto',
 };
 
 const footerStyle: React.CSSProperties = {
