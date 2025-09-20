@@ -13,9 +13,16 @@ import { EmptyState } from '../components/UI/EmptyState';
 interface RequestsPageProps {
   onTabChange: (tab: string) => void;
   setConversationSearchPhoneNumber: (phone: string | null) => void;
+  initialRequestId?: string | null;
+  onInitialRequestHandled?: () => void;
 }
 
-export function RequestsPage({ onTabChange, setConversationSearchPhoneNumber }: RequestsPageProps) {
+export function RequestsPage({ 
+  onTabChange, 
+  setConversationSearchPhoneNumber,
+  initialRequestId,
+  onInitialRequestHandled
+}: RequestsPageProps) {
   const { requests, clients, loading } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     // Default to card view on mobile devices
@@ -35,6 +42,25 @@ export function RequestsPage({ onTabChange, setConversationSearchPhoneNumber }: 
   const [clientModalOpen, setClientModalOpen] = useState(false);
   
   const searchRef = useRef<HTMLInputElement>(null);
+
+  // Handle opening request drawer from URL parameter
+  useEffect(() => {
+    if (initialRequestId && !loading && requests.length > 0) {
+      console.log('🔍 Looking for request with ID:', initialRequestId);
+      
+      const foundRequest = requests.find(req => req.id === initialRequestId);
+      if (foundRequest) {
+        console.log('✅ Found request:', foundRequest.Nome);
+        setSelectedRequest(foundRequest);
+        setDrawerOpen(true);
+      } else {
+        console.warn('❌ Request not found with ID:', initialRequestId);
+      }
+      
+      // Clear the initial request ID to prevent reopening
+      onInitialRequestHandled?.();
+    }
+  }, [initialRequestId, loading, requests, onInitialRequestHandled]);
 
   // Handle window resize to automatically switch view mode
   useEffect(() => {

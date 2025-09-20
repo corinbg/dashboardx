@@ -22,6 +22,26 @@ function MainApp() {
   const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('richieste');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
+  const [initialRequestId, setInitialRequestId] = useState<string | null>(null);
+
+  // Read request_id from URL on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestId = urlParams.get('request_id');
+    if (requestId) {
+      console.log('📖 Found request_id in URL:', requestId);
+      setInitialRequestId(requestId);
+      setActiveTab('richieste'); // Switch to requests tab
+      
+      // Clean URL to avoid confusion
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, []);
+
+  const clearInitialRequestId = () => {
+    setInitialRequestId(null);
+  };
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
   if (isEmailConfirmRoute()) {
@@ -60,6 +80,8 @@ function MainApp() {
         setActiveTab={setActiveTab}
         conversationSearchPhoneNumber={conversationSearchPhoneNumber}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+        initialRequestId={initialRequestId}
+        onInitialRequestHandled={clearInitialRequestId}
       />
     </AppProvider>
   );
@@ -70,13 +92,17 @@ interface AppContentProps {
   setActiveTab: (tab: string) => void;
   conversationSearchPhoneNumber: string | null;
   setConversationSearchPhoneNumber: (phone: string | null) => void;
+  initialRequestId: string | null;
+  onInitialRequestHandled: () => void;
 }
 
 function AppContent({ 
   activeTab, 
   setActiveTab, 
   conversationSearchPhoneNumber, 
-  setConversationSearchPhoneNumber 
+  setConversationSearchPhoneNumber,
+  initialRequestId,
+  onInitialRequestHandled
 }: AppContentProps) {
   const renderContent = () => {
     switch (activeTab) {
@@ -85,6 +111,8 @@ function AppContent({
           <RequestsPage 
             onTabChange={setActiveTab}
             setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+            initialRequestId={initialRequestId}
+            onInitialRequestHandled={onInitialRequestHandled}
           />
         );
       case 'clienti':
