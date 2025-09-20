@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 const EmailConfirmPage: React.FC = () => {
-  const [status, setStatus] = useState<'success' | 'error' | 'missing-params'>('missing-params');
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<'success' | 'error' | 'missing-params' | 'loading'>('loading');
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const EmailConfirmPage: React.FC = () => {
     // Controllo parametri mancanti
     if (!requestId || !statusParam) {
       console.error('❌ Parametri mancanti:', { requestId, statusParam });
+      setLoading(false);
       setStatus('missing-params');
       setMessage('❌ Parametri mancanti');
       return;
@@ -69,6 +71,8 @@ const EmailConfirmPage: React.FC = () => {
         console.error('❌ Errore nella chiamata webhook:', error);
         setStatus('error');
         setMessage('⚠️ Errore nell\'aggiornamento');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -81,6 +85,7 @@ const EmailConfirmPage: React.FC = () => {
       <div style={cardStyle}>
         {/* Logo/Icon */}
         <div style={iconStyle}>
+          {loading && '⏳'}
           {status === 'success' && '✅'}
           {status === 'error' && '⚠️'}
           {status === 'missing-params' && '❌'}
@@ -88,6 +93,7 @@ const EmailConfirmPage: React.FC = () => {
 
         {/* Titolo */}
         <h1 style={titleStyle}>
+          {loading && 'Aggiornamento in corso...'}
           {status === 'success' && 'Conferma Riuscita'}
           {status === 'error' && 'Errore'}
           {status === 'missing-params' && 'Parametri Mancanti'}
@@ -95,7 +101,7 @@ const EmailConfirmPage: React.FC = () => {
 
         {/* Messaggio */}
         <p style={messageStyle}>
-          {message}
+          {loading ? 'Elaborazione della richiesta...' : message}
         </p>
 
         {/* Footer informativo */}
