@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Search, Calendar, RotateCcw, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { FilterState, UrgencyFilter, DatePeriodFilter } from '../../types';
 
@@ -38,7 +38,7 @@ export function RequestsFilters({
   }));
 
   // Open filters by default on mobile for better UX
-  React.useEffect(() => {
+  useEffect(() => {
     if (window.innerWidth < 768) {
       setMobileFiltersOpen(true);
     }
