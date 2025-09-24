@@ -11,27 +11,27 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
     switch (status) {
       case 'Non letto':
         return {
-          color: 'bg-red-50 text-red-900 border border-red-200 dark:bg-red-900/30 dark:text-red-100 dark:border-red-700 font-semibold',
+          color: 'bg-red-100 text-red-900 border-2 border-red-300 dark:bg-red-900/50 dark:text-red-100 dark:border-red-600 font-bold shadow-sm',
           label: 'Non letto'
         };
       case 'Letto':
         return {
-          color: 'bg-amber-50 text-amber-900 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-100 dark:border-amber-700 font-semibold',
+          color: 'bg-amber-100 text-amber-900 border-2 border-amber-300 dark:bg-amber-900/50 dark:text-amber-100 dark:border-amber-600 font-bold shadow-sm',
           label: 'Letto'
         };
       case 'Contattato':
         return {
-          color: 'bg-blue-50 text-blue-900 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-100 dark:border-blue-700 font-semibold',
+          color: 'bg-blue-100 text-blue-900 border-2 border-blue-300 dark:bg-blue-900/50 dark:text-blue-100 dark:border-blue-600 font-bold shadow-sm',
           label: 'Contattato'
         };
       case 'Completato':
         return {
-          color: 'bg-green-50 text-green-900 border border-green-200 dark:bg-green-900/30 dark:text-green-100 dark:border-green-700 font-semibold',
+          color: 'bg-green-100 text-green-900 border-2 border-green-300 dark:bg-green-900/50 dark:text-green-100 dark:border-green-600 font-bold shadow-sm',
           label: 'Completato'
         };
       default:
         return {
-          color: 'bg-gray-50 text-gray-900 border border-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 font-medium',
+          color: 'bg-gray-100 text-gray-900 border-2 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 font-medium shadow-sm',
           label: status
         };
     }
@@ -39,12 +39,12 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
 
   const config = getStatusConfig(status);
   const sizeClasses = size === 'sm' 
-    ? 'px-3 py-1.5 text-sm' 
-    : 'px-4 py-2 text-base';
+    ? 'px-3 py-1.5 text-xs' 
+    : 'px-4 py-2 text-sm';
 
   return (
     <span 
-      className={`inline-flex items-center font-medium rounded-full ${config.color} ${sizeClasses}`}
+      className={`inline-flex items-center font-bold rounded-lg ${config.color} ${sizeClasses}`}
       role="status"
       aria-label={`Status: ${config.label}`}
     >

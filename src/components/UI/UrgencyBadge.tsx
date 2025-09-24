@@ -7,28 +7,29 @@ interface UrgencyBadgeProps {
 
 export function UrgencyBadge({ urgent, size = 'md' }: UrgencyBadgeProps) {
   const sizeClasses = size === 'sm' 
-    ? 'px-3 py-1.5 text-sm font-bold' 
-    : 'px-4 py-2 text-base font-bold';
+    ? 'px-2.5 py-1 text-xs font-extrabold' 
+    : 'px-3 py-1.5 text-sm font-extrabold';
 
   if (urgent) {
     return (
       <span 
-        className={`inline-flex items-center rounded-full bg-red-600 text-white border-2 border-red-700 shadow-lg animate-pulse ${sizeClasses}`}
+        className={`inline-flex items-center rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white border-2 border-red-700 shadow-lg ${sizeClasses}`}
         role="status"
         aria-label="Richiesta urgente"
       >
-        🚨 URGENTE
+        <span className="animate-pulse">🚨</span>
+        <span className="ml-1">URGENTE</span>
       </span>
     );
   }
 
   return (
     <span 
-      className={`inline-flex items-center rounded-full bg-gray-200 text-gray-800 border border-gray-300 dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500 ${sizeClasses}`}
+      className={`inline-flex items-center rounded-lg bg-green-100 text-green-800 border-2 border-green-300 dark:bg-green-900/50 dark:text-green-200 dark:border-green-600 shadow-sm ${sizeClasses}`}
       role="status"
       aria-label="Richiesta non urgente"
     >
-      NON URGENTE
+      ✅ NORMALE
     </span>
   );
 }
