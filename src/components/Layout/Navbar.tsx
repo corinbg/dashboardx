@@ -9,10 +9,10 @@ interface NavbarProps {
 }
 
 const tabs = [
-  { id: 'richieste', label: 'Requests' },
-  { id: 'clienti', label: 'Clients' },
+  { id: 'richieste', label: 'Richieste' },
+  { id: 'clienti', label: 'Clienti' },
   { id: 'checklist', label: 'Checklist' },
-  { id: 'calendario', label: 'Calendar' },
+  { id: 'calendario', label: 'Calendario' },
   { id: 'conversazioni', label: 'Conversazioni' }
 ];
 
@@ -36,7 +36,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
           {/* Logo */}
           <div className="flex-shrink-0">
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Plumber Assistant
+              Assistente Idraulico
             </h1>
           </div>
 
@@ -53,12 +53,12 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                       : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
                   disabled={tab.id === 'calendario'}
-                  title={tab.id === 'calendario' ? 'Feature coming soon' : undefined}
+                  title={tab.id === 'calendario' ? 'Funzionalità in arrivo' : undefined}
                   aria-current={activeTab === tab.id ? 'page' : undefined}
                 >
                   {tab.label}
                   {tab.id === 'calendario' && (
-                    <span className="ml-1 text-xs opacity-75">(coming soon)</span>
+                    <span className="ml-1 text-sm opacity-75">(in arrivo)</span>
                   )}
                 </button>
               ))}
@@ -74,9 +74,9 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
               </div>
               <input
                 type="search"
-                placeholder="Global search..."
+                placeholder="Cerca in tutto il sito..."
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                aria-label="Global search"
+                aria-label="Ricerca globale"
               />
             </div>
 
@@ -84,8 +84,8 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
             <button
               onClick={toggleDarkMode}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              title="Toggle color mode"
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              title="Cambia modalità colore"
+              aria-label={darkMode ? 'Passa alla modalità chiara' : 'Passa alla modalità scura'}
             >
               {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
@@ -98,8 +98,8 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
               <button
                 onClick={handleSignOut}
                 className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                title="Sign out"
-                aria-label="Sign out from application"
+                title="Esci"
+                aria-label="Esci dall'applicazione"
               >
                 <LogOut className="h-5 w-5" />
               </button>
@@ -112,7 +112,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                 className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-menu"
-                aria-label="Open menu"
+                aria-label="Apri menu"
               >
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
@@ -154,9 +154,9 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                 </div>
                 <input
                   type="search"
-                  placeholder="Global search..."
+                  placeholder="Cerca in tutto il sito..."
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  aria-label="Global search"
+                  aria-label="Ricerca globale"
                 />
               </div>
             </div>

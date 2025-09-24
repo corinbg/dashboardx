@@ -15,9 +15,9 @@ export function UrgencyBadge({ urgent, size = 'md' }: UrgencyBadgeProps) {
       <span 
         className={`inline-flex items-center font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 ${sizeClasses}`}
         role="status"
-        aria-label="Urgent request"
+        aria-label="Richiesta urgente"
       >
-        URGENT
+        URGENTE
       </span>
     );
   }
@@ -26,9 +26,9 @@ export function UrgencyBadge({ urgent, size = 'md' }: UrgencyBadgeProps) {
     <span 
       className={`inline-flex items-center font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 ${sizeClasses}`}
       role="status"
-      aria-label="Non-urgent request"
+      aria-label="Richiesta non urgente"
     >
-      NO
+      NON URGENTE
     </span>
   );
 }
