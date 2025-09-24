@@ -16,7 +16,7 @@ export interface Request {
   Nome: string;
   Luogo: string;
   Problema: string;
-  Urgenza: string; // text instead of boolean
+  Urgenza: boolean;
   Numero: string;
   PreferenzaRicontatto: string;
   richiestaAt: string;

@@ -87,6 +87,7 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {requests.map((request, index) => {
         const isUrgent = request.Urgenza === 'true' || request.Urgenza === 'Sì';
+        const isUrgent = request.Urgenza;
         const isUnread = request.stato === 'Non letto';
         
         // Enhanced color coding based on urgency and status

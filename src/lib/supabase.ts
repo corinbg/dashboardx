@@ -75,7 +75,7 @@ export type Database = {
           Nome: string
           Luogo: string
           Problema: string
-          Urgenza: string
+          Urgenza: boolean
           Numero: string
           'Preferenza Ricontatto': string
           richiesta_at: string
@@ -87,7 +87,7 @@ export type Database = {
           Nome: string
           Luogo: string
           Problema: string
-          Urgenza?: string
+          Urgenza?: boolean
           Numero: string
           'Preferenza Ricontatto': string
           richiesta_at?: string
@@ -99,7 +99,7 @@ export type Database = {
           Nome?: string
           Luogo?: string
           Problema?: string
-          Urgenza?: string
+          Urgenza?: boolean
           Numero?: string
           'Preferenza Ricontatto'?: string
           richiesta_at?: string
