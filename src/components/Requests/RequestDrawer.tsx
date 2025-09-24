@@ -205,7 +205,7 @@ export function RequestDrawer({
               <div className="flex items-center space-x-2">
                 <AlertCircle className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 <div className="flex items-center space-x-2">
-                  <UrgencyBadge urgent={request.Urgenza === 'true' || request.Urgenza === 'Sì'} size="sm" />
+                  <UrgencyBadge urgent={request.Urgenza} size="sm" />
                   <p className="text-sm text-gray-500 dark:text-gray-400">Urgenza</p>
                 </div>
               </div>

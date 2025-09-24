@@ -256,8 +256,8 @@ export function RequestsPage({
     if (b.stato === 'Completato' && a.stato !== 'Completato') return -1;
 
     // Sort by urgency (urgent first)
-    const aUrgent = a.Urgenza === 'true' || a.Urgenza === 'Sì';
-    const bUrgent = b.Urgenza === 'true' || b.Urgenza === 'Sì';
+    const aUrgent = a.Urgenza;
+    const bUrgent = b.Urgenza;
     if (aUrgent && !bUrgent) return -1;
     if (bUrgent && !aUrgent) return 1;
     
