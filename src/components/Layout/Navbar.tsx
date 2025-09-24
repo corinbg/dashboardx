@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Moon, Sun, Menu, X, LogOut } from 'lucide-react';
+import { Search, Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -9,11 +9,36 @@ interface NavbarProps {
 }
 
 const tabs = [
-  { id: 'richieste', label: 'Richieste' },
-  { id: 'clienti', label: 'Clienti' },
-  { id: 'checklist', label: 'Checklist' },
-  { id: 'calendario', label: 'Calendario' },
-  { id: 'conversazioni', label: 'Conversazioni' }
+  { 
+    id: 'richieste', 
+    label: 'Richieste', 
+    icon: FileText,
+    description: 'Gestione richieste di servizio'
+  },
+  { 
+    id: 'clienti', 
+    label: 'Clienti', 
+    icon: Users,
+    description: 'Database clienti e contatti'
+  },
+  { 
+    id: 'checklist', 
+    label: 'Checklist', 
+    icon: CheckSquare,
+    description: 'Lista attività da completare'
+  },
+  { 
+    id: 'calendario', 
+    label: 'Calendario', 
+    icon: Calendar,
+    description: 'Gestione appuntamenti'
+  },
+  { 
+    id: 'conversazioni', 
+    label: 'Conversazioni', 
+    icon: MessageCircle,
+    description: 'Chat e messaggi clienti'
+  }
 ];
 
 export function Navbar({ activeTab, onTabChange }: NavbarProps) {
@@ -43,25 +68,34 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
-                    activeTab === tab.id
-                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  disabled={tab.id === 'calendario'}
-                  title={tab.id === 'calendario' ? 'Funzionalità in arrivo' : undefined}
-                  aria-current={activeTab === tab.id ? 'page' : undefined}
-                >
-                  {tab.label}
-                  {tab.id === 'calendario' && (
-                    <span className="ml-1 text-sm opacity-75">(in arrivo)</span>
-                  )}
-                </button>
-              ))}
+              {tabs.map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => onTabChange(tab.id)}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
+                      activeTab === tab.id
+                        ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    disabled={tab.id === 'calendario'}
+                    title={tab.id === 'calendario' ? 'Funzionalità in arrivo' : tab.description}
+                    aria-current={activeTab === tab.id ? 'page' : undefined}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <IconComponent 
+                        className="h-4 w-4" 
+                        aria-hidden="true"
+                      />
+                      <span>{tab.label}</span>
+                    </div>
+                    {tab.id === 'calendario' && (
+                      <span className="ml-1 text-sm opacity-75">(in arrivo)</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -125,27 +159,36 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
       {mobileMenuOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 dark:bg-gray-900">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  onTabChange(tab.id);
-                  setMobileMenuOpen(false);
-                }}
-                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  activeTab === tab.id
-                    ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
-                disabled={tab.id === 'calendario'}
-                aria-current={activeTab === tab.id ? 'page' : undefined}
-              >
-                {tab.label}
-                {tab.id === 'calendario' && (
-                  <span className="ml-1 text-sm opacity-75">(coming soon)</span>
-                )}
-              </button>
-            ))}
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    onTabChange(tab.id);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    activeTab === tab.id
+                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  disabled={tab.id === 'calendario'}
+                  aria-current={activeTab === tab.id ? 'page' : undefined}
+                >
+                  <div className="flex items-center space-x-3">
+                    <IconComponent 
+                      className="h-5 w-5" 
+                      aria-hidden="true"
+                    />
+                    <span>{tab.label}</span>
+                  </div>
+                  {tab.id === 'calendario' && (
+                    <span className="ml-1 text-sm opacity-75">(in arrivo)</span>
+                  )}
+                </button>
+              );
+            })}
             {/* Mobile search */}
             <div className="px-3 py-2">
               <div className="relative">
