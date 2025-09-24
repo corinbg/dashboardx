@@ -104,6 +104,10 @@ function MainApp() {
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
         initialRequestId={initialRequestId}
         onInitialRequestHandled={clearInitialRequestId}
+        handleNewRequest={handleNewRequest}
+        handleNewClient={handleNewClient}
+        handleEmergencyCall={handleEmergencyCall}
+        handleQuickUpdate={handleQuickUpdate}
       />
     </AppProvider>
   );
@@ -116,6 +120,10 @@ interface AppContentProps {
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   initialRequestId: string | null;
   onInitialRequestHandled: () => void;
+  handleNewRequest: () => void;
+  handleNewClient: () => void;
+  handleEmergencyCall: () => void;
+  handleQuickUpdate: () => void;
 }
 
 function AppContent({ 
@@ -124,7 +132,11 @@ function AppContent({
   conversationSearchPhoneNumber, 
   setConversationSearchPhoneNumber,
   initialRequestId,
-  onInitialRequestHandled
+  onInitialRequestHandled,
+  handleNewRequest,
+  handleNewClient,
+  handleEmergencyCall,
+  handleQuickUpdate
 }: AppContentProps) {
   const renderContent = () => {
     switch (activeTab) {
