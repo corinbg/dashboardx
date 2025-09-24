@@ -59,7 +59,7 @@ export function ChecklistPage() {
             Checklist
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Manage your daily activities
+            Gestisci le tue attività quotidiane
           </p>
           {!user && (
             <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
@@ -67,7 +67,7 @@ export function ChecklistPage() {
                 <AlertCircle className="h-5 w-5 text-amber-400" aria-hidden="true" />
                 <div className="ml-3">
                   <p className="text-sm text-amber-800 dark:text-amber-200">
-                    You must be authenticated to use the checklist
+                    Devi essere autenticato per usare la checklist
                   </p>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export function ChecklistPage() {
               <input
                 id="new-item"
                 type="text"
-                placeholder="Add new activity..."
+                placeholder="Aggiungi nuova attività..."
                 value={newItemText}
                 onChange={(e) => setNewItemText(e.target.value)}
                 className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -100,12 +100,12 @@ export function ChecklistPage() {
               {isAdding ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  <span className="hidden sm:inline">Adding...</span>
+                  <span className="hidden sm:inline">Aggiunta...</span>
                 </div>
               ) : (
                 <>
                   <Plus className="h-4 w-4" aria-hidden="true" />
-                  <span className="ml-1 hidden sm:inline">Add</span>
+                  <span className="ml-1 hidden sm:inline">Aggiungi</span>
                 </>
               )}
             </button>
@@ -115,13 +115,13 @@ export function ChecklistPage() {
         {/* Todo Items */}
         <div className="mb-8">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-            To do ({todoItems.length})
+            Da fare ({todoItems.length})
           </h2>
           {todoItems.length === 0 ? (
             <EmptyState
               type="checklist"
-              title="No activities to do"
-              description="Great job! You have no pending activities."
+              title="Nessuna attività da fare"
+              description="Ottimo lavoro! Non hai attività in sospeso."
             />
           ) : (
             <div className="space-y-3">
@@ -147,7 +147,7 @@ export function ChecklistPage() {
             >
               <div className="flex-1">
                 <h2 className="text-lg font-medium text-green-800 dark:text-green-200">
-                  Completed ({completedItems.length})
+                  Completate ({completedItems.length})
                 </h2>
               </div>
               {showCompleted ? (

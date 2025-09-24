@@ -43,8 +43,8 @@ export function ChecklistItemComponent({ item, onToggle }: ChecklistItemProps) {
             ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
         }`}
-        title={item.completata ? 'Mark as not completed' : 'Mark as completed'}
-        aria-label={item.completata ? 'Mark as not completed' : 'Mark as completed'}
+        title={item.completata ? 'Segna come non completata' : 'Segna come completata'}
+        aria-label={item.completata ? 'Segna come non completata' : 'Segna come completata'}
       >
         {isToggling ? (
           <Loader className="h-3 w-3 animate-spin" aria-hidden="true" />
@@ -65,7 +65,7 @@ export function ChecklistItemComponent({ item, onToggle }: ChecklistItemProps) {
         </p>
         {item.completata && item.completataAt && (
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            Completed on {formatDate(item.completataAt)}
+            Completata il {formatDate(item.completataAt)}
           </p>
         )}
       </div>
