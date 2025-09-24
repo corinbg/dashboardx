@@ -208,15 +208,11 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                   {/* Customer */}
                   {visibleColumns.includes('customer') && (
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {request.Nome}
-                          </div>
-                          <div className="mt-1">
-                            <UrgencyBadge urgent={isUrgent} size="sm" />
-                          </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {request.Nome}
                         </div>
+                        <UrgencyBadge urgent={isUrgent} size="sm" />
                       </div>
                     </td>
                   )}
