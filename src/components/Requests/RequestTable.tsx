@@ -187,7 +187,6 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {requests.map((request, index) => {
-              const isUrgent = request.Urgenza === 'true' || request.Urgenza === 'Sì';
               const isUrgent = request.Urgenza;
               const rowBgClass = isUrgent 
                 ? 'bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20' 
