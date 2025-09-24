@@ -138,9 +138,9 @@ export function RequestDrawer({
                         <button
                           onClick={() => onViewClientProfile(request)}
                           className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          title="View client profile"
+                          title="Visualizza profilo cliente"
                         >
-                          View client
+                          Visualizza cliente
                         </button>
                       )}
                       {request.Numero && setConversationSearchPhoneNumber && onTabChange && (
@@ -154,7 +154,6 @@ export function RequestDrawer({
                         </button>
                       )}
                     </div>
-                  </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
                 </div>
               </div>

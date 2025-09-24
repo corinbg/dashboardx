@@ -335,10 +335,10 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
                       <User className="h-4 w-4 text-gray-400" />
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {client.nominativo || 'N/A'}
+                          {client.nominativo || 'N/D'}
                         </p>
                         <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-2">
-                          <span>{client.telefono || 'N/A'}</span>
+                          <span>{client.telefono || 'N/D'}</span>
                           {client.luogo && (
                             <>
                               <span>•</span>
