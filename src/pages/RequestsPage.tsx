@@ -243,15 +243,15 @@ export function RequestsPage({
   const getPeriodDescription = () => {
     switch (datePeriodFilter) {
       case 'today':
-        return `for today (${new Date().toLocaleDateString('en-US')})`;
+        return `per oggi (${new Date().toLocaleDateString('it-IT')})`;
       case 'last3days':
-        return 'in the last 3 days';
+        return 'negli ultimi 3 giorni';
       case 'last7days':
-        return 'in the last 7 days';
+        return 'negli ultimi 7 giorni';
       case 'all':
-        return 'in total';
+        return 'in totale';
       case 'custom':
-        return `for ${new Date(selectedDate).toLocaleDateString('en-US')}`;
+        return `per ${new Date(selectedDate).toLocaleDateString('it-IT')}`;
       default:
         return '';
     }
@@ -284,10 +284,10 @@ export function RequestsPage({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Requests
+                Richieste
               </h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {filteredRequests.length} request(s) {getPeriodDescription()}
+                {filteredRequests.length} richiesta/e {getPeriodDescription()}
               </p>
             </div>
             <div className="mt-4 sm:mt-0">
@@ -300,8 +300,8 @@ export function RequestsPage({
         {filteredRequests.length === 0 ? (
           <EmptyState
             type="requests"
-            title="No requests found"
-            description="There are no requests matching the selected filters."
+            title="Nessuna richiesta trovata"
+            description="Non ci sono richieste che corrispondono ai filtri selezionati."
           />
         ) : (
           <div className="space-y-6">

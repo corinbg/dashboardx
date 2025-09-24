@@ -53,7 +53,7 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
     return (
       <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
         <div className="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
-          No requests found
+          Nessuna richiesta trovata
         </div>
       </div>
     );
@@ -72,7 +72,7 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
         {/* Mobile hint */}
         <div className="md:hidden p-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
           <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
-            💡 Scroll horizontally to see all fields
+            💡 Scorri orizzontalmente per vedere tutti i campi
           </p>
         </div>
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -81,55 +81,55 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <User className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Name
+                  Nome
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Location
+                  Luogo
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <Wrench className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Type
+                  Tipo
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <Zap className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Urgency
+                  Urgenza
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Phone
+                  Telefono
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Callback
+                  Ricontatto
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Date/Time
+                  Data/Ora
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Status
+                  Stato
                 </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <div className="flex items-center">
                   <Ban className="h-4 w-4 mr-1" aria-hidden="true" />
-                  Spam/Out of area
+                  Spam/Fuori zona
                 </div>
               </th>
             </tr>
@@ -181,7 +181,7 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                 <td className="px-6 py-4 whitespace-nowrap">
                   {request.spamFuoriZona ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">
-                      Yes
+                      Sì
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">

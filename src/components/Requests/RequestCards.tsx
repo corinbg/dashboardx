@@ -52,7 +52,7 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
   if (requests.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center text-gray-500 dark:text-gray-400">
-        No requests found
+        Nessuna richiesta trovata
       </div>
     );
   }

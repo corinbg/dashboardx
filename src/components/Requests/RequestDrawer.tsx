@@ -86,12 +86,12 @@ export function RequestDrawer({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 id="drawer-title" className="text-lg font-semibold text-gray-900 dark:text-white">
-              Request Details
+              Dettagli Richiesta
             </h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Close details"
+              aria-label="Chiudi dettagli"
             >
               <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
             </button>
@@ -112,13 +112,14 @@ export function RequestDrawer({
                       <button
                         onClick={() => onViewClientProfile(request)}
                         className="inline-flex items-center text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                        title="View client profile"
+                        title="Visualizza profilo cliente"
                       >
-                        <ExternalLink className="h-3 w-3 ml-1" />
+                        Visualizza cliente
                       </button>
                     )}
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Client</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Cliente</p>
                 </div>
               </div>
 
@@ -146,10 +147,10 @@ export function RequestDrawer({
                         <button
                           onClick={handleViewConversations}
                           className="inline-flex items-center text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
-                          title="View conversations with this client"
+                          title="Visualizza conversazioni con questo cliente"
                         >
                           <MessageCircle className="h-3 w-3 mr-1" />
-                          Conversations
+                          Conversazioni
                         </button>
                       )}
                     </div>
@@ -164,7 +165,7 @@ export function RequestDrawer({
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {request.Luogo}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Address</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Indirizzo</p>
                 </div>
               </div>
             </div>
@@ -177,7 +178,7 @@ export function RequestDrawer({
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {request.Problema}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Service type</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Tipo di servizio</p>
                 </div>
               </div>
 
@@ -187,7 +188,7 @@ export function RequestDrawer({
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {request.PreferenzaRicontatto}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Callback requested</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Ricontatto richiesto</p>
                 </div>
               </div>
 
@@ -197,7 +198,7 @@ export function RequestDrawer({
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {formatDate(request.richiestaAt)}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Request date</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Data richiesta</p>
                 </div>
               </div>
 
@@ -205,7 +206,7 @@ export function RequestDrawer({
                 <AlertCircle className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 <div className="flex items-center space-x-2">
                   <UrgencyBadge urgent={request.Urgenza === 'true' || request.Urgenza === 'Sì'} size="sm" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Urgency</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Urgenza</p>
                 </div>
               </div>
 
@@ -213,7 +214,7 @@ export function RequestDrawer({
                 <Flag className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 <div className="flex items-center space-x-2">
                   <StatusBadge status={request.stato} size="sm" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Stato</p>
                 </div>
               </div>
 
@@ -223,7 +224,7 @@ export function RequestDrawer({
                     <AlertCircle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
                     <div className="ml-3">
                       <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        Marked as spam/out of area
+                        Segnalato come spam/fuori zona
                       </p>
                     </div>
                   </div>
@@ -234,7 +235,7 @@ export function RequestDrawer({
             {/* Actions */}
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
               <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                Actions
+                Azioni
               </h3>
               
               <div className="space-y-2">
@@ -253,13 +254,13 @@ export function RequestDrawer({
                   >
                     <div className="flex items-center justify-between">
                       <span>
-                        Mark as {
-                          status === 'Non letto' ? 'Unread' :
-                          status === 'Letto' ? 'Read' :
-                          status === 'Contattato' ? 'Contacted' :
-                          status === 'Completato' ? 'Completed' : status
+                        Segna come {
+                          status === 'Non letto' ? 'Non letto' :
+                          status === 'Letto' ? 'Letto' :
+                          status === 'Contattato' ? 'Contattato' :
+                          status === 'Completato' ? 'Completato' : status
                         }
-                        {request?.stato === status && ' (current)'}
+                        {request?.stato === status && ' (attuale)'}
                       </span>
                       {updating === status && (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
