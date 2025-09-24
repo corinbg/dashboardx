@@ -11,6 +11,7 @@ import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
+import { FloatingActionButton } from './components/UI/FloatingActionButton';
 
 // Funzione per controllare se siamo sulla route di conferma email
 function isEmailConfirmRoute(): boolean {
@@ -41,6 +42,27 @@ function MainApp() {
 
   const clearInitialRequestId = () => {
     setInitialRequestId(null);
+  };
+
+  // Handlers per FAB
+  const handleNewRequest = () => {
+    // TODO: Implementare modal per nuova richiesta
+    alert('Funzionalità in sviluppo: Nuova Richiesta');
+  };
+
+  const handleNewClient = () => {
+    // TODO: Implementare modal per nuovo cliente  
+    alert('Funzionalità in sviluppo: Nuovo Cliente');
+  };
+
+  const handleEmergencyCall = () => {
+    // Numero di emergenza idraulico
+    window.location.href = 'tel:+393401234567';
+  };
+
+  const handleQuickUpdate = () => {
+    // TODO: Implementare quick update modal
+    alert('Funzionalità in sviluppo: Aggiornamento Rapido');
   };
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
@@ -158,6 +180,14 @@ function AppContent({
       <div id="main-content" role="main">
         {renderContent()}
       </div>
+      
+      {/* FAB - Solo se autenticato e non in pagina di login */}
+      <FloatingActionButton
+        onNewRequest={handleNewRequest}
+        onNewClient={handleNewClient}
+        onEmergencyCall={handleEmergencyCall}
+        onQuickUpdate={handleQuickUpdate}
+      />
     </div>
   );
 }

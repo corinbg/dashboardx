@@ -9,6 +9,7 @@ import { RequestDrawer } from '../components/Requests/RequestDrawer';
 import { ClientProfile } from '../components/Clients/ClientProfile';
 import { ViewToggle } from '../components/UI/ViewToggle';
 import { EmptyState } from '../components/UI/EmptyState';
+import { ContextualHelp, SimpleTooltip } from '../components/UI/ContextualHelp';
 
 interface RequestsPageProps {
   onTabChange: (tab: string) => void;
@@ -40,9 +41,33 @@ export function RequestsPage({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientModalOpen, setClientModalOpen] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   
   const searchRef = useRef<HTMLInputElement>(null);
 
+  // Steps per l'aiuto contextual
+  const helpSteps = [
+    {
+      target: 'search-input',
+      title: 'Ricerca Rapida',
+      content: 'Usa la barra di ricerca per trovare rapidamente richieste per nome, telefono, o indirizzo.',
+      position: 'bottom' as const,
+      action: 'Premi F per accedere rapidamente alla ricerca'
+    },
+    {
+      target: 'filters-section', 
+      title: 'Filtri Intelligenti',
+      content: 'Filtra le richieste per periodo, urgenza e stato per concentrarti su ciò che è importante.',
+      position: 'top' as const,
+      action: 'Usa "Oggi" per vedere solo le richieste di oggi'
+    },
+    {
+      target: 'view-toggle',
+      title: 'Cambia Vista',
+      content: 'Passa tra vista tabella (desktop) e vista schede (mobile) per la migliore esperienza.',
+      position: 'left' as const
+    }
+  ];
   // Handle opening request drawer from URL parameter
   useEffect(() => {
     if (initialRequestId && !loading && requests.length > 0) {
@@ -284,7 +309,18 @@ export function RequestsPage({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Richieste
+                <div className="flex items-center space-x-2">
+                  <span>Richieste</span>
+                  <SimpleTooltip content="Gestisci tutte le richieste di servizio. Usa F per cercare, R per resettare filtri.">
+                    <button 
+                      onClick={() => setShowHelp(true)}
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                      title="Mostra aiuto"
+                    >
+                      <HelpCircle className="h-5 w-5" />
+                    </button>
+                  </SimpleTooltip>
+                </div>
               </h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {filteredRequests.length} richiesta/e {getPeriodDescription()}
@@ -343,6 +379,13 @@ export function RequestsPage({
         onClose={closeClientModal}
         onTabChange={onTabChange}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+      />
+      
+      {/* Sistema di aiuto contestuale */}
+      <ContextualHelp
+        steps={helpSteps}
+        isActive={showHelp}
+        onComplete={() => setShowHelp(false)}
       />
     </div>
   );
