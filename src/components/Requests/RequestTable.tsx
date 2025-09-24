@@ -213,11 +213,9 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {request.Nome}
                           </div>
-                          {isUrgent && (
-                            <div className="text-xs text-red-600 dark:text-red-400 font-semibold">
-                              🚨 URGENTE
-                            </div>
-                          )}
+                          <div className="mt-1">
+                            <UrgencyBadge urgent={isUrgent} size="sm" />
+                          </div>
                         </div>
                       </div>
                     </td>
