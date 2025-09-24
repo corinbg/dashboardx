@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { HelpCircle } from 'lucide-react';
 import { ViewMode, FilterState, UrgencyFilter, Request, DatePeriodFilter, Client } from '../types';
 import { useApp } from '../contexts/AppContext';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
