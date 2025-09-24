@@ -154,6 +154,7 @@ export function RequestDrawer({
                         </button>
                       )}
                     </div>
+                  </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
                 </div>
               </div>
