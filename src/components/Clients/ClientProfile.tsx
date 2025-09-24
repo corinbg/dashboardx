@@ -205,9 +205,11 @@ export function ClientProfile({
                             <div className="mb-1">
                               <span className="font-medium">Location:</span> {request.Luogo}
                             </div>
+                            <span className="font-medium">Luogo:</span> {request.Luogo}
                             <div>
                               <span className="font-medium">Callback preference:</span> {request.PreferenzaRicontatto}
                             </div>
+                            <span className="font-medium">Preferenza ricontatto:</span> {request.PreferenzaRicontatto}
                           </div>
                         </div>
                       </div>
@@ -215,7 +217,7 @@ export function ClientProfile({
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                    Nessuna richiesta trovata per questo cliente.
+                    No requests found for this client.
                   </p>
                 )}
               </div>
