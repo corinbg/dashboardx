@@ -69,10 +69,10 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Clients
+              Clienti
             </h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {filteredClients.length} clients found
+              {filteredClients.length} clienti trovati
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
@@ -90,7 +90,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
             >
               <div className="flex items-center space-x-2">
                 <Filter className="h-4 w-4 text-gray-500" aria-hidden="true" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Filters</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">Filtri</span>
               </div>
               {mobileFiltersOpen ? (
                 <ChevronUp className="h-4 w-4 text-gray-500" aria-hidden="true" />
@@ -108,11 +108,11 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
               </div>
               <input
                 type="search"
-                placeholder="Search by name or phone..."
+                placeholder="Cerca per nome o telefono..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                aria-label="Search clients"
+                aria-label="Cerca clienti"
               />
             </div>
           </div>
@@ -122,8 +122,8 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
         {filteredClients.length === 0 ? (
           <EmptyState
             type="clients"
-            title={searchTerm ? "No clients found" : "No clients"}
-            description={searchTerm ? "Try modifying your search terms." : "There are no registered clients yet."}
+            title={searchTerm ? "Nessun cliente trovato" : "Nessun cliente"}
+            description={searchTerm ? "Prova a modificare i termini di ricerca." : "Non ci sono ancora clienti registrati."}
           />
         ) : (
           <>
@@ -132,29 +132,29 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
             {/* Mobile hint */}
             <div className="md:hidden p-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
               <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
-                💡 Scroll horizontally to see all fields
+                💡 Scorri orizzontalmente per vedere tutti i campi
               </p>
             </div>
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Name
+                      Nome
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Phone
+                      Telefono
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Location
+                      Luogo
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Address
+                      Indirizzo
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Total requests
+                      Richieste totali
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Conversations
+                      Conversazioni
                     </th>
                   </tr>
                 </thead>
@@ -209,7 +209,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                           }}
                           disabled={!client.telefono}
                           className="inline-flex items-center px-2 py-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          title={client.telefono ? "View conversations" : "No phone number"}
+                          title={client.telefono ? "Visualizza conversazioni" : "Nessun numero di telefono"}
                         >
                           <MessageCircle className="h-3 w-3 mr-1" />
                           Chat
@@ -246,7 +246,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                       </h3>
                     </div>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
-                      {getClientRequestCount(client)} requests
+                      {getClientRequestCount(client)} richieste
                     </span>
                   </div>
 
@@ -295,10 +295,10 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                       }}
                       disabled={!client.telefono}
                       className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      title={client.telefono ? "View conversations" : "No phone number available"}
+                      title={client.telefono ? "Visualizza conversazioni" : "Nessun numero di telefono disponibile"}
                     >
                       <MessageCircle className="h-3 w-3 mr-1" />
-                      View Conversations
+                      Visualizza Conversazioni
                     </button>
                   </div>
                 </div>
