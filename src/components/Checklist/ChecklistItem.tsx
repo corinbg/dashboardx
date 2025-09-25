@@ -190,18 +190,3 @@ export function ChecklistItemComponent({
     </div>
   );
 }
-          item.completata 
-            ? 'text-gray-500 dark:text-gray-400 line-through' 
-            : 'text-gray-900 dark:text-white'
-        }`}>
-          {item.testo}
-        </p>
-        {item.completata && item.completataAt && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            Completata il {formatDate(item.completataAt)}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}

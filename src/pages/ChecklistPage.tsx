@@ -299,7 +299,7 @@ export function ChecklistPage() {
           <div className="mb-8">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
               📝 Da fare ({todoItems.length})
-          </h2>
+            </h2>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -373,7 +373,7 @@ export function ChecklistPage() {
                     item={item}
                     onToggle={toggleChecklistItem}
                   />
-                />
+                ))}
               </div>
             </div>
           </div>
