@@ -25,6 +25,7 @@ export async function getClients(): Promise<Client[]> {
 }
 
 export async function createClient(client: Omit<Client, 'id'>): Promise<string | null> {
+export async function createClient(client: Omit<Client, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<string | null> {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
@@ -50,6 +51,23 @@ export async function createClient(client: Omit<Client, 'id'>): Promise<string |
   }
 
   return data.id;
+}
+
+export async function getUniqueCities(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('clients')
+    .select('luogo')
+    .not('luogo', 'is', null)
+    .order('luogo');
+
+  if (error) {
+    console.error('Error fetching cities:', error);
+    return [];
+  }
+
+  // Get unique cities
+  const cities = [...new Set(data.map(row => row.luogo).filter(Boolean))];
+  return cities;
 }
 
 export async function updateClient(id: string, updates: Partial<Omit<Client, 'id'>>): Promise<boolean> {
