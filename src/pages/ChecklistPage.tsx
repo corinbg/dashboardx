@@ -67,18 +67,6 @@ export function ChecklistPage() {
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'overdue' | 'upcoming' | 'no-date'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'pending'>('all');
   
-  // Mock data for now - will be replaced with actual API calls
-  const mockChecklistItems: ChecklistItem[] = checklist.map((item, index) => ({
-    ...item,
-    priorita: (['alta', 'media', 'bassa', 'none'] as Priority[])[index % 4],
-    categoria: (['riparazione', 'follow-up', 'materiali', 'trasferte', 'amministrativo', 'formazione'] as Category[])[index % 6],
-    dataScadenza: index % 3 === 0 ? new Date(Date.now() + (index - 2) * 86400000).toISOString().split('T')[0] : undefined,
-    ricorrente: index % 5 === 0 ? 'settimanale' : 'none',
-    ordine: index,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  }));
-
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -87,7 +75,7 @@ export function ChecklistPage() {
   );
 
   // Apply filters
-  const filteredItems = mockChecklistItems.filter(item => {
+  const filteredItems = checklist.filter(item => {
     // Search filter
     if (searchTerm && !item.testo.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
@@ -167,9 +155,27 @@ export function ChecklistPage() {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      // In a real app, you would update the order in the backend
-      console.log('Reorder items:', active.id, 'to position of', over.id);
-      // For now, we'll just log this action
+      const oldIndex = sortedItems.findIndex(item => item.id === active.id);
+      const newIndex = sortedItems.findIndex(item => item.id === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reorderedItems = arrayMove(sortedItems, oldIndex, newIndex);
+        
+        // Update the order numbers in the database
+        const orderUpdates = reorderedItems.map((item, index) => ({
+          id: item.id,
+          ordine: index
+        }));
+        
+        // Update order in the backend
+        import('../services/checklistService').then(({ updateChecklistItemOrder }) => {
+          updateChecklistItemOrder(orderUpdates).then(success => {
+            if (success) {
+              refreshData(); // Refresh data to show new order
+            }
+          });
+        });
+      }
     }
   };
 
@@ -288,10 +294,18 @@ export function ChecklistPage() {
         {/* New Task Form */}
         {showNewTaskForm && (
           <div className="mb-6">
-            <NewTaskForm
-              onSubmit={handleAddItem}
-              onCancel={() => setShowNewTaskForm(false)}
-            />
+            {editingItem ? (
+              <NewTaskForm
+                initialItem={editingItem}
+                onSubmit={handleUpdateItem}
+                onCancel={handleCancelEdit}
+              />
+            ) : (
+              <NewTaskForm
+                onSubmit={handleAddItem}
+                onCancel={() => setShowNewTaskForm(false)}
+              />
+            )}
           </div>
         )}
 
@@ -313,6 +327,8 @@ export function ChecklistPage() {
                       key={item.id}
                       item={item}
                       onToggle={toggleChecklistItem}
+                      onEdit={handleEditItem}
+                      onDelete={handleDeleteItem}
                     />
                   ))}
                 </div>
@@ -373,6 +389,8 @@ export function ChecklistPage() {
                     key={item.id}
                     item={item}
                     onToggle={toggleChecklistItem}
+                    onEdit={handleEditItem}
+                    onDelete={handleDeleteItem}
                   />
                 ))}
               </div>

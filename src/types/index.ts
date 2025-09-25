@@ -17,6 +17,15 @@ export interface ChecklistItem {
   ordine: number;
   createdAt: string;
   updatedAt: string;
+  priorita: Priority;
+  categoria: Category;
+  categoriaCustom?: string;
+  dataScadenza?: string;
+  dataPromemoria?: string;
+  ricorrente?: 'none' | 'giornaliera' | 'settimanale' | 'mensile';
+  ordine: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Client {
