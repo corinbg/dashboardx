@@ -186,13 +186,38 @@ export function ChecklistPage() {
     }
     
     try {
-      // For now, just add basic text - full implementation would save all fields
-      await addChecklistItem(taskData.testo);
+      if (editingItem) {
+        // Modifica attività esistente
+        await updateChecklistItem(editingItem.id, {
+          testo: taskData.testo,
+          priorita: taskData.priorita,
+          categoria: taskData.categoria,
+          categoriaCustom: taskData.categoriaCustom,
+          dataScadenza: taskData.dataScadenza,
+          dataPromemoria: taskData.dataPromemoria,
+          ricorrente: taskData.ricorrente,
+        });
+      } else {
+        // Crea nuova attività
+        await addAdvancedChecklistItem(taskData);
+      }
+      
       setShowNewTaskForm(false);
+      setEditingItem(null);
     } catch (error) {
       console.error('Error adding item:', error);
       alert('Errore durante l\'aggiunta dell\'elemento');
     }
+  };
+
+  const handleEditItem = (item: ChecklistItem) => {
+    setEditingItem(item);
+    setShowNewTaskForm(true);
+  };
+
+  const handleCancelEdit = () => {
+    setShowNewTaskForm(false);
+    setEditingItem(null);
   };
 
   const handleResetFilters = () => {
@@ -295,8 +320,9 @@ export function ChecklistPage() {
         {showNewTaskForm && (
           <div className="mb-6">
             <NewTaskForm
+              initialItem={editingItem}
               onSubmit={handleAddItem}
-              onCancel={() => setShowNewTaskForm(false)}
+              onCancel={handleCancelEdit}
             />
           </div>
         )}
@@ -379,6 +405,8 @@ export function ChecklistPage() {
                     key={item.id}
                     item={item}
                     onToggle={toggleChecklistItem}
+                    onEdit={handleEditItem}
+                    onEdit={handleEditItem}
                   />
                 ))}
               </div>
