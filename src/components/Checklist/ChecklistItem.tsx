@@ -75,17 +75,35 @@ export function ChecklistItemComponent({
     }
   };
 
+  const handleItemClick = () => {
+    if (onEdit) {
+      onEdit(item);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleItemClick();
+    }
+  };
   return (
-    <div 
+    <div
       className={`flex items-start space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getPriorityColor()} ${
         isDragging ? 'opacity-50 rotate-2 shadow-lg' : ''
-      } ${item.completata ? 'opacity-75' : ''}`}
+      } ${item.completata ? 'opacity-75' : ''} ${onEdit ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-600' : ''}`}
+      onClick={handleItemClick}
+      onKeyDown={handleKeyDown}
+      role={onEdit ? "button" : undefined}
+      tabIndex={onEdit ? 0 : undefined}
+      aria-label={onEdit ? `Modifica attività: ${item.testo}` : undefined}
     >
       {/* Drag Handle */}
       {dragHandleProps && (
         <div
           {...dragHandleProps}
           className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+          onClick={(e) => e.stopPropagation()}
         >
           <GripVertical className="h-4 w-4" />
         </div>
@@ -100,6 +118,10 @@ export function ChecklistItemComponent({
 
       <button
         onClick={handleToggle}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleToggle();
+        }}
         disabled={isToggling}
         className={`flex-shrink-0 w-5 h-5 border-2 rounded-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-60 ${
           item.completata
@@ -133,7 +155,10 @@ export function ChecklistItemComponent({
             <div className="flex items-center space-x-1 ml-2">
               {onEdit && (
                 <button
-                  onClick={() => onEdit(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(item);
+                  }}
                   className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   title="Modifica attività"
                 >
@@ -142,7 +167,10 @@ export function ChecklistItemComponent({
               )}
               {onDelete && (
                 <button
-                  onClick={() => onDelete(item.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(item.id);
+                  }}
                   className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
                   title="Elimina attività"
                 >
