@@ -198,16 +198,27 @@ export async function toggleChecklistItem(id: string, completed: boolean): Promi
 }
 
 export async function updateChecklistItemOrder(items: { id: string; ordine: number }[]): Promise<boolean> {
+  console.log('🔄 updateChecklistItemOrder called with items:', items);
+  
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
-    console.error('User not authenticated');
+    console.error('❌ User not authenticated for updateChecklistItemOrder');
     return false;
   }
 
+  console.log('✅ User authenticated:', user.id);
+  console.log('📝 Updating order for', items.length, 'items');
+
   try {
     // Update all items with their new order
-    for (const item of items) {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      console.log(`🔄 Updating item ${i + 1}/${items.length}:`, {
+        id: item.id,
+        newOrder: item.ordine
+      });
+
       const { error } = await supabase
         .from('checklist_items')
         .update({ 
@@ -218,14 +229,26 @@ export async function updateChecklistItemOrder(items: { id: string; ordine: numb
         .eq('user_id', user.id); // Extra security check
 
       if (error) {
-        console.error(`Error updating order for item ${item.id}:`, error);
+        console.error(`❌ Error updating order for item ${item.id}:`, {
+          error,
+          itemId: item.id,
+          newOrder: item.ordine,
+          userId: user.id
+        });
         return false;
+      } else {
+        console.log(`✅ Successfully updated item ${item.id} to order ${item.ordine}`);
       }
     }
 
+    console.log('🎉 All items updated successfully!');
     return true;
   } catch (error) {
-    console.error('Error updating checklist items order:', error);
+    console.error('💥 Unexpected error in updateChecklistItemOrder:', {
+      error,
+      items,
+      userId: user?.id
+    });
     return false;
   }
 }
