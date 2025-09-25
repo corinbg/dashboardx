@@ -6,6 +6,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
+import { updateChecklistItemOrder } from '../services/checklistService';
 import { ChecklistItemComponent } from '../components/Checklist/ChecklistItem';
 import { NewTaskForm } from '../components/Checklist/NewTaskForm';
 import { ChecklistFilters } from '../components/Checklist/ChecklistFilters';
@@ -53,7 +54,7 @@ function SortableChecklistItem({
 }
 
 export function ChecklistPage() {
-  const { checklist, addChecklistItem, addAdvancedChecklistItem, updateChecklistItem, deleteChecklistItem, toggleChecklistItem, loading } = useApp();
+  const { checklist, addChecklistItem, addAdvancedChecklistItem, updateChecklistItem, deleteChecklistItem, toggleChecklistItem, loading, refreshData } = useApp();
   const { user } = useAuth();
   const [showNewTaskForm, setShowNewTaskForm] = useState(false);
   const [editingItem, setEditingItem] = useState<ChecklistItem | null>(null);
@@ -151,30 +152,42 @@ export function ChecklistPage() {
   const todoItems = sortedItems.filter(item => !item.completata);
   const completedItems = sortedItems.filter(item => item.completata);
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = sortedItems.findIndex(item => item.id === active.id);
-      const newIndex = sortedItems.findIndex(item => item.id === over.id);
+      const oldIndex = todoItems.findIndex(item => item.id === active.id);
+      const newIndex = todoItems.findIndex(item => item.id === over.id);
       
       if (oldIndex !== -1 && newIndex !== -1) {
-        const reorderedItems = arrayMove(sortedItems, oldIndex, newIndex);
+        const reorderedItems = arrayMove(todoItems, oldIndex, newIndex);
         
-        // Update the order numbers in the database
+        console.log('🔄 Riordinamento elementi:', { oldIndex, newIndex });
+        
+        // Prepara gli aggiornamenti dell'ordine per il database
         const orderUpdates = reorderedItems.map((item, index) => ({
           id: item.id,
           ordine: index
         }));
         
-        // Update order in the backend
-        import('../services/checklistService').then(({ updateChecklistItemOrder }) => {
-          updateChecklistItemOrder(orderUpdates).then(success => {
-            if (success) {
-              refreshData(); // Refresh data to show new order
-            }
-          });
-        });
+        try {
+          // Aggiorna l'ordine nel database
+          const success = await updateChecklistItemOrder(orderUpdates);
+          
+          if (success) {
+            console.log('✅ Ordine aggiornato con successo');
+            // Aggiorna i dati dal database per riflettere il nuovo ordine
+            await refreshData();
+          } else {
+            console.error('❌ Errore nell\'aggiornamento dell\'ordine');
+            alert('Errore nel salvataggio dell\'ordine. Riprova.');
+          }
+        } catch (error) {
+          console.error('❌ Errore nel riordinamento:', error);
+          alert('Errore nel riordinamento delle attività.');
+          // Refresh per ripristinare l'ordine precedente
+          await refreshData();
+        }
       }
     }
   };
