@@ -164,18 +164,24 @@ export function ChecklistPage() {
         
         console.log('🔄 Riordinamento elementi:', { oldIndex, newIndex });
         
-        // 🚀 AGGIORNAMENTO OTTIMISTICO - Aggiorna immediatamente l'UI
+        // 🚀 AGGIORNAMENTO OTTIMISTICO - Aggiorna immediatamente la UI
         const updatedChecklist = checklist.map(item => {
-          const reorderedItem = reorderedItems.find(reordered => reordered.id === item.id);
-          if (reorderedItem) {
-            const newOrder = reorderedItems.findIndex(r => r.id === item.id);
-            return { ...item, ordine: newOrder };
+          // Trova l'elemento nel nuovo ordine
+          const newOrderIndex = reorderedItems.findIndex(reordered => reordered.id === item.id);
+          
+          // Se l'elemento è stato riordinato (è nei todoItems), aggiorna il suo ordine
+          if (newOrderIndex !== -1) {
+            return { ...item, ordine: newOrderIndex };
           }
+          
+          // Altrimenti lascia l'elemento invariato
           return item;
         });
         
-        // Aggiorna immediatamente lo stato locale per UI responsiva
+        // ⚡ Aggiorna IMMEDIATAMENTE lo stato locale - questo elimina lo "snap back"
         setChecklist(updatedChecklist);
+        
+        console.log('⚡ UI aggiornata ottimisticamente');
         
         // Prepara gli aggiornamenti dell'ordine per il database
         const orderUpdates = reorderedItems.map((item, index) => ({
@@ -184,21 +190,21 @@ export function ChecklistPage() {
         }));
         
         try {
-          // Aggiorna l'ordine nel database
+          // 💾 Salva nel database (in background)
           const success = await updateChecklistItemOrder(orderUpdates);
           
           if (success) {
-            console.log('✅ Ordine aggiornato con successo');
-            // Non serve fare refreshData() perché abbiamo già aggiornato ottimisticamente
+            console.log('✅ Ordine salvato nel database con successo');
+            // 🎯 Non chiamiamo refreshData() perché l'UI è già aggiornata ottimisticamente
           } else {
             console.error('❌ Errore nell\'aggiornamento dell\'ordine nel database');
-            // Ripristina lo stato precedente in caso di errore
+            // 🔄 Ripristina lo stato precedente solo in caso di errore
             await refreshData();
             alert('Errore nel salvataggio dell\'ordine. Ordine ripristinato.');
           }
         } catch (error) {
           console.error('❌ Errore nel riordinamento:', error);
-          // Ripristina lo stato precedente in caso di errore di rete
+          // 🔄 Ripristina lo stato precedente in caso di errore di rete
           await refreshData();
           alert('Errore nel riordinamento delle attività. Ordine ripristinato.');
         }
