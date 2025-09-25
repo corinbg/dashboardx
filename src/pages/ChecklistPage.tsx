@@ -54,7 +54,7 @@ function SortableChecklistItem({
 }
 
 export function ChecklistPage() {
-  const { checklist, addChecklistItem, addAdvancedChecklistItem, updateChecklistItem, deleteChecklistItem, toggleChecklistItem, loading, refreshData } = useApp();
+  const { checklist, addChecklistItem, addAdvancedChecklistItem, updateChecklistItem, deleteChecklistItem, toggleChecklistItem, loading, refreshData, setChecklist } = useApp();
   const { user } = useAuth();
   const [showNewTaskForm, setShowNewTaskForm] = useState(false);
   const [editingItem, setEditingItem] = useState<ChecklistItem | null>(null);
@@ -164,6 +164,19 @@ export function ChecklistPage() {
         
         console.log('🔄 Riordinamento elementi:', { oldIndex, newIndex });
         
+        // 🚀 AGGIORNAMENTO OTTIMISTICO - Aggiorna immediatamente l'UI
+        const updatedChecklist = checklist.map(item => {
+          const reorderedItem = reorderedItems.find(reordered => reordered.id === item.id);
+          if (reorderedItem) {
+            const newOrder = reorderedItems.findIndex(r => r.id === item.id);
+            return { ...item, ordine: newOrder };
+          }
+          return item;
+        });
+        
+        // Aggiorna immediatamente lo stato locale per UI responsiva
+        setChecklist(updatedChecklist);
+        
         // Prepara gli aggiornamenti dell'ordine per il database
         const orderUpdates = reorderedItems.map((item, index) => ({
           id: item.id,
@@ -176,17 +189,18 @@ export function ChecklistPage() {
           
           if (success) {
             console.log('✅ Ordine aggiornato con successo');
-            // Aggiorna i dati dal database per riflettere il nuovo ordine
-            await refreshData();
+            // Non serve fare refreshData() perché abbiamo già aggiornato ottimisticamente
           } else {
-            console.error('❌ Errore nell\'aggiornamento dell\'ordine');
-            alert('Errore nel salvataggio dell\'ordine. Riprova.');
+            console.error('❌ Errore nell\'aggiornamento dell\'ordine nel database');
+            // Ripristina lo stato precedente in caso di errore
+            await refreshData();
+            alert('Errore nel salvataggio dell\'ordine. Ordine ripristinato.');
           }
         } catch (error) {
           console.error('❌ Errore nel riordinamento:', error);
-          alert('Errore nel riordinamento delle attività.');
-          // Refresh per ripristinare l'ordine precedente
+          // Ripristina lo stato precedente in caso di errore di rete
           await refreshData();
+          alert('Errore nel riordinamento delle attività. Ordine ripristinato.');
         }
       }
     }

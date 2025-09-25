@@ -40,6 +40,7 @@ interface AppContextType {
   toggleChecklistItem: (id: string) => Promise<void>;
   updateRequestStatus: (id: string, status: Request['stato']) => Promise<void>;
   refreshData: () => Promise<void>;
+  setChecklist: React.Dispatch<React.SetStateAction<ChecklistItem[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -169,6 +170,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       toggleChecklistItem,
       updateRequestStatus: updateRequestStatusHandler,
       refreshData,
+      setChecklist,
     }}>
       {children}
     </AppContext.Provider>
