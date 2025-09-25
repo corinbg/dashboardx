@@ -46,66 +46,13 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
   };
 
   const filteredClients = clients.filter(client => {
-    if (!searchTerm) return true;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      (client.nominativo || '').toLowerCase().includes(searchLower) ||
-      (client.telefono || '').toLowerCase().includes(searchLower)
-    );
-  });
-
-  // Enhanced filtering and sorting
-  const handleClientClick = (client: Client) => {
-    setSelectedClient(client);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setSelectedClient(null);
-  };
-
-  const handleViewConversationsFromClientList = (client: Client) => {
-    if (client.telefono) {
-      setConversationSearchPhoneNumber(client.telefono);
-      onTabChange('conversazioni');
-    }
-  };
     // Text search filter
-
     if (searchTerm) {
-  const handleCreateClient = async (clientData: Omit<Client, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    const result = await createClient(clientData);
-    if (result) {
-      await refreshData();
-    } else {
-      throw new Error('Failed to create client');
-    }
-  };
-
-  const handleCallClient = (phone: string) => {
-    window.location.href = `tel:${phone}`;
-  };
-
-  const handleMessageClient = (phone: string) => {
-    // Open SMS app
-    window.location.href = `sms:${phone}`;
-  };
-
-  const toggleSort = (newSortBy: 'name' | 'requests') => {
-    if (sortBy === newSortBy) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(newSortBy);
-      setSortOrder('asc');
-    }
-  };
-
-  if (loading) {
+      const searchLower = searchTerm.toLowerCase();
       const matchesSearch = (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+        (client.nominativo || '').toLowerCase().includes(searchLower) ||
+        (client.telefono || '').toLowerCase().includes(searchLower)
+      );
       if (!matchesSearch) return false;
     }
 
@@ -141,6 +88,59 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
     }
     
     return sortOrder === 'asc' ? comparison : -comparison;
+  });
+
+  // Enhanced filtering and sorting
+  const handleClientClick = (client: Client) => {
+    setSelectedClient(client);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedClient(null);
+  };
+
+  const handleViewConversationsFromClientList = (client: Client) => {
+    if (client.telefono) {
+      setConversationSearchPhoneNumber(client.telefono);
+      onTabChange('conversazioni');
+    }
+  };
+
+  const handleCreateClient = async (clientData: Omit<Client, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
+    const result = await createClient(clientData);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to create client');
+    }
+  };
+
+  const handleCallClient = (phone: string) => {
+    window.location.href = `tel:${phone}`;
+  };
+
+  const handleMessageClient = (phone: string) => {
+    // Open SMS app
+    window.location.href = `sms:${phone}`;
+  };
+
+  const toggleSort = (newSortBy: 'name' | 'requests') => {
+    if (sortBy === newSortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(newSortBy);
+      setSortOrder('asc');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -444,7 +444,6 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                         {client.nominativo || 'N/A'}
                       </h3>
                     </div>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
                     <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold shadow-sm ${
                       getClientRequestCount(client) > 0 
                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-2 border-blue-400'
