@@ -1,5 +1,24 @@
 export type { ChecklistItem } from '../mocks/checklist';
 
+export type Priority = 'alta' | 'media' | 'bassa' | 'none';
+export type Category = 'riparazione' | 'follow-up' | 'materiali' | 'trasferte' | 'amministrativo' | 'formazione' | 'custom';
+
+export interface ChecklistItem {
+  id: string;
+  testo: string;
+  completata: boolean;
+  completataAt?: string;
+  priorita: Priority;
+  categoria: Category;
+  categoriaCustom?: string;
+  dataScadenza?: string;
+  dataPromemoria?: string;
+  ricorrente?: 'none' | 'giornaliera' | 'settimanale' | 'mensile';
+  ordine: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Client {
   id: string;
   nominativo: string | null;
