@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Calendar, Clock, GripVertical, Edit2, Trash2 } from 'lucide-react';
+import { AlertTriangle, Calendar, Clock, GripVertical, CreditCard as Edit2, Trash2 } from 'lucide-react';
 import { ChecklistItem as ChecklistItemType } from '../../types';
 import { Check, Loader } from 'lucide-react';
 import { CategoryTag } from './CategoryTag';
