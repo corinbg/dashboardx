@@ -123,9 +123,6 @@ export function ChecklistItemComponent({
   };
   return (
     <div
-      className={`flex items-start space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getPriorityColor()} ${
-        isDragging ? 'opacity-50 rotate-2 shadow-lg' : ''
-      } ${item.completata ? 'opacity-75' : ''} ${onEdit ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-600' : ''}`}
       className={`flex items-start space-x-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getImportanceClasses()} ${
         isDragging ? 'opacity-50 rotate-2 shadow-lg' : ''
       } ${item.completata ? 'opacity-75' : ''} ${onEdit ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-600' : ''}`}
