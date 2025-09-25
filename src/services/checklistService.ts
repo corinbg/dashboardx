@@ -52,6 +52,20 @@ function SortableChecklistItem({
   );
 }
 
+export async function deleteChecklistItem(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('checklist_items')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating checklist item:', error);
+    return false;
+  }
+
+  return true;
+}
+
 export function ChecklistPage() {
   const { checklist, addChecklistItem, addAdvancedChecklistItem, updateChecklistItem, deleteChecklistItem, toggleChecklistItem, loading } = useApp();
   const { user } = useAuth();
@@ -219,16 +233,16 @@ export function ChecklistPage() {
   const handleDeleteItem = async (id: string) => {
     if (!user) {
       alert('Devi essere autenticato per eliminare elementi dalla checklist');
-    })
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error updating checklist item:', error);
-    return false;
-  }
-
-  return true;
-}
+      return;
+    }
+    
+    try {
+      await deleteChecklistItem(id);
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Errore durante l\'eliminazione dell\'elemento');
+    }
+  };
 
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -249,7 +263,6 @@ export function ChecklistPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-export async function deleteChecklistItem(id: string): Promise<boolean> {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
