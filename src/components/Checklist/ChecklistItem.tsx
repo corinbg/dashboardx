@@ -33,17 +33,51 @@ export function ChecklistItemComponent({
     });
   };
 
-  const getPriorityColor = () => {
-    switch (item.priorita) {
-      case 'alta':
-        return 'border-l-4 border-l-red-500 bg-red-50 dark:bg-red-900/10';
-      case 'media':
-        return 'border-l-4 border-l-amber-500 bg-amber-50 dark:bg-amber-900/10';
-      case 'bassa':
-        return 'border-l-4 border-l-green-500 bg-green-50 dark:bg-green-900/10';
-      default:
-        return 'border-l-4 border-l-gray-300 dark:border-l-gray-600';
+  const getImportanceClasses = () => {
+    // Se l'attività è completata, usa un colore neutro
+    if (item.completata) {
+      return 'border-l-4 border-l-green-500 bg-green-50 dark:bg-green-900/20';
     }
+
+    // Calcola punteggio deadline (1-5)
+    let deadlineScore = 1; // default: nessuna scadenza o molto in futuro
+    
+    if (item.dataScadenza) {
+      const due = new Date(item.dataScadenza);
+      const now = new Date();
+      const diffDays = Math.ceil((due.getTime() - now.getTime()) / (1000 * 3600 * 24));
+      
+      if (diffDays < 0) deadlineScore = 5; // Overdue
+      else if (diffDays === 0) deadlineScore = 4; // Due today
+      else if (diffDays <= 3) deadlineScore = 3; // Due within 3 days
+      else if (diffDays <= 7) deadlineScore = 2; // Due within 1 week
+      else deadlineScore = 1; // Due later than 1 week
+    }
+
+    // Calcola punteggio priorità (1-3)
+    let priorityScore = 1;
+    switch (item.priorita) {
+      case 'alta': priorityScore = 3; break;
+      case 'media': priorityScore = 2; break;
+      case 'bassa': priorityScore = 1; break;
+      default: priorityScore = 1; break;
+    }
+
+    // Punteggio totale importanza (2-8)
+    const importanceScore = deadlineScore + priorityScore;
+
+    // Mappa punteggio a classi CSS
+    const scoreToClasses = {
+      2: 'border-l-4 border-l-gray-300 dark:border-l-gray-600 bg-slate-50 dark:bg-gray-800',
+      3: 'border-l-4 border-l-green-400 dark:border-l-green-500 bg-green-50 dark:bg-green-900/30',
+      4: 'border-l-4 border-l-emerald-400 dark:border-l-emerald-500 bg-emerald-50 dark:bg-emerald-800/30',
+      5: 'border-l-4 border-l-amber-400 dark:border-l-amber-500 bg-amber-50 dark:bg-amber-800/30',
+      6: 'border-l-4 border-l-orange-400 dark:border-l-orange-500 bg-orange-50 dark:bg-orange-700/30',
+      7: 'border-l-4 border-l-red-400 dark:border-l-red-500 bg-red-100 dark:bg-red-800/30',
+      8: 'border-l-4 border-l-red-500 dark:border-l-red-600 bg-red-200 dark:bg-red-900/40'
+    };
+
+    return scoreToClasses[importanceScore as keyof typeof scoreToClasses] || scoreToClasses[2];
   };
 
   const getDueDateStatus = () => {
@@ -90,6 +124,9 @@ export function ChecklistItemComponent({
   return (
     <div
       className={`flex items-start space-x-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getPriorityColor()} ${
+        isDragging ? 'opacity-50 rotate-2 shadow-lg' : ''
+      } ${item.completata ? 'opacity-75' : ''} ${onEdit ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-600' : ''}`}
+      className={`flex items-start space-x-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getImportanceClasses()} ${
         isDragging ? 'opacity-50 rotate-2 shadow-lg' : ''
       } ${item.completata ? 'opacity-75' : ''} ${onEdit ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-600' : ''}`}
       onClick={handleItemClick}
