@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, ChevronDown, ChevronUp, AlertCircle, List, Grid3X3 } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, AlertCircle, List, Grid3x3 as Grid3X3 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
@@ -294,18 +294,10 @@ export function ChecklistPage() {
         {/* New Task Form */}
         {showNewTaskForm && (
           <div className="mb-6">
-            {editingItem ? (
-              <NewTaskForm
-                initialItem={editingItem}
-                onSubmit={handleUpdateItem}
-                onCancel={handleCancelEdit}
-              />
-            ) : (
-              <NewTaskForm
-                onSubmit={handleAddItem}
-                onCancel={() => setShowNewTaskForm(false)}
-              />
-            )}
+            <NewTaskForm
+              onSubmit={handleAddItem}
+              onCancel={() => setShowNewTaskForm(false)}
+            />
           </div>
         )}
 
@@ -327,8 +319,6 @@ export function ChecklistPage() {
                       key={item.id}
                       item={item}
                       onToggle={toggleChecklistItem}
-                      onEdit={handleEditItem}
-                      onDelete={handleDeleteItem}
                     />
                   ))}
                 </div>
@@ -389,8 +379,6 @@ export function ChecklistPage() {
                     key={item.id}
                     item={item}
                     onToggle={toggleChecklistItem}
-                    onEdit={handleEditItem}
-                    onDelete={handleDeleteItem}
                   />
                 ))}
               </div>
