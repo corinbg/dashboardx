@@ -345,6 +345,8 @@ export function ChecklistPage() {
                       key={item.id}
                       item={item}
                       onToggle={toggleChecklistItem}
+                     onEdit={handleEditItem}
+                     onDelete={deleteChecklistItem}
                     />
                   ))}
                 </div>
@@ -406,7 +408,7 @@ export function ChecklistPage() {
                     item={item}
                     onToggle={toggleChecklistItem}
                     onEdit={handleEditItem}
-                    onEdit={handleEditItem}
+                   onDelete={deleteChecklistItem}
                   />
                 ))}
               </div>
