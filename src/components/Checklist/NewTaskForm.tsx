@@ -6,19 +6,20 @@ import { CategorySelector } from './CategoryTag';
 import { DueDatePicker } from './DueDatePicker';
 
 interface NewTaskFormProps {
+  initialItem?: ChecklistItem;
   onSubmit: (task: Omit<ChecklistItem, 'id' | 'completata' | 'completataAt' | 'ordine' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
 }
 
-export function NewTaskForm({ onSubmit, onCancel }: NewTaskFormProps) {
-  const [text, setText] = useState('');
-  const [priority, setPriority] = useState<Priority>('none');
-  const [category, setCategory] = useState<Category>('riparazione');
-  const [customCategoryName, setCustomCategoryName] = useState<string>();
-  const [dueDate, setDueDate] = useState<string>();
-  const [reminderDate, setReminderDate] = useState<string>();
-  const [recurrence, setRecurrence] = useState<'none' | 'giornaliera' | 'settimanale' | 'mensile'>('none');
-  const [showAdvanced, setShowAdvanced] = useState(false);
+export function NewTaskForm({ initialItem, onSubmit, onCancel }: NewTaskFormProps) {
+  const [text, setText] = useState(initialItem?.testo || '');
+  const [priority, setPriority] = useState<Priority>(initialItem?.priorita || 'none');
+  const [category, setCategory] = useState<Category>(initialItem?.categoria || 'riparazione');
+  const [customCategoryName, setCustomCategoryName] = useState<string>(initialItem?.categoriaCustom);
+  const [dueDate, setDueDate] = useState<string>(initialItem?.dataScadenza);
+  const [reminderDate, setReminderDate] = useState<string>(initialItem?.dataPromemoria);
+  const [recurrence, setRecurrence] = useState<'none' | 'giornaliera' | 'settimanale' | 'mensile'>(initialItem?.ricorrente || 'none');
+  const [showAdvanced, setShowAdvanced] = useState(!!initialItem && (initialItem.dataScadenza || initialItem.categoriaCustom || initialItem.ricorrente !== 'none'));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,15 +36,17 @@ export function NewTaskForm({ onSubmit, onCancel }: NewTaskFormProps) {
       ricorrente: recurrence,
     });
 
-    // Reset form
-    setText('');
-    setPriority('none');
-    setCategory('riparazione');
-    setCustomCategoryName(undefined);
-    setDueDate(undefined);
-    setReminderDate(undefined);
-    setRecurrence('none');
-    setShowAdvanced(false);
+    // Reset form only if not editing
+    if (!initialItem) {
+      setText('');
+      setPriority('none');
+      setCategory('riparazione');
+      setCustomCategoryName(undefined);
+      setDueDate(undefined);
+      setReminderDate(undefined);
+      setRecurrence('none');
+      setShowAdvanced(false);
+    }
   };
 
   return (
@@ -52,7 +55,7 @@ export function NewTaskForm({ onSubmit, onCancel }: NewTaskFormProps) {
       <div>
         <input
           type="text"
-          placeholder="Nuova attività..."
+          placeholder={initialItem ? "Modifica attività..." : "Nuova attività..."}
           value={text}
           onChange={(e) => setText(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -131,7 +134,7 @@ export function NewTaskForm({ onSubmit, onCancel }: NewTaskFormProps) {
           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="h-4 w-4 mr-1" />
-          Aggiungi Attività
+          {initialItem ? 'Salva Modifiche' : 'Aggiungi Attività'}
         </button>
       </div>
     </form>

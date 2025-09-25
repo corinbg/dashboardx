@@ -53,9 +53,10 @@ function SortableChecklistItem({
 }
 
 export function ChecklistPage() {
-  const { checklist, addChecklistItem, toggleChecklistItem, loading } = useApp();
+  const { checklist, addChecklistItem, addAdvancedChecklistItem, updateChecklistItem, deleteChecklistItem, toggleChecklistItem, loading } = useApp();
   const { user } = useAuth();
   const [showNewTaskForm, setShowNewTaskForm] = useState(false);
+  const [editingItem, setEditingItem] = useState<ChecklistItem | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   
