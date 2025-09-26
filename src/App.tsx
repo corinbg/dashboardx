@@ -10,6 +10,7 @@ import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
+import { HomePage } from './pages/HomePage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 
