@@ -20,6 +20,33 @@ interface HomePageProps {
 }
 
 export function HomePage({ onTabChange }: HomePageProps) {
+  const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
+
+  // Update date and time every minute
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('it-IT', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('it-IT', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   // Mock data per la dashboard
   const mockStats = {
     richieste: { totale: 24, urgenti: 5, nonUrgenti: 19 },
@@ -73,9 +100,21 @@ export function HomePage({ onTabChange }: HomePageProps) {
         {/* Header Standard */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Dashboard
-            </h1>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Dashboard
+              </h1>
+              <div className="mt-2 sm:mt-0 flex flex-col sm:flex-row sm:items-center sm:space-x-3">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                  <Calendar className="h-4 w-4" />
+                  <span>{formatDate(currentDateTime)}</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                  <Clock className="h-4 w-4" />
+                  <span>{formatTime(currentDateTime)}</span>
+                </div>
+              </div>
+            </div>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Panoramica generale dell'attività
             </p>
