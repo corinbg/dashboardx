@@ -70,7 +70,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Header Standard */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -83,10 +83,10 @@ export function HomePage({ onTabChange }: HomePageProps) {
           <div className="mt-4 sm:mt-0">
             <button
               onClick={handleNewRequest}
-              className="inline-flex items-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Nuova richiesta
+              Nuova Richiesta
             </button>
           </div>
         </div>
@@ -101,18 +101,18 @@ export function HomePage({ onTabChange }: HomePageProps) {
               {/* Card Richieste */}
               <div 
                 onClick={() => onTabChange('richieste')}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('richieste')}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <ClipboardList className="h-8 w-8 text-orange-500" />
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <ClipboardList className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
                     {mockStats.richieste.totale}
                   </span>
                 </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Richieste</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Richieste</h3>
                 <div className="flex space-x-2">
                   <span className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 px-2 py-1 rounded-full text-xs font-medium">
                     {mockStats.richieste.urgenti} urgenti
@@ -126,22 +126,22 @@ export function HomePage({ onTabChange }: HomePageProps) {
               {/* Card Clienti */}
               <div 
                 onClick={() => onTabChange('clienti')}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('clienti')}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <Users className="h-8 w-8 text-orange-500" />
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
                     {mockStats.clienti.totale}
                   </span>
                 </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Clienti</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Clienti</h3>
                 <div className="space-y-1">
                   {mockStats.clienti.topClients.map((client, index) => (
                     <div key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                      <Star className="h-3 w-3 mr-1 text-orange-400" />
+                      <Star className="h-3 w-3 mr-1 text-yellow-400" />
                       {client}
                     </div>
                   ))}
@@ -151,18 +151,18 @@ export function HomePage({ onTabChange }: HomePageProps) {
               {/* Card Checklist */}
               <div 
                 onClick={() => onTabChange('checklist')}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('checklist')}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <CheckSquare className="h-8 w-8 text-orange-500" />
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <CheckSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
                     {mockStats.checklist.aperteOggi}
                   </span>
                 </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Checklist</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Checklist</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Attività aperte oggi</span>
                   <button 
@@ -170,7 +170,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                       e.stopPropagation();
                       onTabChange('checklist');
                     }}
-                    className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 px-3 py-1 rounded-lg text-xs font-medium hover:bg-orange-200 dark:hover:bg-orange-900/70 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-md text-xs font-medium hover:bg-blue-200 dark:hover:bg-blue-900/70 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     Vai alla checklist
                   </button>
@@ -180,18 +180,18 @@ export function HomePage({ onTabChange }: HomePageProps) {
               {/* Card Conversazioni */}
               <div 
                 onClick={() => onTabChange('conversazioni')}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('conversazioni')}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <MessageCircle className="h-8 w-8 text-orange-500" />
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
                     {mockStats.conversazioni.nuove24h}
                   </span>
                 </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Conversazioni</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Conversazioni</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Nuove ultime 24h</span>
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -201,38 +201,38 @@ export function HomePage({ onTabChange }: HomePageProps) {
 
             {/* Azioni Rapide */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Azioni Rapide</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Azioni Rapide</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 <button
                   onClick={handleNewRequest}
-                  className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
-                  <Plus className="h-6 w-6 mb-2" />
-                  <div className="font-medium">Aggiungi richiesta</div>
+                  <Plus className="h-5 w-5 mb-2" />
+                  <div className="text-sm font-medium">Aggiungi richiesta</div>
                 </button>
                 
                 <button
                   onClick={handleNewClient}
-                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-gray-600 hover:bg-gray-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
-                  <Users className="h-6 w-6 mb-2" />
-                  <div className="font-medium">Aggiungi cliente</div>
+                  <Users className="h-5 w-5 mb-2" />
+                  <div className="text-sm font-medium">Aggiungi cliente</div>
                 </button>
                 
                 <button
                   onClick={handleCompleteTask}
-                  className="bg-green-500 hover:bg-green-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
-                  <Check className="h-6 w-6 mb-2" />
-                  <div className="font-medium">Segna attività completata</div>
+                  <Check className="h-5 w-5 mb-2" />
+                  <div className="text-sm font-medium">Completa attività</div>
                 </button>
                 
                 <button
                   onClick={() => onTabChange('conversazioni')}
-                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
-                  <Phone className="h-6 w-6 mb-2" />
-                  <div className="font-medium">Apri conversazioni</div>
+                  <Phone className="h-5 w-5 mb-2" />
+                  <div className="text-sm font-medium">Apri conversazioni</div>
                 </button>
               </div>
             </div>
@@ -244,19 +244,21 @@ export function HomePage({ onTabChange }: HomePageProps) {
             {/* Agenda di Oggi */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900 dark:text-white">Agenda di Oggi</h3>
-                <Calendar className="h-5 w-5 text-orange-500" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Agenda di Oggi</h3>
+                <Calendar className="h-5 w-5 text-gray-400" />
               </div>
               <div className="space-y-3">
                 {mockAgenda.slice(0, 5).map((appuntamento, index) => (
                   <div 
                     key={index} 
-                    className={`flex items-start space-x-3 p-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                      appuntamento.urgente ? 'border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-700'
+                    className={`flex items-start space-x-3 p-3 rounded-md transition-colors ${
+                      appuntamento.urgente 
+                        ? 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500' 
+                        : 'bg-gray-50 dark:bg-gray-700'
                     }`}
                   >
                     <div className="flex-shrink-0">
-                      <div className="font-medium text-sm text-gray-900 dark:text-white">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {appuntamento.orario}
                       </div>
                       {appuntamento.urgente && (
@@ -280,23 +282,23 @@ export function HomePage({ onTabChange }: HomePageProps) {
             {/* Statistiche Minime */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
-                <div className="text-3xl font-bold text-green-500 mb-1">18</div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">18</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Completate settimana</div>
               </div>
               
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
-                <div className="text-3xl font-bold text-orange-500 mb-1">3</div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">3</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Checklist oggi</div>
               </div>
               
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
-                <div className="text-3xl font-bold text-blue-500 mb-1">7</div>
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">7</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Nuovi clienti mese</div>
               </div>
               
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center">
-                  <div className="text-3xl font-bold text-green-500 mb-1">95%</div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">95%</div>
                   <TrendingUp className="h-4 w-4 text-green-500 ml-1" />
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Soddisfazione</div>
@@ -305,7 +307,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
 
             {/* Ultimi Aggiornamenti */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Ultimi Aggiornamenti</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Ultimi Aggiornamenti</h3>
               <div className="space-y-3">
                 {mockAggiornamenti.map((aggiornamento, index) => (
                   <div key={index} className="flex items-start space-x-3">
