@@ -135,7 +135,7 @@ function MainApp() {
         handleNewRequest={handleNewRequest}
         handleNewClient={handleNewClient}
         handleEmergencyCall={handleEmergencyCall}
-        handleQuickUpdate={handleQuickUpdate}
+        onStatusUpdate={handleStatusUpdate}
       />
     </AppProvider>
   );
@@ -155,7 +155,7 @@ interface AppContentProps {
   handleNewRequest: () => void;
   handleNewClient: () => void;
   handleEmergencyCall: () => void;
-  handleQuickUpdate: () => void;
+  onStatusUpdate: () => void;
 }
 
 function AppContent({ 
@@ -172,7 +172,7 @@ function AppContent({
   handleNewRequest,
   handleNewClient,
   handleEmergencyCall,
-  handleQuickUpdate
+  onStatusUpdate
 }: AppContentProps) {
   const { refreshData } = useApp();
 
@@ -262,7 +262,7 @@ function AppContent({
         onNewRequest={handleNewRequest}
         onNewClient={handleNewClient}
         onEmergencyCall={handleEmergencyCall}
-        onStatusUpdate={handleStatusUpdate}
+        onStatusUpdate={onStatusUpdate}
       />
       
       {/* New Client Modal */}
