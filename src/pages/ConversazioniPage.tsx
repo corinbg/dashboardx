@@ -684,6 +684,7 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
             <div ref={messagesEndRef} />
           </div>
         </div>
+      )}
     </div>
   );
 }
