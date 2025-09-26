@@ -213,7 +213,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 
                 <button
                   onClick={handleNewClient}
-                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Users className="h-5 w-5 mb-2" />
                   <div className="text-sm font-medium">Aggiungi cliente</div>
@@ -229,7 +229,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 
                 <button
                   onClick={() => onTabChange('conversazioni')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Phone className="h-5 w-5 mb-2" />
                   <div className="text-sm font-medium">Apri conversazioni</div>
