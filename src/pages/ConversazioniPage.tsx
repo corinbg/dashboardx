@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTriangle, User, MapPin, MessageSquarePlus, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTriangle, User, MapPin, Filter, SlidersHorizontal } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useApp } from '../contexts/AppContext';
 import { ConversationCard } from '../components/Conversations/ConversationCard';
+import { getAllConversations, searchConversationsByPhone, getConversationMessages, ConversationWithLastMessage } from '../services/conversationsService';
 
 interface ConversazioniPageProps {
   initialPhoneNumber?: string | null;
@@ -38,8 +39,10 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
   const [clientSearchTerm, setClientSearchTerm] = useState('');
   const [filteredClients, setFilteredClients] = useState<any[]>([]);
   const [showClientDropdown, setShowClientDropdown] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [conversations, setConversations] = useState<ConversationWithLastMessage[]>([]);
+  const [filteredConversations, setFilteredConversations] = useState<ConversationWithLastMessage[]>([]);
   const [conversationData, setConversationData] = useState<ConversationData | null>(null);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +50,73 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'closed'>('all');
+  const [dateFilter, setDateFilter] = useState<'today' | 'last7days' | 'last30days' | 'all'>('all');
+
+  // Load all conversations on component mount
+  useEffect(() => {
+    const loadConversations = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const allConversations = await getAllConversations();
+        setConversations(allConversations);
+        applyFilters(allConversations, statusFilter, dateFilter);
+      } catch (err) {
+        console.error('Error loading conversations:', err);
+        setError(err instanceof Error ? err.message : 'Errore durante il caricamento delle conversazioni');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadConversations();
+  }, []);
+
+  // Apply filters when conversations or filter values change
+  const applyFilters = (conversationsList: ConversationWithLastMessage[], status: string, date: string) => {
+    let filtered = [...conversationsList];
+
+    // Status filter
+    if (status === 'open') {
+      filtered = filtered.filter(conv => !conv.is_closed);
+    } else if (status === 'closed') {
+      filtered = filtered.filter(conv => conv.is_closed);
+    }
+
+    // Date filter
+    if (date !== 'all') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      filtered = filtered.filter(conv => {
+        const updatedAt = new Date(conv.updated_at);
+        
+        switch (date) {
+          case 'today':
+            return updatedAt >= today;
+          case 'last7days':
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            return updatedAt >= sevenDaysAgo;
+          case 'last30days':
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            return updatedAt >= thirtyDaysAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
+    setFilteredConversations(filtered);
+  };
+
+  // Update filtered conversations when filters change
+  useEffect(() => {
+    applyFilters(conversations, statusFilter, dateFilter);
+  }, [conversations, statusFilter, dateFilter]);
 
   // Handle client search
   const handleClientSearch = (searchTerm: string) => {
@@ -79,8 +149,51 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
       setFilteredClients([]);
       setShowClientDropdown(false);
       
-      // Auto-search conversations for selected client
-      searchConversations(true, undefined, client.telefono);
+      // Auto-search conversations for selected client phone
+      handlePhoneSearch(client.telefono);
+    }
+  };
+
+  const handlePhoneSearch = async (phone?: string) => {
+    const searchPhone = phone || phoneNumber;
+    if (!searchPhone.trim()) {
+      setError('Inserisci un numero di telefono');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const phoneConversations = await searchConversationsByPhone(searchPhone.trim());
+      setConversations(phoneConversations);
+      applyFilters(phoneConversations, statusFilter, dateFilter);
+      
+      if (phoneConversations.length === 0) {
+        setError('Nessuna conversazione trovata per questo numero');
+      }
+    } catch (err) {
+      console.error('Error searching conversations:', err);
+      setError(err instanceof Error ? err.message : 'Errore durante la ricerca');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShowAllConversations = async () => {
+    setPhoneNumber('');
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const allConversations = await getAllConversations();
+      setConversations(allConversations);
+      applyFilters(allConversations, statusFilter, dateFilter);
+    } catch (err) {
+      console.error('Error loading all conversations:', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,10 +201,53 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
   useEffect(() => {
     if (initialPhoneNumber) {
       console.log(`🔄 Auto-searching conversations for: ${initialPhoneNumber}`);
-      searchConversations(true, undefined, initialPhoneNumber);
+      handlePhoneSearch(initialPhoneNumber);
       onPhoneNumberCleared?.();
     }
-  }, [initialPhoneNumber]);
+  }, [initialPhoneNumber, onPhoneNumberCleared]);
+
+  const handleConversationClick = async (conversation: ConversationWithLastMessage) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Load full conversation messages
+      const messages = await getConversationMessages(conversation.id);
+      
+      setConversationData({
+        conversation: {
+          id: conversation.id,
+          user_id: conversation.user_id,
+          started_at: conversation.started_at,
+          is_closed: conversation.is_closed
+        },
+        messages: messages.map(msg => ({
+          id: msg.id,
+          conversation_id: msg.conversation_id,
+          sender_type: msg.sender_type,
+          text_line: msg.text_line,
+          timestamp: msg.timestamp
+        })),
+        has_more: false,
+        all_conversations: conversations.map(conv => ({
+          id: conv.id,
+          user_id: conv.user_id,
+          started_at: conv.started_at,
+          is_closed: conv.is_closed
+        })),
+        has_previous_conversation: false
+      });
+      
+      setCurrentConversationId(conversation.id);
+      setShouldScrollToBottom(true);
+      
+    } catch (err) {
+      console.error('Error loading conversation messages:', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento dei messaggi');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -278,63 +434,34 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      searchConversations();
+      handlePhoneSearch();
     }
   };
 
-  const handleConversationChange = (conversationId: string) => {
+  const handleConversationChange = async (conversationId: string) => {
     if (conversationId !== currentConversationId) {
-      searchConversations(true, conversationId);
+      const conversation = conversations.find(c => c.id === conversationId);
+      if (conversation) {
+        await handleConversationClick(conversation);
+      }
     }
   };
 
-  const handleNewConversation = () => {
-    // TODO: Implementare modal per nuova conversazione
-    alert('Funzionalità in sviluppo: Nuova Conversazione');
+  const handleStatusFilterChange = (newStatus: 'all' | 'open' | 'closed') => {
+    setStatusFilter(newStatus);
   };
 
-  // Mock data for conversation list (will be replaced with real data)
-  const mockConversations = [
-    {
-      id: 'conv-1',
-      user_id: '+393201234567',
-      started_at: '2025-01-27T10:30:00Z',
-      is_closed: false,
-      lastMessage: {
-        text_line: 'Grazie per l\'aiuto, il problema è risolto!',
-        timestamp: '2025-01-27T15:45:00Z',
-        sender_type: 'Cliente' as const
-      },
-      clientName: 'Marco Rossi',
-      unreadCount: 2
-    },
-    {
-      id: 'conv-2', 
-      user_id: '+393339876543',
-      started_at: '2025-01-27T09:15:00Z',
-      is_closed: true,
-      lastMessage: {
-        text_line: 'Perfetto, ci sentiamo domani per l\'appuntamento.',
-        timestamp: '2025-01-27T14:20:00Z',
-        sender_type: 'Agente' as const
-      },
-      clientName: 'Anna Verdi',
-      unreadCount: 0
-    },
-    {
-      id: 'conv-3',
-      user_id: '+393475551234', 
-      started_at: '2025-01-27T08:00:00Z',
-      is_closed: false,
-      lastMessage: {
-        text_line: 'Quando può venire per il sopralluogo?',
-        timestamp: '2025-01-27T13:10:00Z',
-        sender_type: 'Cliente' as const
-      },
-      clientName: undefined,
-      unreadCount: 1
-    }
-  ];
+  const handleDateFilterChange = (newDate: 'today' | 'last7days' | 'last30days' | 'all') => {
+    setDateFilter(newDate);
+  };
+
+  const getStatusCounts = () => {
+    const open = conversations.filter(c => !c.is_closed).length;
+    const closed = conversations.filter(c => c.is_closed).length;
+    return { total: conversations.length, open, closed };
+  };
+
+  const statusCounts = getStatusCounts();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -361,15 +488,6 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
             >
               <SlidersHorizontal className="h-4 w-4 mr-2" />
               Filtri
-            </button>
-            
-            {/* New Conversation Button */}
-            <button
-              onClick={handleNewConversation}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
-            >
-              <MessageSquarePlus className="h-4 w-4 mr-2" />
-              Nuova Conversazione
             </button>
           </div>
         </div>
@@ -449,7 +567,7 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
                 </div>
                 
                 <button
-                  onClick={() => searchConversations()}
+                  onClick={() => handlePhoneSearch()}
                   disabled={loading}
                   className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
@@ -464,6 +582,14 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
                       Cerca
                     </>
                   )}
+                </button>
+                
+                <button
+                  onClick={handleShowAllConversations}
+                  disabled={loading}
+                  className="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Mostra Tutte
                 </button>
               </div>
             </div>
@@ -489,14 +615,35 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
                 Stato Conversazione
               </h3>
               <div className="space-y-2">
-                <button className="w-full text-left px-3 py-2 text-sm bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md font-medium">
-                  Tutte (12)
+                <button 
+                  onClick={() => handleStatusFilterChange('all')}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-md font-medium transition-colors ${
+                    statusFilter === 'all' 
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Tutte ({statusCounts.total})
                 </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
-                  🟢 Aperte (8)
+                <button 
+                  onClick={() => handleStatusFilterChange('open')}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                    statusFilter === 'open' 
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' 
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  🟢 Aperte ({statusCounts.open})
                 </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
-                  ⚪ Chiuse (4)
+                <button 
+                  onClick={() => handleStatusFilterChange('closed')}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                    statusFilter === 'closed' 
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' 
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  ⚪ Chiuse ({statusCounts.closed})
                 </button>
               </div>
             </div>
@@ -506,11 +653,15 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Data Ultima Attività
               </h3>
-              <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+              <select 
+                value={dateFilter} 
+                onChange={(e) => handleDateFilterChange(e.target.value as any)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="all">Tutte</option>
                 <option value="today">Oggi</option>
                 <option value="last7days">Ultimi 7 giorni</option>
                 <option value="last30days">Ultimi 30 giorni</option>
-                <option value="custom">Personalizzata</option>
               </select>
             </div>
           </div>
@@ -521,170 +672,180 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
             {/* Conversation List Header */}
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                Conversazioni Recenti
+                {phoneNumber ? `Conversazioni per ${phoneNumber}` : 'Conversazioni Recenti'}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {mockConversations.length} conversazioni trovate
+                {filteredConversations.length} conversazioni trovate
               </p>
             </div>
 
             {/* Conversation Cards List */}
-            <div className="space-y-4">
-              {mockConversations.map((conversation) => (
-                <ConversationCard
-                  key={conversation.id}
-                  conversation={{
-                    id: conversation.id,
-                    user_id: conversation.user_id,
-                    started_at: conversation.started_at,
-                    is_closed: conversation.is_closed
-                  }}
-                  lastMessage={conversation.lastMessage}
-                  clientName={conversation.clientName}
-                  phoneNumber={conversation.user_id}
-                  unreadCount={conversation.unreadCount}
-                  onClick={() => {
-                    // Set phone number and search for the specific conversation
-                    setPhoneNumber(conversation.user_id);
-                    searchConversations(true, conversation.id, conversation.user_id);
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Error */}
-            {error && (
-              <div className="mb-6 rounded-md bg-red-50 dark:bg-red-900/20 p-4">
-                <div className="flex">
-                  <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
-                  <div className="ml-3">
-                    <p className="text-sm text-red-800 dark:text-red-200">
-                      {error}
-                    </p>
-                  </div>
-                </div>
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
+                <span className="ml-2 text-gray-600 dark:text-gray-400">Caricamento conversazioni...</span>
               </div>
-            )}
-
-            {/* No Results */}
-            {conversationData && !conversationData.conversation && (
+            ) : filteredConversations.length > 0 ? (
+              <div className="space-y-4">
+                {filteredConversations.map((conversation) => (
+                  <ConversationCard
+                    key={conversation.id}
+                    conversation={{
+                      id: conversation.id,
+                      user_id: conversation.user_id,
+                      started_at: conversation.started_at,
+                      is_closed: conversation.is_closed
+                    }}
+                    lastMessage={conversation.lastMessage}
+                    clientName={conversation.clientName}
+                    phoneNumber={conversation.user_id}
+                    unreadCount={conversation.unreadCount}
+                    onClick={() => handleConversationClick(conversation)}
+                  />
+                ))}
+              </div>
+            ) : (
               <div className="text-center py-12">
                 <Users className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
                   Nessuna conversazione trovata
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Non ci sono conversazioni per questo numero di telefono.
+                  {phoneNumber 
+                    ? 'Non ci sono conversazioni per questo numero di telefono.' 
+                    : 'Non ci sono conversazioni che corrispondono ai filtri selezionati.'}
                 </p>
-              </div>
-            )}
-
-            {/* Chat Interface */}
-            {conversationData?.conversation && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                {/* Chat Header */}
-                <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                        {conversationData.conversation.user_id}
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
-                        <Clock className="h-3 w-3 mr-1" />
-                        Iniziata: {formatTimestamp(conversationData.conversation.started_at)}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        conversationData.conversation.is_closed
-                          ? 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
-                          : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
-                      }`}>
-                        {conversationData.conversation.is_closed ? 'Chiusa' : 'Attiva'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Conversation Selector */}
-                  {conversationData.all_conversations.length > 1 && (
-                    <div className="mt-4">
-                      <label htmlFor="conversation-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Seleziona conversazione:
-                      </label>
-                      <select
-                        id="conversation-select"
-                        value={currentConversationId || ''}
-                        onChange={(e) => handleConversationChange(e.target.value)}
-                        className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      >
-                        {conversationData.all_conversations.map((conv) => (
-                          <option key={conv.id} value={conv.id}>
-                            {formatTimestamp(conv.started_at)} - {conv.is_closed ? 'Chiusa' : 'Attiva'}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-
-                {/* Load More Button */}
-                {conversationData.has_more && (
-                  <div className="p-4 text-center border-b border-gray-200 dark:border-gray-600">
-                    <button
-                      onClick={loadMoreMessages}
-                      disabled={loadingMore}
-                      className="inline-flex items-center px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                    >
-                      {loadingMore ? (
-                        <>
-                          <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                          Caricamento...
-                        </>
-                      ) : (
-                        <>
-                          <ChevronUp className="h-4 w-4 mr-2" />
-                          Carica messaggi precedenti
-                        </>
-                      )}
-                    </button>
-                  </div>
+                {phoneNumber && (
+                  <button
+                    onClick={handleShowAllConversations}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
+                  >
+                    Mostra Tutte le Conversazioni
+                  </button>
                 )}
-
-                {/* Messages */}
-                <div 
-                  ref={messagesContainerRef}
-                  className="h-96 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-900"
-                >
-                  {conversationData.messages.map((message, index) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender_type === 'Agente' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-sm ${
-                          message.sender_type === 'Agente'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'
-                        }`}
-                      >
-                        <p className="text-sm whitespace-pre-wrap">{message.text_line}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.sender_type === 'Agente'
-                            ? 'text-blue-100'
-                            : 'text-gray-500 dark:text-gray-400'
-                        }`}>
-                          {formatTime(message.timestamp)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
               </div>
             )}
           </div>
         </div>
       </main>
+
+      {/* Error */}
+      {error && (
+        <div className="mb-6 rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+            <div className="flex">
+              <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
+              <div className="ml-3">
+                <p className="text-sm text-red-800 dark:text-red-200">
+                  {error}
+                </p>
+              </div>
+            </div>
+          </div>
+      )}
+
+      {/* Chat Interface */}
+      {conversationData?.conversation && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+          {/* Chat Header */}
+          <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  {conversationData.conversation.user_id}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Iniziata: {formatTimestamp(conversationData.conversation.started_at)}
+                </p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  conversationData.conversation.is_closed
+                    ? 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
+                    : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+                }`}>
+                  {conversationData.conversation.is_closed ? 'Chiusa' : 'Attiva'}
+                </span>
+              </div>
+            </div>
+            
+            {/* Conversation Selector */}
+            {conversationData.all_conversations.length > 1 && (
+              <div className="mt-4">
+                <label htmlFor="conversation-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Seleziona conversazione:
+                </label>
+                <select
+                  id="conversation-select"
+                  value={currentConversationId || ''}
+                  onChange={(e) => handleConversationChange(e.target.value)}
+                  className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  {conversationData.all_conversations.map((conv) => (
+                    <option key={conv.id} value={conv.id}>
+                      {formatTimestamp(conv.started_at)} - {conv.is_closed ? 'Chiusa' : 'Attiva'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Load More Button */}
+          {conversationData.has_more && (
+            <div className="p-4 text-center border-b border-gray-200 dark:border-gray-600">
+              <button
+                onClick={loadMoreMessages}
+                disabled={loadingMore}
+                className="inline-flex items-center px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                    Caricamento...
+                  </>
+                ) : (
+                  <>
+                    <ChevronUp className="h-4 w-4 mr-2" />
+                    Carica messaggi precedenti
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Messages */}
+          <div 
+            ref={messagesContainerRef}
+            className="h-96 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-900"
+          >
+            {conversationData.messages.map((message, index) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender_type === 'Agente' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-sm ${
+                    message.sender_type === 'Agente'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{message.text_line}</p>
+                  <p className={`text-xs mt-1 ${
+                    message.sender_type === 'Agente'
+                      ? 'text-blue-100'
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    {formatTime(message.timestamp)}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
