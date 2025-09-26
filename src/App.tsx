@@ -16,6 +16,7 @@ import EmailConfirmPage from './pages/EmailConfirmPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
+import { QuickCompleteTaskModal } from './components/Checklist/QuickCompleteTaskModal';
 import { createClient } from './services/clientsService';
 import { createRequest } from './services/requestsService';
 
@@ -32,6 +33,7 @@ function MainApp() {
   const [initialRequestId, setInitialRequestId] = useState<string | null>(null);
   const [newClientModalOpen, setNewClientModalOpen] = useState(false);
   const [newRequestModalOpen, setNewRequestModalOpen] = useState(false);
+  const [quickCompleteTaskModalOpen, setQuickCompleteTaskModalOpen] = useState(false);
 
   // Read request_id from URL on component mount
   useEffect(() => {
@@ -71,22 +73,7 @@ function MainApp() {
   };
 
   const handleStatusUpdate = () => {
-    // STATUS UPDATE: Redirect to requests page for better UX
-    // This approach is chosen because:
-    // 1. Avoids duplicating complex request filtering logic
-    // 2. Users can see all available filters and options
-    // 3. Maintains consistency with existing app navigation
-    // 4. Allows full request management capabilities
-    console.log('📊 Status update: Redirecting to requests page');
-    setActiveTab('richieste');
-    
-    // Optional: Show a brief hint to user about what they can do
-    setTimeout(() => {
-      const requestsContainer = document.querySelector('[role="main"]');
-      if (requestsContainer) {
-        requestsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
+    setQuickCompleteTaskModalOpen(true);
   };
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
@@ -136,6 +123,9 @@ function MainApp() {
         handleNewClient={handleNewClient}
         handleEmergencyCall={handleEmergencyCall}
         onStatusUpdate={handleStatusUpdate}
+        quickCompleteTaskModalOpen={quickCompleteTaskModalOpen}
+        setQuickCompleteTaskModalOpen={setQuickCompleteTaskModalOpen}
+        handleCompleteTask={handleCompleteTask}
       />
     </AppProvider>
   );
@@ -156,6 +146,9 @@ interface AppContentProps {
   handleNewClient: () => void;
   handleEmergencyCall: () => void;
   onStatusUpdate: () => void;
+  quickCompleteTaskModalOpen: boolean;
+  setQuickCompleteTaskModalOpen: (open: boolean) => void;
+  handleCompleteTask: () => void;
 }
 
 function AppContent({ 
@@ -173,6 +166,9 @@ function AppContent({
   handleNewClient,
   handleEmergencyCall,
   onStatusUpdate
+  quickCompleteTaskModalOpen,
+  setQuickCompleteTaskModalOpen,
+  handleCompleteTask
 }: AppContentProps) {
   const { refreshData } = useApp();
 
@@ -204,7 +200,14 @@ function AppContent({
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomePage onTabChange={setActiveTab} />;
+        return (
+          <HomePage 
+            onTabChange={setActiveTab} 
+            onNewRequest={handleNewRequest}
+            onNewClient={handleNewClient}
+            onCompleteTask={handleCompleteTask}
+          />
+        );
       case 'richieste':
         return (
           <RequestsPage 
@@ -212,6 +215,7 @@ function AppContent({
             setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
             initialRequestId={initialRequestId}
             onInitialRequestHandled={onInitialRequestHandled}
+            onNewRequest={handleNewRequest}
           />
         );
       case 'clienti':
