@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
+import { useApp } from './contexts/AppContext';
 import { AppProvider } from './contexts/AppContext';
 import { Navbar } from './components/Layout/Navbar';
 import { LoginForm } from './components/Auth/LoginForm';
