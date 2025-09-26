@@ -165,10 +165,10 @@ function AppContent({
   handleNewRequest,
   handleNewClient,
   handleEmergencyCall,
-  onStatusUpdate
+  onStatusUpdate,
   quickCompleteTaskModalOpen,
   setQuickCompleteTaskModalOpen,
-  handleCompleteTask
+  onCompleteTask
 }: AppContentProps) {
   const { refreshData } = useApp();
 
