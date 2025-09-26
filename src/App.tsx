@@ -125,7 +125,7 @@ function MainApp() {
         onStatusUpdate={handleStatusUpdate}
         quickCompleteTaskModalOpen={quickCompleteTaskModalOpen}
         setQuickCompleteTaskModalOpen={setQuickCompleteTaskModalOpen}
-        handleCompleteTask={handleCompleteTask}
+        onCompleteTask={handleCompleteTask}
       />
     </AppProvider>
   );
