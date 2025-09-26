@@ -62,13 +62,31 @@ function MainApp() {
   };
 
   const handleEmergencyCall = () => {
-    // Numero di emergenza idraulico
-    window.location.href = 'tel:+393401234567';
+    // EMERGENCY CALL: Direct dial to specified emergency number
+    // This works on both mobile and desktop browsers
+    // Mobile devices will open the phone app, desktop will prompt with default phone app
+    const emergencyNumber = '+393520845493';
+    console.log(`🚨 Emergency call initiated to: ${emergencyNumber}`);
+    window.location.href = `tel:${emergencyNumber}`;
   };
 
-  const handleQuickUpdate = () => {
-    // TODO: Implementare quick update modal
-    alert('Funzionalità in sviluppo: Aggiornamento Rapido');
+  const handleStatusUpdate = () => {
+    // STATUS UPDATE: Redirect to requests page for better UX
+    // This approach is chosen because:
+    // 1. Avoids duplicating complex request filtering logic
+    // 2. Users can see all available filters and options
+    // 3. Maintains consistency with existing app navigation
+    // 4. Allows full request management capabilities
+    console.log('📊 Status update: Redirecting to requests page');
+    setActiveTab('richieste');
+    
+    // Optional: Show a brief hint to user about what they can do
+    setTimeout(() => {
+      const requestsContainer = document.querySelector('[role="main"]');
+      if (requestsContainer) {
+        requestsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
@@ -244,7 +262,7 @@ function AppContent({
         onNewRequest={handleNewRequest}
         onNewClient={handleNewClient}
         onEmergencyCall={handleEmergencyCall}
-        onQuickUpdate={handleQuickUpdate}
+        onStatusUpdate={handleStatusUpdate}
       />
       
       {/* New Client Modal */}

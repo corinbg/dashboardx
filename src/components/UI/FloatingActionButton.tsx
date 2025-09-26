@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Phone, UserPlus, FileText, X, Wrench } from 'lucide-react';
+import { Plus, Phone, UserPlus, FileText, X, RefreshCw } from 'lucide-react';
 
 interface FABAction {
   icon: React.ReactNode;
@@ -12,21 +12,21 @@ interface FloatingActionButtonProps {
   onNewRequest: () => void;
   onNewClient: () => void;
   onEmergencyCall: () => void;
-  onQuickUpdate: () => void;
+  onStatusUpdate: () => void;
 }
 
 export function FloatingActionButton({
   onNewRequest,
   onNewClient,
   onEmergencyCall,
-  onQuickUpdate
+  onStatusUpdate
 }: FloatingActionButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const actions: FABAction[] = [
     {
       icon: <Phone className="h-5 w-5" />,
-      label: "Chiamata Emergenza",
+      label: "Chiamata Emergenza (+393520845493)",
       onClick: onEmergencyCall,
       color: "bg-red-600 hover:bg-red-700 text-white shadow-lg"
     },
@@ -43,9 +43,9 @@ export function FloatingActionButton({
       color: "bg-green-600 hover:bg-green-700 text-white shadow-lg"
     },
     {
-      icon: <Wrench className="h-5 w-5" />,
+      icon: <RefreshCw className="h-5 w-5" />,
       label: "Aggiorna Stato",
-      onClick: onQuickUpdate,
+      onClick: onStatusUpdate,
       color: "bg-orange-600 hover:bg-orange-700 text-white shadow-lg"
     }
   ];
@@ -55,7 +55,7 @@ export function FloatingActionButton({
       {/* Overlay per chiudere il menu */}
       {isExpanded && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-20 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-30 z-40"
           onClick={() => setIsExpanded(false)}
         />
       )}
@@ -65,11 +65,11 @@ export function FloatingActionButton({
         {isExpanded && actions.map((action, index) => (
           <div 
             key={index}
-            className="flex items-center space-x-3 animate-in slide-in-from-bottom-2 duration-200"
+            className="flex items-center justify-end space-x-3 animate-in slide-in-from-bottom-2 duration-200"
             style={{ animationDelay: `${index * 50}ms` }}
           >
-            {/* Label del pulsante (solo desktop) */}
-            <span className="hidden md:block bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+            {/* Label del pulsante - Migliorato per mobile */}
+            <span className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap max-w-xs break-words text-right backdrop-blur-sm bg-opacity-95 border border-gray-700">
               {action.label}
             </span>
             
@@ -78,7 +78,7 @@ export function FloatingActionButton({
                 action.onClick();
                 setIsExpanded(false);
               }}
-              className={`w-14 h-14 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-95 ${action.color}`}
+              className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-opacity-50 ${action.color}`}
               title={action.label}
               aria-label={action.label}
             >
@@ -90,7 +90,7 @@ export function FloatingActionButton({
         {/* Pulsante principale FAB */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className={`w-16 h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
+          className={`w-16 h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 ${
             isExpanded ? 'rotate-45' : ''
           }`}
           title={isExpanded ? "Chiudi menu" : "Azioni rapide"}
