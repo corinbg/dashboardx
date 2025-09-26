@@ -75,82 +75,93 @@ export function ChecklistPage() {
     })
   );
 
-  // Apply filters
-  const filteredItems = checklist.filter(item => {
-    // Search filter
-    if (searchTerm && !item.testo.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
-    
-    // Priority filter
-    if (priorityFilter !== 'all' && item.priorita !== priorityFilter) {
-      return false;
-    }
-    
-    // Category filter
-    if (categoryFilter !== 'all' && item.categoria !== categoryFilter) {
-      return false;
-    }
-    
-    // Date filter
-    if (dateFilter !== 'all') {
-      const hasDate = !!item.dataScadenza;
-      const dueDate = item.dataScadenza ? new Date(item.dataScadenza) : null;
-      const today = new Date();
-      const diffDays = dueDate ? Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24)) : null;
-      
-      switch (dateFilter) {
-        case 'overdue':
-          if (!hasDate || diffDays === null || diffDays >= 0) return false;
-          break;
-        case 'today':
-          if (!hasDate || diffDays !== 0) return false;
-          break;
-        case 'upcoming':
-          if (!hasDate || diffDays === null || diffDays <= 0) return false;
-          break;
-        case 'no-date':
-          if (hasDate) return false;
-          break;
+  // Apply filters with memoization to prevent unnecessary re-renders
+  const filteredItems = React.useMemo(() => {
+    return checklist.filter(item => {
+      // Search filter
+      if (searchTerm && !item.testo.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false;
       }
-    }
-    
-    // Status filter
-    if (statusFilter === 'completed' && !item.completata) return false;
-    if (statusFilter === 'pending' && item.completata) return false;
-    
-    return true;
-  });
+      
+      // Priority filter
+      if (priorityFilter !== 'all' && item.priorita !== priorityFilter) {
+        return false;
+      }
+      
+      // Category filter
+      if (categoryFilter !== 'all' && item.categoria !== categoryFilter) {
+        return false;
+      }
+      
+      // Date filter
+      if (dateFilter !== 'all') {
+        const hasDate = !!item.dataScadenza;
+        const dueDate = item.dataScadenza ? new Date(item.dataScadenza) : null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize to start of day for consistent comparison
+        const diffDays = dueDate ? Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24)) : null;
+        
+        switch (dateFilter) {
+          case 'overdue':
+            if (!hasDate || diffDays === null || diffDays >= 0) return false;
+            break;
+          case 'today':
+            if (!hasDate || diffDays !== 0) return false;
+            break;
+          case 'upcoming':
+            if (!hasDate || diffDays === null || diffDays <= 0) return false;
+            break;
+          case 'no-date':
+            if (hasDate) return false;
+            break;
+        }
+      }
+      
+      // Status filter
+      if (statusFilter === 'completed' && !item.completata) return false;
+      if (statusFilter === 'pending' && item.completata) return false;
+      
+      return true;
+    });
+  }, [checklist, searchTerm, priorityFilter, categoryFilter, dateFilter, statusFilter]);
 
-  // Sort items
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    // First by completion status
-    if (a.completata !== b.completata) {
-      return a.completata ? 1 : -1;
-    }
-    
-    // Then by priority
-    const priorityOrder = { 'alta': 0, 'media': 1, 'bassa': 2, 'none': 3 };
-    const aPriority = priorityOrder[a.priorita];
-    const bPriority = priorityOrder[b.priorita];
-    
-    if (aPriority !== bPriority) {
-      return aPriority - bPriority;
-    }
-    
-    // Then by due date
-    if (a.dataScadenza && b.dataScadenza) {
-      return new Date(a.dataScadenza).getTime() - new Date(b.dataScadenza).getTime();
-    }
-    if (a.dataScadenza && !b.dataScadenza) return -1;
-    if (!a.dataScadenza && b.dataScadenza) return 1;
-    
-    // Finally by order
-    return a.ordine - b.ordine;
-  });
+  // Sort items with memoization
+  const sortedItems = React.useMemo(() => {
+    return [...filteredItems].sort((a, b) => {
+      // First by completion status
+      if (a.completata !== b.completata) {
+        return a.completata ? 1 : -1;
+      }
+      
+      // Then by priority
+      const priorityOrder = { 'alta': 0, 'media': 1, 'bassa': 2, 'none': 3 };
+      const aPriority = priorityOrder[a.priorita];
+      const bPriority = priorityOrder[b.priorita];
+      
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+      
+      // Then by due date
+      if (a.dataScadenza && b.dataScadenza) {
+        return new Date(a.dataScadenza).getTime() - new Date(b.dataScadenza).getTime();
+      }
+      if (a.dataScadenza && !b.dataScadenza) return -1;
+      if (!a.dataScadenza && b.dataScadenza) return 1;
+      
+      // Finally by order
+      return a.ordine - b.ordine;
+    });
+  }, [filteredItems]);
 
-  const todoItems = sortedItems.filter(item => !item.completata);
-  const completedItems = sortedItems.filter(item => item.completata);
+  // Separate todo and completed items with memoization
+  const todoItems = React.useMemo(() => {
+    return sortedItems.filter(item => !item.completata);
+  }, [sortedItems]);
+
+  const completedItems = React.useMemo(() => {
+    return sortedItems.filter(item => item.completata);
+  }, [sortedItems]);
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
