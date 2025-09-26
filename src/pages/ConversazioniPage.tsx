@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTriangle, User, MapPin } from 'lucide-react';
+import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTriangle, User, MapPin, MessageSquarePlus, Filter, SlidersHorizontal } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useApp } from '../contexts/AppContext';
+import { ConversationCard } from '../components/Conversations/ConversationCard';
 
 interface ConversazioniPageProps {
   initialPhoneNumber?: string | null;
@@ -45,6 +46,7 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Handle client search
   const handleClientSearch = (searchTerm: string) => {
@@ -286,119 +288,272 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
     }
   };
 
+  const handleNewConversation = () => {
+    // TODO: Implementare modal per nuova conversazione
+    alert('Funzionalità in sviluppo: Nuova Conversazione');
+  };
+
+  // Mock data for conversation list (will be replaced with real data)
+  const mockConversations = [
+    {
+      id: 'conv-1',
+      user_id: '+393201234567',
+      started_at: '2025-01-27T10:30:00Z',
+      is_closed: false,
+      lastMessage: {
+        text_line: 'Grazie per l\'aiuto, il problema è risolto!',
+        timestamp: '2025-01-27T15:45:00Z',
+        sender_type: 'Cliente' as const
+      },
+      clientName: 'Marco Rossi',
+      unreadCount: 2
+    },
+    {
+      id: 'conv-2', 
+      user_id: '+393339876543',
+      started_at: '2025-01-27T09:15:00Z',
+      is_closed: true,
+      lastMessage: {
+        text_line: 'Perfetto, ci sentiamo domani per l\'appuntamento.',
+        timestamp: '2025-01-27T14:20:00Z',
+        sender_type: 'Agente' as const
+      },
+      clientName: 'Anna Verdi',
+      unreadCount: 0
+    },
+    {
+      id: 'conv-3',
+      user_id: '+393475551234', 
+      started_at: '2025-01-27T08:00:00Z',
+      is_closed: false,
+      lastMessage: {
+        text_line: 'Quando può venire per il sopralluogo?',
+        timestamp: '2025-01-27T13:10:00Z',
+        sender_type: 'Cliente' as const
+      },
+      clientName: undefined,
+      unreadCount: 1
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            <MessageCircle className="h-6 w-6 mr-2" aria-hidden="true" />
-            Conversazioni
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Cerca le conversazioni inserendo il numero di telefono del cliente
-          </p>
-        </div>
-
-        {/* Search */}
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
-          {/* Client Search */}
-          <div className="relative">
-            <label htmlFor="client-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Cerca Cliente
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-4 w-4 text-gray-400" aria-hidden="true" />
-              </div>
-              <input
-                id="client-search"
-                type="text"
-                placeholder="Nome, luogo, indirizzo..."
-                value={clientSearchTerm}
-                onChange={(e) => handleClientSearch(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                aria-label="Cerca cliente"
-              />
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                Conversazioni
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Gestisci le conversazioni con i clienti
+              </p>
             </div>
-            
-            {/* Client Dropdown */}
-            {showClientDropdown && filteredClients.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
-                {filteredClients.map((client) => (
-                  <button
-                    key={client.id}
-                    onClick={() => handleClientSelect(client)}
-                    className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:outline-none first:rounded-t-md last:rounded-b-md"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {client.nominativo || 'N/D'}
-                        </p>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-2">
-                          <span>{client.telefono || 'N/D'}</span>
-                          {client.luogo && (
-                            <>
-                              <span>•</span>
-                              <span className="flex items-center">
-                                <MapPin className="h-3 w-3 mr-1" />
-                                {client.luogo}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
           
-          {/* Phone Search */}
-          <div className="relative">
-            <label htmlFor="phone-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Cerca per Telefono
-            </label>
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Phone className="h-4 w-4 text-gray-400" aria-hidden="true" />
-            </div>
-            <input
-              id="phone-search"
-              type="text"
-              placeholder="Numero di telefono (es. 320 1234567)"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              aria-label="Numero di telefono"
-            />
-          </div>
-        </div>
-        
-        <div className="mb-8 max-w-md">
-          <div className="flex">
+          <div className="flex items-center space-x-3">
+            {/* Mobile Filters Toggle */}
             <button
-              onClick={() => searchConversations()}
-              disabled={loading}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+              className="md:hidden inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  Ricerca...
-                </>
-              ) : (
-                <>
-                  <Search className="h-4 w-4 mr-2" />
-                  Cerca
-                </>
-              )}
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              Filtri
+            </button>
+            
+            {/* New Conversation Button */}
+            <button
+              onClick={handleNewConversation}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
+            >
+              <MessageSquarePlus className="h-4 w-4 mr-2" />
+              Nuova Conversazione
             </button>
           </div>
         </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto flex flex-col md:flex-row min-h-screen">
+        {/* Left Sidebar - Filters & Quick Access */}
+        <div className={`md:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 ${mobileFiltersOpen ? 'block' : 'hidden md:block'}`}>
+          <div className="p-4 space-y-6">
+            {/* Search Section */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Cerca Cliente o Numero
+              </label>
+              <div className="space-y-4">
+                {/* Client Search */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Nome, luogo, indirizzo..."
+                    value={clientSearchTerm}
+                    onChange={(e) => handleClientSearch(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                  
+                  {/* Client Dropdown */}
+                  {showClientDropdown && filteredClients.length > 0 && (
+                    <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                      {filteredClients.map((client) => (
+                        <button
+                          key={client.id}
+                          onClick={() => handleClientSelect(client)}
+                          className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:outline-none first:rounded-t-md last:rounded-b-md"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                {client.nominativo || 'N/D'}
+                              </p>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-2">
+                                <span>{client.telefono || 'N/D'}</span>
+                                {client.luogo && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="flex items-center">
+                                      <MapPin className="h-3 w-3 mr-1" />
+                                      {client.luogo}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Phone Search */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Numero di telefono..."
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                
+                <button
+                  onClick={() => searchConversations()}
+                  disabled={loading}
+                  className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                      Ricerca...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-4 w-4 mr-2" />
+                      Cerca
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Access Section */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Accesso Rapido
+              </h3>
+              <div className="space-y-2">
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                  ⭐ Conversazioni Preferite
+                </button>
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                  🕒 Recenti
+                </button>
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Stato Conversazione
+              </h3>
+              <div className="space-y-2">
+                <button className="w-full text-left px-3 py-2 text-sm bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md font-medium">
+                  Tutte (12)
+                </button>
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                  🟢 Aperte (8)
+                </button>
+                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                  ⚪ Chiuse (4)
+                </button>
+              </div>
+            </div>
+
+            {/* Date Filter */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Data Ultima Attività
+              </h3>
+              <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                <option value="today">Oggi</option>
+                <option value="last7days">Ultimi 7 giorni</option>
+                <option value="last30days">Ultimi 30 giorni</option>
+                <option value="custom">Personalizzata</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        {/* Right Content Area - Conversation List */}
+        <div className="flex-1 bg-gray-50 dark:bg-gray-900">
+          <div className="p-4 sm:p-6">
+            {/* Conversation List Header */}
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                Conversazioni Recenti
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {mockConversations.length} conversazioni trovate
+              </p>
+            </div>
+
+            {/* Conversation Cards List */}
+            <div className="space-y-4">
+              {mockConversations.map((conversation) => (
+                <ConversationCard
+                  key={conversation.id}
+                  conversation={{
+                    id: conversation.id,
+                    user_id: conversation.user_id,
+                    started_at: conversation.started_at,
+                    is_closed: conversation.is_closed
+                  }}
+                  lastMessage={conversation.lastMessage}
+                  clientName={conversation.clientName}
+                  phoneNumber={conversation.user_id}
+                  unreadCount={conversation.unreadCount}
+                  onClick={() => {
+                    // Set phone number and search for the specific conversation
+                    setPhoneNumber(conversation.user_id);
+                    searchConversations(true, conversation.id, conversation.user_id);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
 
         {/* Error */}
         {error && (
