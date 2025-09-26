@@ -37,9 +37,9 @@ export async function createClient(client: Omit<Client, 'id' | 'user_id' | 'crea
     .from('clients')
     .select('id, telefono')
     .eq('telefono', client.telefono)
-    .single();
+    .maybeSingle();
 
-  if (checkError && checkError.code !== 'PGRST116') {
+  if (checkError) {
     console.error('Error checking for existing client:', checkError);
     return null;
   }
