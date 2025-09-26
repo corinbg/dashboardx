@@ -223,6 +223,13 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                     ) : (
                       <>
                         <CalendarCheck className="h-3 w-3 mr-1" />
+                        Contatta
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
             <div className="flex items-center flex-1">
               <span className="text-sm text-gray-600 dark:text-gray-300 mr-3 flex-1">
                 {request.Numero}
@@ -240,3 +247,9 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                 <Phone className="h-4 w-4" />
               </button>
             </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
