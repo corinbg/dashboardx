@@ -70,6 +70,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-3">
+            <div className="ml-6 flex items-baseline space-x-2">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 return (
@@ -80,21 +81,18 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                       activeTab === tab.id
                         ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''} whitespace-nowrap`}
                     disabled={tab.id === 'calendario'}
-                    title={tab.id === 'calendario' ? 'Funzionalità in arrivo' : tab.description}
+                    title={tab.id === 'calendario' ? 'Calendario - Funzionalità in arrivo' : tab.description}
                     aria-current={activeTab === tab.id ? 'page' : undefined}
                   >
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1.5">
                       <IconComponent 
-                        className="h-4 w-4" 
+                        className="h-3.5 w-3.5" 
                         aria-hidden="true"
                       />
                       <span>{tab.label}</span>
                     </div>
-                    {tab.id === 'calendario' && (
-                      <span className="ml-1 text-sm opacity-75">(in arrivo)</span>
-                    )}
                   </button>
                 );
               })}
@@ -165,16 +163,13 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                   disabled={tab.id === 'calendario'}
                   aria-current={activeTab === tab.id ? 'page' : undefined}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2.5">
                     <IconComponent 
-                      className="h-5 w-5" 
+                      className="h-4 w-4" 
                       aria-hidden="true"
                     />
                     <span>{tab.label}</span>
                   </div>
-                  {tab.id === 'calendario' && (
-                    <span className="ml-1 text-sm opacity-75">(in arrivo)</span>
-                  )}
                 </button>
               );
             })}

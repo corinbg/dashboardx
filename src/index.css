@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevenire overflow orizzontale su mobile */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Assicurare che gli elementi non eccedano la larghezza del viewport */
+* {
+  box-sizing: border-box;
+}
+
 /* Miglioramenti per leggibilità mobile e accessibilità */
 @layer base {
   /* Font size minimi per uso professionale mobile */
