@@ -69,37 +69,39 @@ export function HomePage({ onTabChange }: HomePageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-          <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-            <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/50 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 bg-orange-500 rounded-md"></div>
-            </div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              ImpresaPronta
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Dashboard
             </h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Panoramica generale dell'attività
+            </p>
           </div>
-          <button
-            onClick={handleNewRequest}
-            className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-6 py-3 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-          >
-            <Plus className="h-4 w-4 inline mr-2" />
-            Nuova richiesta
-          </button>
+          <div className="mt-4 sm:mt-0">
+            <button
+              onClick={handleNewRequest}
+              className="inline-flex items-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nuova richiesta
+            </button>
+          </div>
         </div>
 
         {/* Grid principale */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Colonna sinistra - Sezioni principali */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6">
             
             {/* Sezione Riepilogo */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Card Richieste */}
               <div 
                 onClick={() => onTabChange('richieste')}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-6 cursor-pointer transition-all transform hover:scale-[1.02] border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('richieste')}
@@ -124,7 +126,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
               {/* Card Clienti */}
               <div 
                 onClick={() => onTabChange('clienti')}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-6 cursor-pointer transition-all transform hover:scale-[1.02] border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('clienti')}
@@ -149,7 +151,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
               {/* Card Checklist */}
               <div 
                 onClick={() => onTabChange('checklist')}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-6 cursor-pointer transition-all transform hover:scale-[1.02] border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('checklist')}
@@ -163,7 +165,13 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Checklist</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Attività aperte oggi</span>
-                  <button className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 px-3 py-1 rounded-lg text-xs font-medium hover:bg-orange-200 dark:hover:bg-orange-900/70 transition-colors">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTabChange('checklist');
+                    }}
+                    className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 px-3 py-1 rounded-lg text-xs font-medium hover:bg-orange-200 dark:hover:bg-orange-900/70 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
                     Vai alla checklist
                   </button>
                 </div>
@@ -172,7 +180,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
               {/* Card Conversazioni */}
               <div 
                 onClick={() => onTabChange('conversazioni')}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-6 cursor-pointer transition-all transform hover:scale-[1.02] border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && onTabChange('conversazioni')}
@@ -192,12 +200,12 @@ export function HomePage({ onTabChange }: HomePageProps) {
             </div>
 
             {/* Azioni Rapide */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Azioni Rapide</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <button
                   onClick={handleNewRequest}
-                  className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Plus className="h-6 w-6 mb-2" />
                   <div className="font-medium">Aggiungi richiesta</div>
@@ -205,7 +213,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 
                 <button
                   onClick={handleNewClient}
-                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-xl p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Users className="h-6 w-6 mb-2" />
                   <div className="font-medium">Aggiungi cliente</div>
@@ -213,7 +221,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 
                 <button
                   onClick={handleCompleteTask}
-                  className="bg-green-500 hover:bg-green-600 text-white rounded-xl p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-green-500 hover:bg-green-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Check className="h-6 w-6 mb-2" />
                   <div className="font-medium">Segna attività completata</div>
@@ -221,7 +229,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 
                 <button
                   onClick={() => onTabChange('conversazioni')}
-                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-xl p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Phone className="h-6 w-6 mb-2" />
                   <div className="font-medium">Apri conversazioni</div>
@@ -234,7 +242,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
           <div className="space-y-6">
             
             {/* Agenda di Oggi */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900 dark:text-white">Agenda di Oggi</h3>
                 <Calendar className="h-5 w-5 text-orange-500" />
@@ -271,22 +279,22 @@ export function HomePage({ onTabChange }: HomePageProps) {
 
             {/* Statistiche Minime */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
                 <div className="text-3xl font-bold text-green-500 mb-1">18</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Completate settimana</div>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
                 <div className="text-3xl font-bold text-orange-500 mb-1">3</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Checklist oggi</div>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
                 <div className="text-3xl font-bold text-blue-500 mb-1">7</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Nuovi clienti mese</div>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center">
                   <div className="text-3xl font-bold text-green-500 mb-1">95%</div>
                   <TrendingUp className="h-4 w-4 text-green-500 ml-1" />
@@ -296,7 +304,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
             </div>
 
             {/* Ultimi Aggiornamenti */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Ultimi Aggiornamenti</h3>
               <div className="space-y-3">
                 {mockAggiornamenti.map((aggiornamento, index) => (
@@ -318,7 +326,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
