@@ -76,6 +76,10 @@ function MainApp() {
     setQuickCompleteTaskModalOpen(true);
   };
 
+  const handleCompleteTask = () => {
+    setQuickCompleteTaskModalOpen(true);
+  };
+
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
   if (isEmailConfirmRoute()) {
     console.log('📧 Rendering Email Confirmation Page');
