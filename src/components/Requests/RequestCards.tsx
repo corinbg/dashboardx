@@ -223,12 +223,22 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                     ) : (
                       <>
                         <CalendarCheck className="h-3 w-3 mr-1" />
-                        Contatta
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
+            <div className="flex items-center flex-1">
+              <span className="text-sm text-gray-600 dark:text-gray-300 mr-3 flex-1">
+                {request.Numero}
+              </span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleQuickCall(e, request.Numero);
+                }}
+                className="flex-shrink-0 p-2 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                title={`Chiama ${request.Numero}`}
+                aria-label={`Chiama ${request.Numero}`}
+              >
+                <Phone className="h-4 w-4" />
+              </button>
             </div>
           </div>
         );

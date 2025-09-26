@@ -238,13 +238,23 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                   {/* Phone */}
                   {visibleColumns.includes('phone') && (
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <button
-                        onClick={(e) => handleQuickCall(e, request.Numero)}
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                        title={`Chiama ${request.Numero}`}
-                      >
-                        {request.Numero}
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-900 dark:text-white">
+                          {request.Numero}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleQuickCall(e, request.Numero);
+                          }}
+                          className="flex-shrink-0 p-1.5 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                          title={`Chiama ${request.Numero}`}
+                          aria-label={`Chiama ${request.Numero}`}
+                        >
+                          <Phone className="h-3 w-3" />
+                        </button>
+                      </div>
                     </td>
                   )}
 
