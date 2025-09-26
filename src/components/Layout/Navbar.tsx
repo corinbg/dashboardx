@@ -61,7 +61,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
           {/* Logo */}
           <div className="flex-shrink-0">
             <img 
-              src="/Logo.png" 
+              src={darkMode ? "/Logo-dark.png" : "/Logo.png"} 
               alt="Logo Assistente Idraulico" 
               className="h-8 w-auto"
             />
