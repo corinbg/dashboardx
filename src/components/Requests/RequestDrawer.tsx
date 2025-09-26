@@ -115,10 +115,10 @@ export function RequestDrawer({
 
               <div className="flex items-center space-x-2">
                 <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                <div>
+                <div className="flex flex-col items-start">
                   <a 
                     href={`tel:${request.Numero}`}
-                    className="inline text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    className="inline-block text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {request.Numero}
