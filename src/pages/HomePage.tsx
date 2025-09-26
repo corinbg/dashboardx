@@ -17,9 +17,12 @@ import {
 
 interface HomePageProps {
   onTabChange: (tab: string) => void;
+  onNewRequest: () => void;
+  onNewClient: () => void;
+  onCompleteTask: () => void;
 }
 
-export function HomePage({ onTabChange }: HomePageProps) {
+export function HomePage({ onTabChange, onNewRequest, onNewClient, onCompleteTask }: HomePageProps) {
   const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
 
   // Update date and time every minute
@@ -70,21 +73,6 @@ export function HomePage({ onTabChange }: HomePageProps) {
     { tipo: 'richiesta', testo: 'Richiesta urgente da Giuseppe Bianchi', tempo: '2h fa' }
   ];
 
-  const handleNewRequest = () => {
-    // TODO: Implementare modal per nuova richiesta
-    alert('Funzionalità in sviluppo: Nuova Richiesta');
-  };
-
-  const handleNewClient = () => {
-    // TODO: Implementare modal per nuovo cliente  
-    alert('Funzionalità in sviluppo: Nuovo Cliente');
-  };
-
-  const handleCompleteTask = () => {
-    // TODO: Implementare quick complete task
-    alert('Funzionalità in sviluppo: Completa Attività');
-  };
-
   const getAggiornamentiIcon = (tipo: string) => {
     switch (tipo) {
       case 'richiesta': return <ClipboardList className="h-4 w-4" />;
@@ -118,15 +106,6 @@ export function HomePage({ onTabChange }: HomePageProps) {
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Panoramica generale dell'attività
             </p>
-          </div>
-          <div className="mt-4 sm:mt-0">
-            <button
-              onClick={handleNewRequest}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Nuova Richiesta
-            </button>
           </div>
         </div>
 
@@ -243,7 +222,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Azioni Rapide</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 <button
-                  onClick={handleNewRequest}
+                  onClick={onNewRequest}
                   className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Plus className="h-5 w-5 mb-2" />
@@ -251,7 +230,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 </button>
                 
                 <button
-                  onClick={handleNewClient}
+                  onClick={onNewClient}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Users className="h-5 w-5 mb-2" />
@@ -259,7 +238,7 @@ export function HomePage({ onTabChange }: HomePageProps) {
                 </button>
                 
                 <button
-                  onClick={handleCompleteTask}
+                  onClick={onCompleteTask}
                   className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Check className="h-5 w-5 mb-2" />

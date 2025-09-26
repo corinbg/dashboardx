@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { ViewMode, FilterState, UrgencyFilter, Request, DatePeriodFilter, Client } from '../types';
 import { useApp } from '../contexts/AppContext';
+import { Plus } from 'lucide-react';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { RequestsFilters } from '../components/Requests/RequestsFilters';
 import { RequestTable } from '../components/Requests/RequestTable';
@@ -17,13 +18,15 @@ interface RequestsPageProps {
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   initialRequestId?: string | null;
   onInitialRequestHandled?: () => void;
+  onNewRequest: () => void;
 }
 
 export function RequestsPage({ 
   onTabChange, 
   setConversationSearchPhoneNumber,
   initialRequestId,
-  onInitialRequestHandled
+  onInitialRequestHandled,
+  onNewRequest
 }: RequestsPageProps) {
   const { requests, clients, loading } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -326,6 +329,13 @@ export function RequestsPage({
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {filteredRequests.length} richiesta/e {getPeriodDescription()}
               </p>
+              <button
+                onClick={onNewRequest}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nuova Richiesta
+              </button>
             </div>
             <div className="mt-4 sm:mt-0">
               <ViewToggle view={viewMode} onViewChange={setViewMode} />

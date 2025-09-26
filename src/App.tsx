@@ -278,6 +278,12 @@ function AppContent({
         onClose={() => setNewRequestModalOpen(false)}
         onSave={handleCreateRequest}
       />
+      
+      {/* Quick Complete Task Modal */}
+      <QuickCompleteTaskModal
+        isOpen={quickCompleteTaskModalOpen}
+        onClose={() => setQuickCompleteTaskModalOpen(false)}
+      />
     </div>
   );
 }
