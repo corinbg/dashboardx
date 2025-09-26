@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, User, Phone, MapPin, Home, Loader2 } from 'lucide-react';
+import { X, User, MapPin, Home, Loader2 } from 'lucide-react';
 import { Client } from '../../types';
+import { PhoneInputWithCountryCode } from '../UI/PhoneInputWithCountryCode';
 
 interface NewClientModalProps {
   isOpen: boolean;
@@ -28,7 +29,7 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
     }
     if (!formData.telefono.trim()) {
       newErrors.telefono = 'Il telefono è obbligatorio';
-    } else if (!/^[\+]?[0-9\s\-\(\)]{7,15}$/.test(formData.telefono.trim())) {
+    } else if (!/^\+[0-9]{1,4}[0-9\s\-\(\)]{7,15}$/.test(formData.telefono.trim())) {
       newErrors.telefono = 'Formato telefono non valido';
     }
 
@@ -152,24 +153,16 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
               <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Telefono *
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                </div>
-                <input
-                  id="telefono"
-                  type="tel"
-                  value={formData.telefono}
-                  onChange={(e) => setFormData(prev => ({ ...prev, telefono: e.target.value }))}
-                  className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.telefono
-                      ? 'border-red-300 dark:border-red-600'
-                      : 'border-gray-300 dark:border-gray-600'
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100`}
-                  placeholder="+39 320 1234567"
-                  disabled={loading}
-                />
-              </div>
+              <PhoneInputWithCountryCode
+                id="telefono"
+                name="telefono"
+                value={formData.telefono}
+                onChange={(value) => setFormData(prev => ({ ...prev, telefono: value }))}
+                error={errors.telefono}
+                disabled={loading}
+                required
+                placeholder="320 1234567"
+              />
               {errors.telefono && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.telefono}</p>
               )}
