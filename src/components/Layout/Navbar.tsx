@@ -97,6 +97,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                 );
               })}
             </div>
+            </div>
           </div>
 
           {/* Right side controls */}
