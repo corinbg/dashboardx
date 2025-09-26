@@ -108,17 +108,7 @@ export function RequestDrawer({
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {request.Nome}
                     </p>
-                    {onViewClientProfile && request.Numero && (
-                      <button
-                        onClick={() => onViewClientProfile(request)}
-                        className="inline-flex items-center text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                        title="Visualizza profilo cliente"
-                      >
-                        Visualizza cliente
-                      </button>
-                    )}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Client</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Cliente</p>
                 </div>
               </div>
