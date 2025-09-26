@@ -23,7 +23,7 @@ export async function getRequests(): Promise<Request[]> {
     PreferenzaRicontatto: row['Preferenza Ricontatto'],
     richiestaAt: row.richiesta_at,
     stato: row.stato as Request['stato'],
-    spamFuoriZona: row.spam_fuori_zo,
+    spamFuoriZona: row.spam_fuori_zona,
   }));
 }
 
@@ -60,7 +60,7 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
       'Preferenza Ricontatto': request.PreferenzaRicontatto,
       richiesta_at: request.richiestaAt,
       stato: request.stato,
-      spam_fuori_zo: request.spamFuoriZona,
+      spam_fuori_zona: request.spamFuoriZona,
     })
     .select('id')
     .single();

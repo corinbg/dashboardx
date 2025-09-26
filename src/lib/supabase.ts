@@ -80,7 +80,7 @@ export type Database = {
           'Preferenza Ricontatto': string
           richiesta_at: string
           stato: 'Non letto' | 'Letto' | 'Contattato' | 'Completato'
-          spam_fuori_zo: boolean
+          spam_fuori_zona: boolean
         }
         Insert: {
           id?: string
@@ -92,7 +92,7 @@ export type Database = {
           'Preferenza Ricontatto': string
           richiesta_at?: string
           stato?: 'Non letto' | 'Letto' | 'Contattato' | 'Completato'
-          spam_fuori_zo?: boolean
+          spam_fuori_zona?: boolean
         }
         Update: {
           id?: string
@@ -104,7 +104,7 @@ export type Database = {
           'Preferenza Ricontatto'?: string
           richiesta_at?: string
           stato?: 'Non letto' | 'Letto' | 'Contattato' | 'Completato'
-          spam_fuori_zo?: boolean
+          spam_fuori_zona?: boolean
         }
       }
       clients: {
