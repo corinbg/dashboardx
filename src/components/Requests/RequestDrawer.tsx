@@ -123,27 +123,6 @@ export function RequestDrawer({
                     >
                       {request.Numero}
                     </a>
-                    <div className="flex items-center space-x-2">
-                      {onViewClientProfile && request.Numero && (
-                        <button
-                          onClick={() => onViewClientProfile(request)}
-                          className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          title="Visualizza profilo cliente"
-                        >
-                          Visualizza cliente
-                        </button>
-                      )}
-                      {request.Numero && setConversationSearchPhoneNumber && onTabChange && (
-                        <button
-                          onClick={handleViewConversations}
-                          className="inline-flex items-center text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/70 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
-                          title="Visualizza conversazioni con questo cliente"
-                        >
-                          <MessageCircle className="h-3 w-3 mr-1" />
-                          Conversazioni
-                        </button>
-                      )}
-                    </div>
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
                 </div>
@@ -227,6 +206,37 @@ export function RequestDrawer({
               <h3 className="text-sm font-medium text-gray-900 dark:text-white">
                 Azioni
               </h3>
+              
+              {/* Client Actions */}
+              <div className="space-y-2">
+                {onViewClientProfile && request.Numero && (
+                  <button
+                    onClick={() => onViewClientProfile(request)}
+                    className="w-full text-left px-3 py-2 text-sm rounded-md text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <div className="flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Visualizza profilo cliente
+                    </div>
+                  </button>
+                )}
+                
+                {request.Numero && setConversationSearchPhoneNumber && onTabChange && (
+                  <button
+                    onClick={handleViewConversations}
+                    className="w-full text-left px-3 py-2 text-sm rounded-md text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 border border-green-200 dark:border-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <div className="flex items-center">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Visualizza conversazioni
+                    </div>
+                  </button>
+                )}
+              </div>
+              
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 pt-2">
+                Stato richiesta
+              </h4>
               
               <div className="space-y-2">
                 {['Non letto', 'Letto', 'Contattato', 'Completato'].map((status) => (
