@@ -32,6 +32,24 @@ export async function createClient(client: Omit<Client, 'id' | 'user_id' | 'crea
     return null;
   }
 
+  // Check if client with this phone number already exists
+  const { data: existingClient, error: checkError } = await supabase
+    .from('clients')
+    .select('id, telefono')
+    .eq('telefono', client.telefono)
+    .single();
+
+  if (checkError && checkError.code !== 'PGRST116') {
+    console.error('Error checking for existing client:', checkError);
+    return null;
+  }
+
+  if (existingClient) {
+    console.log('Client with phone number already exists:', client.telefono);
+    // Return the existing client ID instead of creating a duplicate
+    return existingClient.id;
+  }
+
   const { data, error } = await supabase
     .from('clients')
     .insert({

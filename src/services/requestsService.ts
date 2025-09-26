@@ -61,7 +61,7 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
       richiesta_at: request.richiestaAt,
       stato: request.stato,
       spam_fuori_zona: request.spamFuoriZona,
-      user_id: request.Numero,
+      user_id: user.id,
     })
     .select('id')
     .single();

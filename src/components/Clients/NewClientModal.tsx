@@ -59,7 +59,12 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
       onClose();
     } catch (error) {
       console.error('Error creating client:', error);
-      setErrors({ general: 'Errore durante la creazione del cliente' });
+      // Check if it's a duplicate phone number error
+      if (error instanceof Error && error.message.includes('duplicate key value violates unique constraint')) {
+        setErrors({ telefono: 'Esiste già un cliente con questo numero di telefono' });
+      } else {
+        setErrors({ general: 'Errore durante la creazione del cliente' });
+      }
     } finally {
       setLoading(false);
     }
