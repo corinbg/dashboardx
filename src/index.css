@@ -38,6 +38,31 @@ html, body {
     min-height: 48px;
     min-width: 48px;
   }
+  
+  /* Prevent touch callout on mobile */
+  .no-callout {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Enhanced touch targets for mobile */
+  .mobile-touch-safe {
+    position: relative;
+    touch-action: manipulation;
+  }
+  
+  .mobile-touch-safe::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    z-index: -1;
+  }
 }
 
 /* Animazioni ridotte per utenti con preferenze di movimento */

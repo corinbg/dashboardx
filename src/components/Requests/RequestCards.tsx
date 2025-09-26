@@ -248,8 +248,3 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
               </button>
             </div>
           </div>
-        );
-      })}
-    </div>
-  );
-}

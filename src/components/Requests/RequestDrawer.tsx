@@ -203,7 +203,7 @@ export function RequestDrawer({
           </div>
 
           {/* Actions */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-3">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">
               Azioni
             </h3>
@@ -235,64 +235,67 @@ export function RequestDrawer({
               )}
             </div>
             
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 pt-2">
-              Aggiorna Stato
-            </h4>
-            
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { status: 'Non letto', color: 'red', icon: EyeOff, label: 'Non letto' },
-                { status: 'Letto', color: 'yellow', icon: Eye, label: 'Letto' },
-                { status: 'Contattato', color: 'blue', icon: PhoneCall, label: 'Contattato' },
-                { status: 'Completato', color: 'green', icon: CheckCircle2, label: 'Completato' }
-              ].map(({ status, color, icon: Icon, label }) => {
-                const isActive = request?.stato === status;
-                const isUpdating = updating === status;
-                
-                const colorClasses = {
-                  red: isActive 
-                    ? 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700' 
-                    : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40',
-                  yellow: isActive 
-                    ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-700' 
-                    : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-900/40',
-                  blue: isActive 
-                    ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700' 
-                    : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/40',
-                  green: isActive 
-                    ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700' 
-                    : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40'
-                };
+            {/* Status Update Section */}
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Aggiorna Stato
+              </h4>
+              
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { status: 'Non letto', color: 'red', icon: EyeOff, label: 'Non letto' },
+                  { status: 'Letto', color: 'yellow', icon: Eye, label: 'Letto' },
+                  { status: 'Contattato', color: 'blue', icon: PhoneCall, label: 'Contattato' },
+                  { status: 'Completato', color: 'green', icon: CheckCircle2, label: 'Completato' }
+                ].map(({ status, color, icon: Icon, label }) => {
+                  const isActive = request?.stato === status;
+                  const isUpdating = updating === status;
+                  
+                  const colorClasses = {
+                    red: isActive 
+                      ? 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700' 
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40',
+                    yellow: isActive 
+                      ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-700' 
+                      : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-900/40',
+                    blue: isActive 
+                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700' 
+                      : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/40',
+                    green: isActive 
+                      ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700' 
+                      : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40'
+                  };
 
-                return (
-                <button
-                  key={status as string}
-                  onClick={() => handleStatusUpdate(status as Request['stato'])}
-                  disabled={isActive || updating !== null}
-                  className={`relative px-3 py-3 text-xs font-medium rounded-lg border transition-all duration-200 ${
-                    isActive 
-                      ? `${colorClasses[color as keyof typeof colorClasses]} cursor-default ring-2 ring-opacity-50` 
-                      : isUpdating
-                      ? `${colorClasses[color as keyof typeof colorClasses]} opacity-75`
-                      : `${colorClasses[color as keyof typeof colorClasses]} focus:outline-none focus:ring-2 focus:ring-offset-2`
-                  } ${isActive ? 'ring-current' : ''}`}
-                >
-                  <div className="flex flex-col items-center space-y-1">
-                    {isUpdating ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    ) : (
-                      <Icon className="h-4 w-4" />
-                    )}
-                    <span className="text-center leading-tight">
-                      {label}
-                    </span>
-                    {isActive && (
-                      <div className="w-1 h-1 bg-current rounded-full"></div>
-                    )}
-                  </div>
-                </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={status as string}
+                      onClick={() => handleStatusUpdate(status as Request['stato'])}
+                      disabled={isActive || updating !== null}
+                      className={`relative px-3 py-3 text-xs font-medium rounded-lg border transition-all duration-200 touch-target ${
+                        isActive 
+                          ? `${colorClasses[color as keyof typeof colorClasses]} cursor-default ring-2 ring-opacity-50` 
+                          : isUpdating
+                          ? `${colorClasses[color as keyof typeof colorClasses]} opacity-75`
+                          : `${colorClasses[color as keyof typeof colorClasses]} focus:outline-none focus:ring-2 focus:ring-offset-2`
+                      } ${isActive ? 'ring-current' : ''}`}
+                    >
+                      <div className="flex flex-col items-center space-y-1">
+                        {isUpdating ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                        ) : (
+                          <Icon className="h-4 w-4" />
+                        )}
+                        <span className="text-center leading-tight">
+                          {label}
+                        </span>
+                        {isActive && (
+                          <div className="w-1 h-1 bg-current rounded-full"></div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
