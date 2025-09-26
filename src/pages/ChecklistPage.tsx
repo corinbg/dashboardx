@@ -166,33 +166,35 @@ export function ChecklistPage() {
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
+    console.log('🎯 handleDragEnd called:', { activeId: active.id, overId: over?.id });
+
     if (over && active.id !== over.id) {
       const oldIndex = todoItems.findIndex(item => item.id === active.id);
       const newIndex = todoItems.findIndex(item => item.id === over.id);
       
+      console.log('📊 Drag indices:', { oldIndex, newIndex, totalTodoItems: todoItems.length });
+      
       if (oldIndex !== -1 && newIndex !== -1) {
         const reorderedItems = arrayMove(todoItems, oldIndex, newIndex);
         
-        console.log('🔄 Riordinamento elementi:', { oldIndex, newIndex });
+        console.log('🔄 Items after reorder:', reorderedItems.map(item => ({ id: item.id, text: item.testo.substring(0, 30) })));
         
-        // 🚀 AGGIORNAMENTO OTTIMISTICO - Aggiorna immediatamente la UI
+        // 🚀 AGGIORNAMENTO OTTIMISTICO - Ricostruisce completamente la checklist
+        const reorderedTodoItemsMap = new Map(reorderedItems.map((item, index) => [item.id, { ...item, ordine: index }]));
+        
         const updatedChecklist = checklist.map(item => {
-          // Trova l'elemento nel nuovo ordine
-          const newOrderIndex = reorderedItems.findIndex(reordered => reordered.id === item.id);
-          
-          // Se l'elemento è stato riordinato (è nei todoItems), aggiorna il suo ordine
-          if (newOrderIndex !== -1) {
-            return { ...item, ordine: newOrderIndex };
+          // Se è un todo item riordinato, usa la nuova posizione
+          if (reorderedTodoItemsMap.has(item.id)) {
+            return reorderedTodoItemsMap.get(item.id)!;
           }
-          
-          // Altrimenti lascia l'elemento invariato
+          // Altrimenti mantieni l'elemento invariato
           return item;
         });
         
-        // ⚡ Aggiorna IMMEDIATAMENTE lo stato locale - questo elimina lo "snap back"
-        setChecklist(updatedChecklist);
+        console.log('⚡ Updating checklist optimistically');
+        console.log('📝 New order:', updatedChecklist.filter(item => !item.completata).map(item => ({ id: item.id, ordine: item.ordine, text: item.testo.substring(0, 20) })));
         
-        console.log('⚡ UI aggiornata ottimisticamente');
+        setChecklist(updatedChecklist);
         
         // Prepara gli aggiornamenti dell'ordine per il database
         const orderUpdates = reorderedItems.map((item, index) => ({
@@ -200,26 +202,29 @@ export function ChecklistPage() {
           ordine: index
         }));
         
+        console.log('💾 Preparing database updates:', orderUpdates);
+
         try {
           // 💾 Salva nel database (in background)
           const success = await updateChecklistItemOrder(orderUpdates);
           
           if (success) {
             console.log('✅ Ordine salvato nel database con successo');
-            // 🎯 Non chiamiamo refreshData() perché l'UI è già aggiornata ottimisticamente
           } else {
             console.error('❌ Errore nell\'aggiornamento dell\'ordine nel database');
-            // 🔄 Ripristina lo stato precedente solo in caso di errore
+            console.log('🔄 Ripristino stato precedente a causa di errore database');
             await refreshData();
             alert('Errore nel salvataggio dell\'ordine. Ordine ripristinato.');
           }
         } catch (error) {
           console.error('❌ Errore nel riordinamento:', error);
-          // 🔄 Ripristina lo stato precedente in caso di errore di rete
+          console.log('🔄 Ripristino stato precedente a causa di errore di rete');
           await refreshData();
           alert('Errore nel riordinamento delle attività. Ordine ripristinato.');
         }
       }
+    } else {
+      console.log('❌ Drag cancelled or invalid:', { activeId: active.id, overId: over?.id });
     }
   };
 
