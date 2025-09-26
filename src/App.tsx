@@ -26,7 +26,6 @@ function isEmailConfirmRoute(): boolean {
 
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
-  const { refreshData } = useApp();
   const [activeTab, setActiveTab] = useState('home');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
   const [initialRequestId, setInitialRequestId] = useState<string | null>(null);
@@ -71,31 +70,6 @@ function MainApp() {
     alert('Funzionalità in sviluppo: Aggiornamento Rapido');
   };
 
-  const handleCreateClient = async (clientData: any) => {
-    const result = await createClient(clientData);
-    if (result) {
-      await refreshData();
-    } else {
-      throw new Error('Failed to create client');
-    }
-  };
-
-  const handleCreateRequest = async (requestData: any) => {
-    // Add current timestamp and spam flag
-    const requestWithTimestamp = {
-      ...requestData,
-      richiestaAt: new Date().toISOString(),
-      spamFuoriZona: false
-    };
-    
-    const result = await createRequest(requestWithTimestamp);
-    if (result) {
-      await refreshData();
-    } else {
-      throw new Error('Failed to create request');
-    }
-  };
-
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
   if (isEmailConfirmRoute()) {
     console.log('📧 Rendering Email Confirmation Page');
@@ -135,24 +109,14 @@ function MainApp() {
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
         initialRequestId={initialRequestId}
         onInitialRequestHandled={clearInitialRequestId}
+        newClientModalOpen={newClientModalOpen}
+        setNewClientModalOpen={setNewClientModalOpen}
+        newRequestModalOpen={newRequestModalOpen}
+        setNewRequestModalOpen={setNewRequestModalOpen}
         handleNewRequest={handleNewRequest}
         handleNewClient={handleNewClient}
         handleEmergencyCall={handleEmergencyCall}
         handleQuickUpdate={handleQuickUpdate}
-      />
-      
-      {/* New Client Modal */}
-      <NewClientModal
-        isOpen={newClientModalOpen}
-        onClose={() => setNewClientModalOpen(false)}
-        onSave={handleCreateClient}
-      />
-      
-      {/* New Request Modal */}
-      <NewRequestModal
-        isOpen={newRequestModalOpen}
-        onClose={() => setNewRequestModalOpen(false)}
-        onSave={handleCreateRequest}
       />
     </AppProvider>
   );
@@ -165,6 +129,10 @@ interface AppContentProps {
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   initialRequestId: string | null;
   onInitialRequestHandled: () => void;
+  newClientModalOpen: boolean;
+  setNewClientModalOpen: (open: boolean) => void;
+  newRequestModalOpen: boolean;
+  setNewRequestModalOpen: (open: boolean) => void;
   handleNewRequest: () => void;
   handleNewClient: () => void;
   handleEmergencyCall: () => void;
@@ -178,11 +146,42 @@ function AppContent({
   setConversationSearchPhoneNumber,
   initialRequestId,
   onInitialRequestHandled,
+  newClientModalOpen,
+  setNewClientModalOpen,
+  newRequestModalOpen,
+  setNewRequestModalOpen,
   handleNewRequest,
   handleNewClient,
   handleEmergencyCall,
   handleQuickUpdate
 }: AppContentProps) {
+  const { refreshData } = useApp();
+
+  const handleCreateClient = async (clientData: any) => {
+    const result = await createClient(clientData);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to create client');
+    }
+  };
+
+  const handleCreateRequest = async (requestData: any) => {
+    // Add current timestamp and spam flag
+    const requestWithTimestamp = {
+      ...requestData,
+      richiestaAt: new Date().toISOString(),
+      spamFuoriZona: false
+    };
+    
+    const result = await createRequest(requestWithTimestamp);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to create request');
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -245,6 +244,20 @@ function AppContent({
         onNewClient={handleNewClient}
         onEmergencyCall={handleEmergencyCall}
         onQuickUpdate={handleQuickUpdate}
+      />
+      
+      {/* New Client Modal */}
+      <NewClientModal
+        isOpen={newClientModalOpen}
+        onClose={() => setNewClientModalOpen(false)}
+        onSave={handleCreateClient}
+      />
+      
+      {/* New Request Modal */}
+      <NewRequestModal
+        isOpen={newRequestModalOpen}
+        onClose={() => setNewRequestModalOpen(false)}
+        onSave={handleCreateRequest}
       />
     </div>
   );
