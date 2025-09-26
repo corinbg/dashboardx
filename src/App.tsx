@@ -13,6 +13,10 @@ import { ConversazioniPage } from './pages/ConversazioniPage';
 import { HomePage } from './pages/HomePage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
+import { NewClientModal } from './components/Clients/NewClientModal';
+import { NewRequestModal } from './components/Requests/NewRequestModal';
+import { createClient } from './services/clientsService';
+import { createRequest } from './services/requestsService';
 
 // Funzione per controllare se siamo sulla route di conferma email
 function isEmailConfirmRoute(): boolean {
@@ -22,9 +26,12 @@ function isEmailConfirmRoute(): boolean {
 
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
+  const { refreshData } = useApp();
   const [activeTab, setActiveTab] = useState('home');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
   const [initialRequestId, setInitialRequestId] = useState<string | null>(null);
+  const [newClientModalOpen, setNewClientModalOpen] = useState(false);
+  const [newRequestModalOpen, setNewRequestModalOpen] = useState(false);
 
   // Read request_id from URL on component mount
   useEffect(() => {
@@ -47,13 +54,11 @@ function MainApp() {
 
   // Handlers per FAB
   const handleNewRequest = () => {
-    // TODO: Implementare modal per nuova richiesta
-    alert('Funzionalità in sviluppo: Nuova Richiesta');
+    setNewRequestModalOpen(true);
   };
 
   const handleNewClient = () => {
-    // TODO: Implementare modal per nuovo cliente  
-    alert('Funzionalità in sviluppo: Nuovo Cliente');
+    setNewClientModalOpen(true);
   };
 
   const handleEmergencyCall = () => {
@@ -64,6 +69,31 @@ function MainApp() {
   const handleQuickUpdate = () => {
     // TODO: Implementare quick update modal
     alert('Funzionalità in sviluppo: Aggiornamento Rapido');
+  };
+
+  const handleCreateClient = async (clientData: any) => {
+    const result = await createClient(clientData);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to create client');
+    }
+  };
+
+  const handleCreateRequest = async (requestData: any) => {
+    // Add current timestamp and spam flag
+    const requestWithTimestamp = {
+      ...requestData,
+      richiestaAt: new Date().toISOString(),
+      spamFuoriZona: false
+    };
+    
+    const result = await createRequest(requestWithTimestamp);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to create request');
+    }
   };
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
@@ -109,6 +139,20 @@ function MainApp() {
         handleNewClient={handleNewClient}
         handleEmergencyCall={handleEmergencyCall}
         handleQuickUpdate={handleQuickUpdate}
+      />
+      
+      {/* New Client Modal */}
+      <NewClientModal
+        isOpen={newClientModalOpen}
+        onClose={() => setNewClientModalOpen(false)}
+        onSave={handleCreateClient}
+      />
+      
+      {/* New Request Modal */}
+      <NewRequestModal
+        isOpen={newRequestModalOpen}
+        onClose={() => setNewRequestModalOpen(false)}
+        onSave={handleCreateRequest}
       />
     </AppProvider>
   );
