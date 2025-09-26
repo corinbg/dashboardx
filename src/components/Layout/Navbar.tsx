@@ -60,9 +60,11 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Assistente Idraulico
-            </h1>
+            <img 
+              src="/Logo.png" 
+              alt="Logo Assistente Idraulico" 
+              className="h-8 w-auto"
+            />
           </div>
 
           {/* Desktop Navigation */}
