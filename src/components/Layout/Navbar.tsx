@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle } from 'lucide-react';
+import { Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -28,16 +28,16 @@ const tabs = [
     description: 'Lista attività da completare'
   },
   { 
-    id: 'calendario', 
-    label: 'Calendario', 
-    icon: Calendar,
-    description: 'Gestione appuntamenti'
-  },
-  { 
     id: 'conversazioni', 
     label: 'Conversazioni', 
     icon: MessageCircle,
     description: 'Chat e messaggi clienti'
+  },
+  { 
+    id: 'calendario', 
+    label: 'Calendario', 
+    icon: Calendar,
+    description: 'Gestione appuntamenti'
   }
 ];
 
@@ -69,7 +69,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="ml-10 flex items-baseline space-x-3">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 return (
@@ -103,19 +103,6 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
 
           {/* Right side controls */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="hidden sm:block relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
-              </div>
-              <input
-                type="search"
-                placeholder="Cerca in tutto il sito..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                aria-label="Ricerca globale"
-              />
-            </div>
-
             {/* Dark mode toggle */}
             <button
               onClick={toggleDarkMode}
@@ -191,20 +178,6 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                 </button>
               );
             })}
-            {/* Mobile search */}
-            <div className="px-3 py-2">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                </div>
-                <input
-                  type="search"
-                  placeholder="Cerca in tutto il sito..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  aria-label="Ricerca globale"
-                />
-              </div>
-            </div>
           </div>
         </div>
       )}
