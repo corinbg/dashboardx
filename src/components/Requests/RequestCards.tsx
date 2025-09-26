@@ -240,9 +240,3 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                 <Phone className="h-4 w-4" />
               </button>
             </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
