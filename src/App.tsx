@@ -209,7 +209,7 @@ function AppContent({
             onTabChange={setActiveTab} 
             onNewRequest={handleNewRequest}
             onNewClient={handleNewClient}
-            onCompleteTask={handleCompleteTask}
+           onCompleteTask={onCompleteTask}
           />
         );
       case 'richieste':
@@ -244,6 +244,9 @@ function AppContent({
         return (
           <HomePage 
             onTabChange={setActiveTab}
+           onNewRequest={handleNewRequest}
+           onNewClient={handleNewClient}
+           onCompleteTask={onCompleteTask}
           />
         );
     }
