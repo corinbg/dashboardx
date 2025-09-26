@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle } from 'lucide-react';
+import { Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle, Home } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -9,6 +9,12 @@ interface NavbarProps {
 }
 
 const tabs = [
+  { 
+    id: 'home', 
+    label: 'Home', 
+    icon: Home,
+    description: 'Dashboard principale'
+  },
   { 
     id: 'richieste', 
     label: 'Richieste', 
@@ -60,17 +66,13 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <button
-              onClick={() => onTabChange('home')}
-              className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
-              title="Torna alla dashboard principale"
-            >
+            <div className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
               <img 
                 src={darkMode ? "/Logo-dark.png" : "/Logo.png"} 
                 alt="Logo Assistente Idraulico" 
                 className="h-8 w-auto"
               />
-            </button>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
