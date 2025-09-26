@@ -2,13 +2,19 @@ import { supabase } from '../lib/supabase';
 import { ChecklistItem } from '../types';
 
 export async function getChecklistItems(): Promise<ChecklistItem[]> {
+  console.log('🔍 getChecklistItems: Starting to fetch checklist items');
+  
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
-    console.error('User not authenticated');
+    console.error('❌ getChecklistItems: User not authenticated');
     return [];
   }
 
+  console.log('✅ getChecklistItems: User authenticated:', {
+    userId: user.id,
+    userEmail: user.email
+  });
   const { data, error } = await supabase
     .from('checklist_items')
     .select(`
@@ -30,12 +36,22 @@ export async function getChecklistItems(): Promise<ChecklistItem[]> {
     .order('ordine', { ascending: true })
     .order('created_at', { ascending: true });
 
+  console.log('📊 getChecklistItems: Supabase query result:', {
+    dataLength: data?.length || 0,
+    error: error,
+    rawData: data
+  });
   if (error) {
-    console.error('Error fetching checklist items:', error);
+    console.error('❌ getChecklistItems: Error fetching checklist items:', {
+      error,
+      errorMessage: error.message,
+      errorCode: error.code,
+      userId: user.id
+    });
     return [];
   }
 
-  return data.map(row => ({
+  const mappedItems = data.map(row => ({
     id: row.id,
     testo: row.testo,
     completata: row.completata,
@@ -50,6 +66,19 @@ export async function getChecklistItems(): Promise<ChecklistItem[]> {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }));
+
+  console.log('🎯 getChecklistItems: Successfully mapped items:', {
+    totalItems: mappedItems.length,
+    completedItems: mappedItems.filter(item => item.completata).length,
+    pendingItems: mappedItems.filter(item => !item.completata).length,
+    itemsSample: mappedItems.slice(0, 3).map(item => ({
+      id: item.id,
+      testo: item.testo,
+      completata: item.completata,
+      ordine: item.ordine
+    }))
+  });
+  return mappedItems;
 }
 
 export async function createChecklistItem(text: string): Promise<string | null> {
