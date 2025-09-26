@@ -22,7 +22,7 @@ function isEmailConfirmRoute(): boolean {
 
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState('richieste');
+  const [activeTab, setActiveTab] = useState('home');
   const [conversationSearchPhoneNumber, setConversationSearchPhoneNumber] = useState<string | null>(null);
   const [initialRequestId, setInitialRequestId] = useState<string | null>(null);
 
@@ -172,9 +172,8 @@ function AppContent({
         );
       default:
         return (
-          <RequestsPage 
+          <HomePage 
             onTabChange={setActiveTab}
-            setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
           />
         );
     }
