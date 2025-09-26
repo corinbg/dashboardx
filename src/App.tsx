@@ -140,6 +140,8 @@ function AppContent({
 }: AppContentProps) {
   const renderContent = () => {
     switch (activeTab) {
+      case 'home':
+        return <HomePage onTabChange={setActiveTab} />;
       case 'richieste':
         return (
           <RequestsPage 
