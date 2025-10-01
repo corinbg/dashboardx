@@ -16,7 +16,7 @@ import EmailConfirmPage from './pages/EmailConfirmPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
-import { QuickCompleteTaskModal } from './components/Checklist/QuickCompleteTaskModal';
+import { QuickStatusUpdateModal } from './components/Requests/QuickStatusUpdateModal';
 import { createClient } from './services/clientsService';
 import { createRequest } from './services/requestsService';
 
@@ -33,7 +33,7 @@ function MainApp() {
   const [initialRequestId, setInitialRequestId] = useState<string | null>(null);
   const [newClientModalOpen, setNewClientModalOpen] = useState(false);
   const [newRequestModalOpen, setNewRequestModalOpen] = useState(false);
-  const [quickCompleteTaskModalOpen, setQuickCompleteTaskModalOpen] = useState(false);
+  const [quickStatusUpdateModalOpen, setQuickStatusUpdateModalOpen] = useState(false);
 
   // Read request_id from URL on component mount
   useEffect(() => {
@@ -73,11 +73,7 @@ function MainApp() {
   };
 
   const handleStatusUpdate = () => {
-    setQuickCompleteTaskModalOpen(true);
-  };
-
-  const handleCompleteTask = () => {
-    setQuickCompleteTaskModalOpen(true);
+    setQuickStatusUpdateModalOpen(true);
   };
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
@@ -127,9 +123,8 @@ function MainApp() {
         handleNewClient={handleNewClient}
         handleEmergencyCall={handleEmergencyCall}
         onStatusUpdate={handleStatusUpdate}
-        quickCompleteTaskModalOpen={quickCompleteTaskModalOpen}
-        setQuickCompleteTaskModalOpen={setQuickCompleteTaskModalOpen}
-        onCompleteTask={handleCompleteTask}
+        quickStatusUpdateModalOpen={quickStatusUpdateModalOpen}
+        setQuickStatusUpdateModalOpen={setQuickStatusUpdateModalOpen}
       />
     </AppProvider>
   );
@@ -150,9 +145,8 @@ interface AppContentProps {
   handleNewClient: () => void;
   handleEmergencyCall: () => void;
   onStatusUpdate: () => void;
-  quickCompleteTaskModalOpen: boolean;
-  setQuickCompleteTaskModalOpen: (open: boolean) => void;
-  handleCompleteTask: () => void;
+  quickStatusUpdateModalOpen: boolean;
+  setQuickStatusUpdateModalOpen: (open: boolean) => void;
 }
 
 function AppContent({ 
@@ -170,9 +164,8 @@ function AppContent({
   handleNewClient,
   handleEmergencyCall,
   onStatusUpdate,
-  quickCompleteTaskModalOpen,
-  setQuickCompleteTaskModalOpen,
-  onCompleteTask
+  quickStatusUpdateModalOpen,
+  setQuickStatusUpdateModalOpen
 }: AppContentProps) {
   const { refreshData } = useApp();
 
@@ -205,11 +198,10 @@ function AppContent({
     switch (activeTab) {
       case 'home':
         return (
-          <HomePage 
-            onTabChange={setActiveTab} 
+          <HomePage
+            onTabChange={setActiveTab}
             onNewRequest={handleNewRequest}
             onNewClient={handleNewClient}
-           onCompleteTask={onCompleteTask}
           />
         );
       case 'richieste':
@@ -242,11 +234,10 @@ function AppContent({
         );
       default:
         return (
-          <HomePage 
+          <HomePage
             onTabChange={setActiveTab}
            onNewRequest={handleNewRequest}
            onNewClient={handleNewClient}
-           onCompleteTask={onCompleteTask}
           />
         );
     }
@@ -290,10 +281,10 @@ function AppContent({
         onSave={handleCreateRequest}
       />
       
-      {/* Quick Complete Task Modal */}
-      <QuickCompleteTaskModal
-        isOpen={quickCompleteTaskModalOpen}
-        onClose={() => setQuickCompleteTaskModalOpen(false)}
+      {/* Quick Status Update Modal */}
+      <QuickStatusUpdateModal
+        isOpen={quickStatusUpdateModalOpen}
+        onClose={() => setQuickStatusUpdateModalOpen(false)}
       />
     </div>
   );

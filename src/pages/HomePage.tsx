@@ -19,10 +19,9 @@ interface HomePageProps {
   onTabChange: (tab: string) => void;
   onNewRequest: () => void;
   onNewClient: () => void;
-  onCompleteTask: () => void;
 }
 
-export function HomePage({ onTabChange, onNewRequest, onNewClient, onCompleteTask }: HomePageProps) {
+export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePageProps) {
   const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
 
   // Update date and time every minute
@@ -238,11 +237,11 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient, onCompleteTas
                 </button>
                 
                 <button
-                  onClick={onCompleteTask}
+                  onClick={() => onTabChange('checklist')}
                   className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
-                  <Check className="h-5 w-5 mb-2" />
-                  <div className="text-sm font-medium">Completa attività</div>
+                  <CheckSquare className="h-5 w-5 mb-2" />
+                  <div className="text-sm font-medium">Vai a checklist</div>
                 </button>
                 
                 <button

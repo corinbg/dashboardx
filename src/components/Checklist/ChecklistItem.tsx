@@ -151,7 +151,6 @@ export function ChecklistItemComponent({
       </div>
 
       <button
-        onClick={handleToggle}
         onClick={(e) => {
           e.stopPropagation();
           handleToggle();

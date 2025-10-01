@@ -44,7 +44,7 @@ export function FloatingActionButton({
     },
     {
       icon: <RefreshCw className="h-5 w-5" />,
-      label: "Aggiorna Stato",
+      label: "Aggiorna Stato Richieste",
       onClick: onStatusUpdate,
       color: "bg-orange-600 hover:bg-orange-700 text-white shadow-lg"
     }
