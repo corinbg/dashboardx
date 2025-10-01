@@ -217,10 +217,12 @@ export function RequestsPage({
     // Search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = 
+      const matchesSearch =
         request.Nome.toLowerCase().includes(searchLower) ||
         request.Numero.toLowerCase().includes(searchLower) ||
-        request.Luogo.toLowerCase().includes(searchLower) ||
+        (request.comune && request.comune.toLowerCase().includes(searchLower)) ||
+        (request.Indirizzo && request.Indirizzo.toLowerCase().includes(searchLower)) ||
+        (request.Luogo && request.Luogo.toLowerCase().includes(searchLower)) ||
         request.Problema.toLowerCase().includes(searchLower);
       if (!matchesSearch) return false;
     }
