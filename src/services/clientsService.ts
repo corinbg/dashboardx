@@ -16,7 +16,7 @@ export async function getClients(): Promise<Client[]> {
     id: row.id,
     nominativo: row.nominativo,
     telefono: row.telefono,
-    luogo: row.luogo,
+    citta: row['Città'],
     indirizzo: row.indirizzo,
     user_id: row.user_id,
     created_at: row.created_at,
@@ -55,7 +55,7 @@ export async function createClient(client: Omit<Client, 'id' | 'user_id' | 'crea
     .insert({
       nominativo: client.nominativo,
       telefono: client.telefono,
-      luogo: client.luogo,
+      'Città': client.citta,
       indirizzo: client.indirizzo,
       user_id: client.telefono,
     })
@@ -73,9 +73,9 @@ export async function createClient(client: Omit<Client, 'id' | 'user_id' | 'crea
 export async function getUniqueCities(): Promise<string[]> {
   const { data, error } = await supabase
     .from('clients')
-    .select('luogo')
-    .not('luogo', 'is', null)
-    .order('luogo');
+    .select('Città')
+    .not('Città', 'is', null)
+    .order('Città');
 
   if (error) {
     console.error('Error fetching cities:', error);
@@ -83,7 +83,7 @@ export async function getUniqueCities(): Promise<string[]> {
   }
 
   // Get unique cities
-  const cities = [...new Set(data.map(row => row.luogo).filter(Boolean))];
+  const cities = [...new Set(data.map(row => row['Città']).filter(Boolean))];
   return cities;
 }
 
@@ -93,7 +93,7 @@ export async function updateClient(id: string, updates: Partial<Omit<Client, 'id
     .update({
       nominativo: updates.nominativo,
       telefono: updates.telefono,
-      luogo: updates.luogo,
+      'Città': updates.citta,
       indirizzo: updates.indirizzo,
       updated_at: new Date().toISOString(),
     })
