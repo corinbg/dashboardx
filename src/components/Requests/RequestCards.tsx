@@ -140,9 +140,9 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
             <div className="flex items-start mb-2 group">
               <MapPin className="h-4 w-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0" aria-hidden="true" />
               <div className="flex-1 min-w-0">
-                {request.Citta && (
+                {request.comune && (
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {request.Citta}
+                    {request.comune}
                   </p>
                 )}
                 {request.Indirizzo && (
@@ -150,14 +150,14 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                     {request.Indirizzo}
                   </p>
                 )}
-                {!request.Citta && !request.Indirizzo && request.Luogo && (
+                {!request.comune && !request.Indirizzo && request.Luogo && (
                   <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
                     {request.Luogo}
                   </p>
                 )}
               </div>
               <button
-                onClick={(e) => handleQuickNavigate(e, `${request.Citta || ''} ${request.Indirizzo || request.Luogo || ''}`)}
+                onClick={(e) => handleQuickNavigate(e, `${request.comune || ''} ${request.Indirizzo || request.Luogo || ''}`)}
                 className="ml-2 p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400 rounded opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-green-500"
                 title="Naviga verso indirizzo"
               >

@@ -14,7 +14,7 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
   const [formData, setFormData] = useState({
     nominativo: '',
     telefono: '',
-    citta: '',
+    comune: '',
     indirizzo: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,7 +44,7 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
       await onSave({
         nominativo: formData.nominativo.trim(),
         telefono: formData.telefono.trim(),
-        citta: formData.citta.trim() || null,
+        comune: formData.comune.trim() || null,
         indirizzo: formData.indirizzo.trim() || null,
       });
       
@@ -52,7 +52,7 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
       setFormData({
         nominativo: '',
         telefono: '',
-        citta: '',
+        comune: '',
         indirizzo: '',
       });
       setErrors({});
@@ -75,7 +75,7 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
       setFormData({
         nominativo: '',
         telefono: '',
-        citta: '',
+        comune: '',
         indirizzo: '',
       });
       setErrors({});
@@ -173,20 +173,20 @@ export function NewClientModal({ isOpen, onClose, onSave }: NewClientModalProps)
               )}
             </div>
 
-            {/* Città */}
+            {/* Comune */}
             <div>
-              <label htmlFor="citta" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Città
+              <label htmlFor="comune" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Comune
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <MapPin className="h-4 w-4 text-gray-400" aria-hidden="true" />
                 </div>
                 <input
-                  id="citta"
+                  id="comune"
                   type="text"
-                  value={formData.citta}
-                  onChange={(e) => setFormData(prev => ({ ...prev, citta: e.target.value }))}
+                  value={formData.comune}
+                  onChange={(e) => setFormData(prev => ({ ...prev, comune: e.target.value }))}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   placeholder="Milano"
                   disabled={loading}

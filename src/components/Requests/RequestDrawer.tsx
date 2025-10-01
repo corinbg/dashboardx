@@ -130,9 +130,9 @@ export function RequestDrawer({
               <div className="flex items-start space-x-2">
                 <MapPin className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
                 <div className="flex-1">
-                  {request.Citta && (
+                  {request.comune && (
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {request.Citta}
+                      {request.comune}
                     </p>
                   )}
                   {request.Indirizzo && (
@@ -140,7 +140,7 @@ export function RequestDrawer({
                       {request.Indirizzo}
                     </p>
                   )}
-                  {!request.Citta && !request.Indirizzo && request.Luogo && (
+                  {!request.comune && !request.Indirizzo && request.Luogo && (
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {request.Luogo}
                     </p>

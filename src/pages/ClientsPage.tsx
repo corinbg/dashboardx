@@ -59,9 +59,9 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
     // City filter
     if (cityFilter !== 'all') {
       if (cityFilter === 'no-city') {
-        if (client.citta) return false;
+        if (client.comune) return false;
       } else {
-        if (client.citta !== cityFilter) return false;
+        if (client.comune !== cityFilter) return false;
       }
     }
 
@@ -218,7 +218,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
               {/* City Filter */}
               <div>
                 <label htmlFor="city-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Città
+                  Comune
                 </label>
                 <select
                   id="city-filter"
@@ -226,8 +226,8 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                   onChange={(e) => setCityFilter(e.target.value)}
                   className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
-                  <option value="all">Tutte le città</option>
-                  <option value="no-city">Senza città</option>
+                  <option value="all">Tutti i comuni</option>
+                  <option value="no-city">Senza comune</option>
                   {uniqueCities.map(city => (
                     <option key={city} value={city}>{city}</option>
                   ))}
@@ -360,10 +360,10 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                        {client.citta || client.indirizzo ? (
+                        {client.comune || client.indirizzo ? (
                           <div>
-                            {client.citta && (
-                              <div className="font-medium text-gray-900 dark:text-white">{client.citta}</div>
+                            {client.comune && (
+                              <div className="font-medium text-gray-900 dark:text-white">{client.comune}</div>
                             )}
                             {client.indirizzo && (
                               <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{client.indirizzo}</div>
@@ -475,13 +475,13 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                   </div>
 
                   {/* Location */}
-                  {(client.citta || client.indirizzo) && (
+                  {(client.comune || client.indirizzo) && (
                     <div className="flex items-start mb-2">
                       <MapPin className="h-4 w-4 text-gray-400 mr-2 mt-0.5" aria-hidden="true" />
                       <div className="flex-1 min-w-0">
-                        {client.citta && (
+                        {client.comune && (
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {client.citta}
+                            {client.comune}
                           </p>
                         )}
                         {client.indirizzo && (

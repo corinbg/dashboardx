@@ -122,13 +122,13 @@ export function ClientProfile({
                       </div>
                     </div>
 
-                    {(client.citta || client.indirizzo) && (
+                    {(client.comune || client.indirizzo) && (
                       <div className="flex items-start space-x-2">
                         <MapPin className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
                         <div className="flex-1">
-                          {client.citta && (
+                          {client.comune && (
                             <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {client.citta}
+                              {client.comune}
                             </p>
                           )}
                           {client.indirizzo && (
@@ -197,12 +197,12 @@ export function ClientProfile({
                         <div className="flex items-start space-x-2">
                           <FileText className="h-4 w-4 text-gray-400 mt-0.5" aria-hidden="true" />
                           <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {(request.Citta || request.Indirizzo || request.Luogo) && (
+                            {(request.comune || request.Indirizzo || request.Luogo) && (
                               <div className="mb-1">
                                 <span className="font-medium">Luogo:</span>{' '}
-                                {request.Citta && <span>{request.Citta}</span>}
+                                {request.comune && <span>{request.comune}</span>}
                                 {request.Indirizzo && <span className="text-xs">, {request.Indirizzo}</span>}
-                                {!request.Citta && !request.Indirizzo && request.Luogo && <span>{request.Luogo}</span>}
+                                {!request.comune && !request.Indirizzo && request.Luogo && <span>{request.Luogo}</span>}
                               </div>
                             )}
                             <div>

@@ -324,7 +324,7 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                         <Phone className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={(e) => handleQuickNavigate(e, `${request.Citta || ''} ${request.Indirizzo || request.Luogo || ''}`)}
+                        onClick={(e) => handleQuickNavigate(e, `${request.comune || ''} ${request.Indirizzo || request.Luogo || ''}`)}
                         className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 p-1 hover:bg-green-100 dark:hover:bg-green-900/50 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                         title="Naviga verso indirizzo"
                       >

@@ -32,7 +32,7 @@ export interface Client {
   id: string;
   nominativo: string | null;
   telefono: string | null;
-  citta: string | null;
+  comune: string | null;
   indirizzo: string | null;
   user_id: string;
   created_at: string | null;
@@ -42,7 +42,7 @@ export interface Client {
 export interface Request {
   id: string;
   Nome: string;
-  Citta?: string;
+  comune?: string;
   Indirizzo?: string;
   Luogo?: string;
   Problema: string;
