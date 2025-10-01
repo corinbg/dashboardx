@@ -59,9 +59,9 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
     // City filter
     if (cityFilter !== 'all') {
       if (cityFilter === 'no-city') {
-        if (client.luogo) return false;
+        if (client.citta) return false;
       } else {
-        if (client.luogo !== cityFilter) return false;
+        if (client.citta !== cityFilter) return false;
       }
     }
 
@@ -320,9 +320,6 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                       Luogo
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Indirizzo
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Richieste totali
                     </th>
                     <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -362,11 +359,19 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                           'N/A'
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {client.luogo || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                        {client.indirizzo || 'N/A'}
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        {client.citta || client.indirizzo ? (
+                          <div>
+                            {client.citta && (
+                              <div className="font-medium text-gray-900 dark:text-white">{client.citta}</div>
+                            )}
+                            {client.indirizzo && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{client.indirizzo}</div>
+                            )}
+                          </div>
+                        ) : (
+                          'N/A'
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold shadow-sm ${
@@ -470,22 +475,21 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
                   </div>
 
                   {/* Location */}
-                  {client.luogo && (
-                    <div className="flex items-center mb-2">
-                      <MapPin className="h-4 w-4 text-gray-400 mr-2" aria-hidden="true" />
-                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                        {client.luogo}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Address */}
-                  {client.indirizzo && (
-                    <div className="flex items-start">
-                      <Home className="h-4 w-4 text-gray-400 mr-2 mt-0.5" aria-hidden="true" />
-                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                        {client.indirizzo}
-                      </p>
+                  {(client.citta || client.indirizzo) && (
+                    <div className="flex items-start mb-2">
+                      <MapPin className="h-4 w-4 text-gray-400 mr-2 mt-0.5" aria-hidden="true" />
+                      <div className="flex-1 min-w-0">
+                        {client.citta && (
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            {client.citta}
+                          </p>
+                        )}
+                        {client.indirizzo && (
+                          <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5 line-clamp-2">
+                            {client.indirizzo}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   )}
 
