@@ -221,9 +221,9 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                   {visibleColumns.includes('location') && (
                     <td className="px-4 py-4">
                       <div className="flex flex-col">
-                        {request.Citta && (
+                        {request.comune && (
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {request.Citta}
+                            {request.comune}
                           </div>
                         )}
                         {request.Indirizzo && (
@@ -231,7 +231,7 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                             {request.Indirizzo}
                           </div>
                         )}
-                        {!request.Citta && !request.Indirizzo && request.Luogo && (
+                        {!request.comune && !request.Indirizzo && request.Luogo && (
                           <div className="text-sm text-gray-900 dark:text-white truncate max-w-xs" title={request.Luogo}>
                             {request.Luogo}
                           </div>
