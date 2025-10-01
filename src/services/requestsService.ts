@@ -16,6 +16,8 @@ export async function getRequests(): Promise<Request[]> {
   return data.map(row => ({
     id: row.id,
     Nome: row.Nome,
+    Citta: row['Città'],
+    Indirizzo: row.Indirizzo,
     Luogo: row.Luogo,
     Problema: row.Problema,
     Urgenza: row.Urgenza,
@@ -53,7 +55,8 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
     .from('requests')
     .insert({
       Nome: request.Nome,
-      Luogo: request.Luogo,
+      'Città': request.Citta,
+      Indirizzo: request.Indirizzo,
       Problema: request.Problema,
       Urgenza: request.Urgenza,
       Numero: request.Numero,

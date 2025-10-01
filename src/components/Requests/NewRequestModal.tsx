@@ -14,7 +14,8 @@ export function NewRequestModal({ isOpen, onClose, onSave }: NewRequestModalProp
   const [formData, setFormData] = useState({
     Nome: '',
     Numero: '',
-    Luogo: '',
+    Citta: '',
+    Indirizzo: '',
     Problema: '',
     PreferenzaRicontatto: '',
     Urgenza: false,
@@ -35,8 +36,8 @@ export function NewRequestModal({ isOpen, onClose, onSave }: NewRequestModalProp
     } else if (!/^\+[0-9]{1,4}[0-9\s\-\(\)]{7,15}$/.test(formData.Numero.trim())) {
       newErrors.Numero = 'Formato telefono non valido';
     }
-    if (!formData.Luogo.trim()) {
-      newErrors.Luogo = 'Il luogo è obbligatorio';
+    if (!formData.Citta.trim()) {
+      newErrors.Citta = 'La città è obbligatoria';
     }
     if (!formData.Problema.trim()) {
       newErrors.Problema = 'Il tipo di problema è obbligatorio';
@@ -53,7 +54,8 @@ export function NewRequestModal({ isOpen, onClose, onSave }: NewRequestModalProp
       await onSave({
         Nome: formData.Nome.trim(),
         Numero: formData.Numero.trim(),
-        Luogo: formData.Luogo.trim(),
+        Citta: formData.Citta.trim(),
+        Indirizzo: formData.Indirizzo.trim(),
         Problema: formData.Problema.trim(),
         PreferenzaRicontatto: formData.PreferenzaRicontatto.trim() || 'Non specificato',
         Urgenza: formData.Urgenza,
@@ -64,7 +66,8 @@ export function NewRequestModal({ isOpen, onClose, onSave }: NewRequestModalProp
       setFormData({
         Nome: '',
         Numero: '',
-        Luogo: '',
+        Citta: '',
+        Indirizzo: '',
         Problema: '',
         PreferenzaRicontatto: '',
         Urgenza: false,
@@ -85,7 +88,8 @@ export function NewRequestModal({ isOpen, onClose, onSave }: NewRequestModalProp
       setFormData({
         Nome: '',
         Numero: '',
-        Luogo: '',
+        Citta: '',
+        Indirizzo: '',
         Problema: '',
         PreferenzaRicontatto: '',
         Urgenza: false,
@@ -186,32 +190,53 @@ export function NewRequestModal({ isOpen, onClose, onSave }: NewRequestModalProp
               )}
             </div>
 
-            {/* Luogo */}
+            {/* Città */}
             <div>
-              <label htmlFor="luogo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Luogo/Indirizzo *
+              <label htmlFor="citta" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Città *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <MapPin className="h-4 w-4 text-gray-400" aria-hidden="true" />
                 </div>
                 <input
-                  id="luogo"
+                  id="citta"
                   type="text"
-                  value={formData.Luogo}
-                  onChange={(e) => setFormData(prev => ({ ...prev, Luogo: e.target.value }))}
+                  value={formData.Citta}
+                  onChange={(e) => setFormData(prev => ({ ...prev, Citta: e.target.value }))}
                   className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.Luogo
+                    errors.Citta
                       ? 'border-red-300 dark:border-red-600'
                       : 'border-gray-300 dark:border-gray-600'
                   } bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100`}
-                  placeholder="Via Roma 123, Milano"
+                  placeholder="Milano"
                   disabled={loading}
                 />
               </div>
-              {errors.Luogo && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.Luogo}</p>
+              {errors.Citta && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.Citta}</p>
               )}
+            </div>
+
+            {/* Indirizzo */}
+            <div>
+              <label htmlFor="indirizzo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Indirizzo
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MapPin className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                </div>
+                <input
+                  id="indirizzo"
+                  type="text"
+                  value={formData.Indirizzo}
+                  onChange={(e) => setFormData(prev => ({ ...prev, Indirizzo: e.target.value }))}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder="Via Roma 123"
+                  disabled={loading}
+                />
+              </div>
             </div>
 
             {/* Tipo Problema */}

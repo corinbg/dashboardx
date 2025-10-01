@@ -220,8 +220,22 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                   {/* Location */}
                   {visibleColumns.includes('location') && (
                     <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900 dark:text-white truncate max-w-xs" title={request.Luogo}>
-                        {request.Luogo}
+                      <div className="flex flex-col">
+                        {request.Citta && (
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {request.Citta}
+                          </div>
+                        )}
+                        {request.Indirizzo && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs" title={request.Indirizzo}>
+                            {request.Indirizzo}
+                          </div>
+                        )}
+                        {!request.Citta && !request.Indirizzo && request.Luogo && (
+                          <div className="text-sm text-gray-900 dark:text-white truncate max-w-xs" title={request.Luogo}>
+                            {request.Luogo}
+                          </div>
+                        )}
                       </div>
                     </td>
                   )}
@@ -310,7 +324,7 @@ export function RequestTable({ requests, onRequestClick, selectedIndex, onSelect
                         <Phone className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={(e) => handleQuickNavigate(e, request.Luogo)}
+                        onClick={(e) => handleQuickNavigate(e, `${request.Citta || ''} ${request.Indirizzo || request.Luogo || ''}`)}
                         className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 p-1 hover:bg-green-100 dark:hover:bg-green-900/50 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                         title="Naviga verso indirizzo"
                       >

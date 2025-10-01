@@ -129,11 +129,23 @@ export function RequestDrawer({
 
               <div className="flex items-start space-x-2">
                 <MapPin className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {request.Luogo}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Indirizzo</p>
+                <div className="flex-1">
+                  {request.Citta && (
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {request.Citta}
+                    </p>
+                  )}
+                  {request.Indirizzo && (
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">
+                      {request.Indirizzo}
+                    </p>
+                  )}
+                  {!request.Citta && !request.Indirizzo && request.Luogo && (
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {request.Luogo}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Indirizzo</p>
                 </div>
               </div>
             </div>

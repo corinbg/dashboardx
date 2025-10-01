@@ -42,7 +42,9 @@ export interface Client {
 export interface Request {
   id: string;
   Nome: string;
-  Luogo: string;
+  Citta?: string;
+  Indirizzo?: string;
+  Luogo?: string;
   Problema: string;
   Urgenza: boolean;
   Numero: string;
