@@ -102,6 +102,7 @@ export function Footer() {
                       onClick={() => {
                         const event = new CustomEvent('footer-nav', { detail: { tab: link.id } });
                         window.dispatchEvent(event);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                     >
