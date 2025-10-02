@@ -493,7 +493,7 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto flex flex-col md:flex-row min-h-screen">
+      <main className="max-w-7xl mx-auto flex flex-col md:flex-row min-h-screen pb-24">
         {/* Left Sidebar - Filters & Quick Access */}
         <div className={`md:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 ${mobileFiltersOpen ? 'block' : 'hidden md:block'}`}>
           <div className="p-4 space-y-6">

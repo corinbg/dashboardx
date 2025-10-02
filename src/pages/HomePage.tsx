@@ -83,7 +83,7 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
         {/* Header Standard */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
