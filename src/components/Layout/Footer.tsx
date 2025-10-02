@@ -65,7 +65,7 @@ export function Footer() {
               />
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              La soluzione professionale per la gestione completa del tuo business idraulico.
+              La soluzione professionale per la gestione completa del tuo business.
               Organizza richieste, clienti e attività in un unico posto.
             </p>
             <div className="flex space-x-4">
