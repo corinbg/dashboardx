@@ -5,6 +5,7 @@ import { useAuth } from './contexts/AuthContext';
 import { useApp } from './contexts/AppContext';
 import { AppProvider } from './contexts/AppContext';
 import { Navbar } from './components/Layout/Navbar';
+import { Footer } from './components/Layout/Footer';
 import { LoginForm } from './components/Auth/LoginForm';
 import { RequestsPage } from './pages/RequestsPage';
 import { ClientsPage } from './pages/ClientsPage';
@@ -149,10 +150,10 @@ interface AppContentProps {
   setQuickStatusUpdateModalOpen: (open: boolean) => void;
 }
 
-function AppContent({ 
-  activeTab, 
-  setActiveTab, 
-  conversationSearchPhoneNumber, 
+function AppContent({
+  activeTab,
+  setActiveTab,
+  conversationSearchPhoneNumber,
   setConversationSearchPhoneNumber,
   initialRequestId,
   onInitialRequestHandled,
@@ -168,6 +169,15 @@ function AppContent({
   setQuickStatusUpdateModalOpen
 }: AppContentProps) {
   const { refreshData } = useApp();
+
+  React.useEffect(() => {
+    const handleFooterNav = (event: CustomEvent) => {
+      setActiveTab(event.detail.tab);
+    };
+
+    window.addEventListener('footer-nav', handleFooterNav as EventListener);
+    return () => window.removeEventListener('footer-nav', handleFooterNav as EventListener);
+  }, [setActiveTab]);
 
   const handleCreateClient = async (clientData: any) => {
     const result = await createClient(clientData);
@@ -244,7 +254,7 @@ function AppContent({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Skip to content link for accessibility */}
       <a
         href="#main-content"
@@ -254,11 +264,13 @@ function AppContent({
       </a>
 
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      <div id="main-content" role="main">
+
+      <div id="main-content" role="main" className="flex-grow">
         {renderContent()}
       </div>
-      
+
+      <Footer />
+
       {/* FAB - Solo se autenticato e non in pagina di login */}
       <FloatingActionButton
         onNewRequest={handleNewRequest}
@@ -266,21 +278,21 @@ function AppContent({
         onEmergencyCall={handleEmergencyCall}
         onStatusUpdate={onStatusUpdate}
       />
-      
+
       {/* New Client Modal */}
       <NewClientModal
         isOpen={newClientModalOpen}
         onClose={() => setNewClientModalOpen(false)}
         onSave={handleCreateClient}
       />
-      
+
       {/* New Request Modal */}
       <NewRequestModal
         isOpen={newRequestModalOpen}
         onClose={() => setNewRequestModalOpen(false)}
         onSave={handleCreateRequest}
       />
-      
+
       {/* Quick Status Update Modal */}
       <QuickStatusUpdateModal
         isOpen={quickStatusUpdateModalOpen}
