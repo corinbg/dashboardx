@@ -126,8 +126,18 @@ export function QuickStatusUpdateModal({ isOpen, onClose }: QuickStatusUpdateMod
                               </a>
                             </div>
                             <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {request.Luogo}
+                              <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                              <div className="flex flex-col">
+                                {request.comune && (
+                                  <span className="font-medium">{request.comune}</span>
+                                )}
+                                {request.Indirizzo && (
+                                  <span className="text-gray-500 dark:text-gray-500">{request.Indirizzo}</span>
+                                )}
+                                {!request.comune && !request.Indirizzo && request.Luogo && (
+                                  <span>{request.Luogo}</span>
+                                )}
+                              </div>
                             </div>
                             <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
                               <Wrench className="h-3 w-3 mr-1" />
