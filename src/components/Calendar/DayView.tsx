@@ -14,17 +14,9 @@ export function DayView({ events, date, onEventClick }: DayViewProps) {
   const getEventsForHour = (hour: number) => {
     return events.filter(event => {
       const eventStart = new Date(event.data_inizio);
-      const eventEnd = new Date(event.data_fine);
-      const hourStart = new Date(date);
-      hourStart.setHours(hour, 0, 0, 0);
-      const hourEnd = new Date(date);
-      hourEnd.setHours(hour, 59, 59, 999);
+      const eventHour = eventStart.getHours();
 
-      return (
-        (eventStart >= hourStart && eventStart <= hourEnd) ||
-        (eventEnd >= hourStart && eventEnd <= hourEnd) ||
-        (eventStart <= hourStart && eventEnd >= hourEnd)
-      );
+      return eventHour === hour;
     });
   };
 
