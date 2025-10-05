@@ -96,8 +96,10 @@ export function CalendarPage() {
       });
     } else if (view === 'week') {
       const weekStart = getWeekStart(currentDate);
+      weekStart.setHours(0, 0, 0, 0);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
 
       return events.filter(event => {
         const eventDate = new Date(event.data_inizio);
