@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, User, MapPin, FileText, Tag, Trash2, Edit2, CheckCircle } from 'lucide-react';
+import { X, Calendar, Clock, User, MapPin, FileText, Tag, Trash2, CreditCard as Edit2, CheckCircle } from 'lucide-react';
 import { CalendarEvent, EventType, EventStatus } from '../../types';
 import { getClients } from '../../services/clientsService';
 
