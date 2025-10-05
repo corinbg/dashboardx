@@ -18,8 +18,10 @@ import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
 import { QuickStatusUpdateModal } from './components/Requests/QuickStatusUpdateModal';
+import { NewEventModal } from './components/Calendar/NewEventModal';
 import { createClient } from './services/clientsService';
 import { createRequest } from './services/requestsService';
+import { createEvent } from './services/calendarService';
 
 // Funzione per controllare se siamo sulla route di conferma email
 function isEmailConfirmRoute(): boolean {
@@ -35,6 +37,7 @@ function MainApp() {
   const [newClientModalOpen, setNewClientModalOpen] = useState(false);
   const [newRequestModalOpen, setNewRequestModalOpen] = useState(false);
   const [quickStatusUpdateModalOpen, setQuickStatusUpdateModalOpen] = useState(false);
+  const [newEventModalOpen, setNewEventModalOpen] = useState(false);
 
   // Read request_id from URL on component mount
   useEffect(() => {
@@ -75,6 +78,10 @@ function MainApp() {
 
   const handleStatusUpdate = () => {
     setQuickStatusUpdateModalOpen(true);
+  };
+
+  const handleNewEvent = () => {
+    setNewEventModalOpen(true);
   };
 
   // Controlla se siamo sulla route di conferma email PRIMA di qualsiasi controllo di autenticazione
@@ -126,6 +133,9 @@ function MainApp() {
         onStatusUpdate={handleStatusUpdate}
         quickStatusUpdateModalOpen={quickStatusUpdateModalOpen}
         setQuickStatusUpdateModalOpen={setQuickStatusUpdateModalOpen}
+        handleNewEvent={handleNewEvent}
+        newEventModalOpen={newEventModalOpen}
+        setNewEventModalOpen={setNewEventModalOpen}
       />
     </AppProvider>
   );
@@ -148,6 +158,9 @@ interface AppContentProps {
   onStatusUpdate: () => void;
   quickStatusUpdateModalOpen: boolean;
   setQuickStatusUpdateModalOpen: (open: boolean) => void;
+  handleNewEvent: () => void;
+  newEventModalOpen: boolean;
+  setNewEventModalOpen: (open: boolean) => void;
 }
 
 function AppContent({
@@ -166,7 +179,10 @@ function AppContent({
   handleEmergencyCall,
   onStatusUpdate,
   quickStatusUpdateModalOpen,
-  setQuickStatusUpdateModalOpen
+  setQuickStatusUpdateModalOpen,
+  handleNewEvent,
+  newEventModalOpen,
+  setNewEventModalOpen
 }: AppContentProps) {
   const { refreshData } = useApp();
 
@@ -195,12 +211,21 @@ function AppContent({
       richiestaAt: new Date().toISOString(),
       spamFuoriZona: false
     };
-    
+
     const result = await createRequest(requestWithTimestamp);
     if (result) {
       await refreshData();
     } else {
       throw new Error('Failed to create request');
+    }
+  };
+
+  const handleCreateEvent = async (eventData: any) => {
+    const result = await createEvent(eventData);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to create event');
     }
   };
 
@@ -277,6 +302,7 @@ function AppContent({
         onNewClient={handleNewClient}
         onEmergencyCall={handleEmergencyCall}
         onStatusUpdate={onStatusUpdate}
+        onNewEvent={handleNewEvent}
       />
 
       {/* New Client Modal */}
@@ -297,6 +323,13 @@ function AppContent({
       <QuickStatusUpdateModal
         isOpen={quickStatusUpdateModalOpen}
         onClose={() => setQuickStatusUpdateModalOpen(false)}
+      />
+
+      {/* New Event Modal */}
+      <NewEventModal
+        isOpen={newEventModalOpen}
+        onClose={() => setNewEventModalOpen(false)}
+        onSave={handleCreateEvent}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Phone, UserPlus, FileText, X, RefreshCw } from 'lucide-react';
+import { Plus, Phone, UserPlus, FileText, X, RefreshCw, Calendar } from 'lucide-react';
 
 interface FABAction {
   icon: React.ReactNode;
@@ -13,13 +13,15 @@ interface FloatingActionButtonProps {
   onNewClient: () => void;
   onEmergencyCall: () => void;
   onStatusUpdate: () => void;
+  onNewEvent: () => void;
 }
 
 export function FloatingActionButton({
   onNewRequest,
   onNewClient,
   onEmergencyCall,
-  onStatusUpdate
+  onStatusUpdate,
+  onNewEvent
 }: FloatingActionButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -35,6 +37,12 @@ export function FloatingActionButton({
       label: "Nuova Richiesta",
       onClick: onNewRequest,
       color: "bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+    },
+    {
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Nuovo Appuntamento",
+      onClick: onNewEvent,
+      color: "bg-purple-600 hover:bg-purple-700 text-white shadow-lg"
     },
     {
       icon: <UserPlus className="h-5 w-5" />,
