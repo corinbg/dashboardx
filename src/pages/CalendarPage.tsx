@@ -1,218 +1,271 @@
-import React from 'react';
-import { Calendar, Clock, MapPin, User, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { CalendarEvent, CalendarView } from '../types';
+import { getEvents, createEvent, updateEvent, deleteEvent } from '../services/calendarService';
+import { CalendarViewToggle } from '../components/Calendar/CalendarViewToggle';
+import { DayView } from '../components/Calendar/DayView';
+import { WeekView } from '../components/Calendar/WeekView';
+import { MonthView } from '../components/Calendar/MonthView';
+import { NewEventModal } from '../components/Calendar/NewEventModal';
+import { EventDrawer } from '../components/Calendar/EventDrawer';
 
 export function CalendarPage() {
-  // Mock calendar events
-  const mockEvents = [
-    {
-      id: '1',
-      time: '09:00 - 10:30',
-      title: 'Sopralluogo caldaia',
-      client: 'Marco Rossi',
-      location: 'via Luigi Settembrini 3',
-      type: 'Sopralluogo'
-    },
-    {
-      id: '2',
-      time: '11:00 - 12:00',
-      title: 'Riparazione perdita',
-      client: 'Anna Verdi',
-      location: 'corso Buenos Aires 15',
-      type: 'Riparazione'
-    },
-    {
-      id: '3',
-      time: '14:30 - 16:00',
-      title: 'Installazione boiler',
-      client: 'Giuseppe Bianchi',
-      location: 'via Torino 42',
-      type: 'Installazione'
-    },
-    {
-      id: '4',
-      time: '17:00 - 18:00',
-      title: 'Manutenzione impianto',
-      client: 'Maria Neri',
-      location: 'viale Monza 88',
-      type: 'Manutenzione'
-    }
-  ];
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<CalendarView>('month');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [isEventDrawerOpen, setIsEventDrawerOpen] = useState(false);
+  const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
+  const [newEventDate, setNewEventDate] = useState<Date | undefined>(undefined);
 
-  const getEventColor = (type: string) => {
-    switch (type) {
-      case 'Sopralluogo':
-        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700';
-      case 'Riparazione':
-        return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700';
-      case 'Installazione':
-        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700';
-      case 'Manutenzione':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  const loadEvents = async () => {
+    setLoading(true);
+    const eventsData = await getEvents();
+    setEvents(eventsData);
+    setLoading(false);
+  };
+
+  const handleCreateEvent = async (eventData: any) => {
+    const eventId = await createEvent(eventData);
+    if (eventId) {
+      await loadEvents();
     }
   };
 
+  const handleUpdateEvent = async (id: string, updates: any) => {
+    const success = await updateEvent(id, updates);
+    if (success) {
+      await loadEvents();
+    }
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    const success = await deleteEvent(id);
+    if (success) {
+      await loadEvents();
+    }
+  };
+
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setIsEventDrawerOpen(true);
+  };
+
+  const handleDateClick = (date: Date) => {
+    setCurrentDate(date);
+    setView('day');
+  };
+
+  const handleNewEventClick = (date?: Date) => {
+    setNewEventDate(date || currentDate);
+    setIsNewEventModalOpen(true);
+  };
+
+  const navigateDate = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+
+    if (view === 'day') {
+      newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
+    } else if (view === 'week') {
+      newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+    } else {
+      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+    }
+
+    setCurrentDate(newDate);
+  };
+
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  const getDisplayedEvents = () => {
+    if (view === 'day') {
+      return events.filter(event => {
+        const eventDate = new Date(event.data_inizio);
+        return (
+          eventDate.getDate() === currentDate.getDate() &&
+          eventDate.getMonth() === currentDate.getMonth() &&
+          eventDate.getFullYear() === currentDate.getFullYear()
+        );
+      });
+    } else if (view === 'week') {
+      const weekStart = getWeekStart(currentDate);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      return events.filter(event => {
+        const eventDate = new Date(event.data_inizio);
+        return eventDate >= weekStart && eventDate <= weekEnd;
+      });
+    } else {
+      const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+      return events.filter(event => {
+        const eventDate = new Date(event.data_inizio);
+        return eventDate >= monthStart && eventDate <= monthEnd;
+      });
+    }
+  };
+
+  const getWeekStart = (date: Date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
+  };
+
+  const formatDateRange = () => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+
+    if (view === 'day') {
+      return currentDate.toLocaleDateString('it-IT', {
+        weekday: 'long',
+        ...options,
+      });
+    } else if (view === 'week') {
+      const weekStart = getWeekStart(currentDate);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      return `${weekStart.toLocaleDateString('it-IT', options)} - ${weekEnd.toLocaleDateString('it-IT', options)}`;
+    } else {
+      return currentDate.toLocaleDateString('it-IT', {
+        year: 'numeric',
+        month: 'long',
+      });
+    }
+  };
+
+  const displayedEvents = getDisplayedEvents();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Caricamento calendario...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Calendar
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Appointment management and daily schedule
-          </p>
-        </div>
-
-        {/* Status Banner */}
-        <div className="mb-8 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-          <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400 mt-0.5 mr-3 flex-shrink-0" aria-hidden="true" />
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                Feature in development
-              </h3>
-              <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
-                <p>
-                  Soon the agent will receive requests and create appointments automatically when the plumber is available. 
-                  Calendar integration will allow synchronizing appointments with Google Calendar, Outlook and other services.
-                </p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Calendario
+              </h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Gestione appuntamenti e programmazione giornaliera
+              </p>
+            </div>
+            <button
+              onClick={() => handleNewEventClick()}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nuovo Appuntamento
+            </button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => navigateDate('prev')}
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                  aria-label="Periodo precedente"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={goToToday}
+                  className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Oggi
+                </button>
+                <button
+                  onClick={() => navigateDate('next')}
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                  aria-label="Periodo successivo"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+                  {formatDateRange()}
+                </h2>
+                {displayedEvents.length > 0 && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {displayedEvents.length} {displayedEvents.length === 1 ? 'appuntamento' : 'appuntamenti'}
+                  </p>
+                )}
               </div>
             </div>
+
+            <CalendarViewToggle currentView={view} onViewChange={setView} />
           </div>
         </div>
 
-        {/* Date Navigation */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Wednesday, January 27, 2025
-            </h2>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
-              4 appointments
-            </span>
-          </div>
-          <button
-            disabled
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 cursor-not-allowed"
-            title="Feature not yet available"
-          >
-            <Calendar className="h-4 w-4 mr-2" aria-hidden="true" />
-            Connect Calendar
-          </button>
-        </div>
+        <div className="mb-8">
+          {view === 'day' && (
+            <DayView
+              events={displayedEvents}
+              date={currentDate}
+              onEventClick={handleEventClick}
+            />
+          )}
 
-        {/* Calendar View */}
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <div className="space-y-4">
-              {mockEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className={`p-4 border rounded-lg ${getEventColor(event.type)}`}
-                  role="article"
-                  aria-labelledby={`event-${event.id}-title`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Clock className="h-4 w-4" aria-hidden="true" />
-                        <span className="text-sm font-medium">
-                          {event.time}
-                        </span>
-                      </div>
-                      <h3 
-                        id={`event-${event.id}-title`}
-                        className="text-base font-semibold mb-1"
-                      >
-                        {event.title}
-                      </h3>
-                      <div className="space-y-1">
-                        <div className="flex items-center text-sm">
-                          <User className="h-3 w-3 mr-1" aria-hidden="true" />
-                          {event.client}
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <MapPin className="h-3 w-3 mr-1" aria-hidden="true" />
-                          {event.location}
-                        </div>
-                      </div>
-                    </div>
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white bg-opacity-50">
-                      {event.type}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+          {view === 'week' && (
+            <WeekView
+              events={displayedEvents}
+              weekStart={getWeekStart(currentDate)}
+              onEventClick={handleEventClick}
+            />
+          )}
 
-        {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <button
-            disabled
-            className="relative group bg-white dark:bg-gray-800 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg shadow border border-gray-200 dark:border-gray-700 opacity-60 cursor-not-allowed"
-            title="Disponibile quando sarà attivata l'integrazione calendario"
-          >
-            <div>
-              <span className="rounded-lg inline-flex p-3 bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
-                <Calendar className="h-6 w-6" aria-hidden="true" />
-              </span>
-            </div>
-            <div className="mt-8">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                New Appointment
-              </h3>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Create a new appointment with a client
-              </p>
-            </div>
-          </button>
-
-          <button
-            disabled
-            className="relative group bg-white dark:bg-gray-800 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg shadow border border-gray-200 dark:border-gray-700 opacity-60 cursor-not-allowed"
-            title="Disponibile quando sarà attivata l'integrazione calendario"
-          >
-            <div>
-              <span className="rounded-lg inline-flex p-3 bg-green-50 dark:bg-green-900/50 text-green-700 dark:text-green-300">
-                <Clock className="h-6 w-6" aria-hidden="true" />
-              </span>
-            </div>
-            <div className="mt-8">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Free Slots
-              </h3>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                View available time slots
-              </p>
-            </div>
-          </button>
-
-          <button
-            disabled
-            className="relative group bg-white dark:bg-gray-800 p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg shadow border border-gray-200 dark:border-gray-700 opacity-60 cursor-not-allowed"
-            title="Disponibile quando sarà attivata l'integrazione calendario"
-          >
-            <div>
-              <span className="rounded-lg inline-flex p-3 bg-purple-50 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300">
-                <User className="h-6 w-6" aria-hidden="true" />
-              </span>
-            </div>
-            <div className="mt-8">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Clients of the Day
-              </h3>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                See all scheduled clients
-              </p>
-            </div>
-          </button>
+          {view === 'month' && (
+            <MonthView
+              events={events}
+              currentMonth={currentDate}
+              onDateClick={handleDateClick}
+              onEventClick={handleEventClick}
+            />
+          )}
         </div>
       </main>
+
+      <NewEventModal
+        isOpen={isNewEventModalOpen}
+        onClose={() => setIsNewEventModalOpen(false)}
+        onSave={handleCreateEvent}
+        initialDate={newEventDate}
+      />
+
+      <EventDrawer
+        event={selectedEvent}
+        isOpen={isEventDrawerOpen}
+        onClose={() => {
+          setIsEventDrawerOpen(false);
+          setSelectedEvent(null);
+        }}
+        onUpdate={handleUpdateEvent}
+        onDelete={handleDeleteEvent}
+      />
     </div>
   );
 }

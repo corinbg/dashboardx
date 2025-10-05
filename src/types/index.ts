@@ -58,3 +58,23 @@ export type ViewMode = 'table' | 'card';
 export type FilterState = 'All' | 'Unread' | 'Read' | 'Contacted' | 'Completed';
 export type UrgencyFilter = 'All' | 'Urgent' | 'Non-urgent';
 export type DatePeriodFilter = 'today' | 'last3days' | 'last7days' | 'all' | 'custom';
+
+export type EventType = 'Sopralluogo' | 'Riparazione' | 'Installazione' | 'Manutenzione';
+export type EventStatus = 'Programmato' | 'In corso' | 'Completato' | 'Cancellato';
+export type CalendarView = 'day' | 'week' | 'month';
+
+export interface CalendarEvent {
+  id: string;
+  titolo: string;
+  cliente_id: string | null;
+  cliente_nome: string | null;
+  data_inizio: string;
+  data_fine: string;
+  tipo_intervento: EventType;
+  indirizzo: string | null;
+  note: string | null;
+  stato: EventStatus;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+}
