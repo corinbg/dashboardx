@@ -14,9 +14,25 @@ export function DayView({ events, date, onEventClick }: DayViewProps) {
   const getEventsForHour = (hour: number) => {
     return events.filter(event => {
       const eventStart = new Date(event.data_inizio);
-      const eventHour = eventStart.getHours();
+      const eventEnd = new Date(event.data_fine);
+      const eventStartHour = eventStart.getHours();
+      const eventEndHour = eventEnd.getHours();
+      const eventEndMinutes = eventEnd.getMinutes();
 
-      return eventHour === hour;
+      // L'evento appare nell'ora se:
+      // - Inizia in quest'ora, oppure
+      // - L'ora corrente è tra l'ora di inizio e l'ora di fine
+      // - Ma non appare nell'ora di fine se l'evento finisce esattamente all'inizio di quell'ora (es. 10:00)
+      if (hour >= eventStartHour && hour < eventEndHour) {
+        return true;
+      }
+
+      // Caso speciale: se l'evento finisce nell'ora corrente ma non esattamente all'inizio
+      if (hour === eventEndHour && eventEndMinutes > 0) {
+        return true;
+      }
+
+      return false;
     });
   };
 
