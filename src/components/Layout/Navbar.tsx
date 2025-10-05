@@ -89,9 +89,8 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                       activeTab === tab.id
                         ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''} whitespace-nowrap`}
-                    disabled={tab.id === 'calendario'}
-                    title={tab.id === 'calendario' ? 'Calendario - Funzionalità in arrivo' : tab.description}
+                    } whitespace-nowrap`}
+                    title={tab.description}
                     aria-current={activeTab === tab.id ? 'page' : undefined}
                   >
                     <div className="flex items-center space-x-1.5">
@@ -168,8 +167,7 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
                     activeTab === tab.id
                       ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
                       : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  } ${tab.id === 'calendario' ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  disabled={tab.id === 'calendario'}
+                  }`}
                   aria-current={activeTab === tab.id ? 'page' : undefined}
                 >
                   <div className="flex items-center space-x-2.5">
