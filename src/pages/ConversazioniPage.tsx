@@ -154,7 +154,7 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
     }
   };
 
-  const handlePhoneSearch = async (phone?: string) => {
+  const handlePhoneSearch = async (phone?: string, onComplete?: () => void) => {
     const searchPhone = phone || phoneNumber;
     if (!searchPhone.trim()) {
       setError('Inserisci un numero di telefono');
@@ -168,9 +168,14 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
       const phoneConversations = await searchConversationsByPhone(searchPhone.trim());
       setConversations(phoneConversations);
       applyFilters(phoneConversations, statusFilter, dateFilter);
-      
+
       if (phoneConversations.length === 0) {
         setError('Nessuna conversazione trovata per questo numero');
+      }
+
+      // Call the completion callback after successful search
+      if (onComplete) {
+        onComplete();
       }
     } catch (err) {
       console.error('Error searching conversations:', err);
@@ -201,10 +206,15 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
   useEffect(() => {
     if (initialPhoneNumber) {
       console.log(`🔄 Auto-searching conversations for: ${initialPhoneNumber}`);
-      handlePhoneSearch(initialPhoneNumber);
-      onPhoneNumberCleared?.();
+      // Set the phone number in the input field
+      setPhoneNumber(initialPhoneNumber);
+      // Perform the search and clear the prop only after successful completion
+      handlePhoneSearch(initialPhoneNumber, () => {
+        console.log('✅ Search completed, clearing initial phone number prop');
+        onPhoneNumberCleared?.();
+      });
     }
-  }, [initialPhoneNumber, onPhoneNumberCleared]);
+  }, [initialPhoneNumber]);
 
   const handleConversationClick = async (conversation: ConversationWithLastMessage) => {
     setLoading(true);
