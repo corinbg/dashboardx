@@ -58,6 +58,7 @@ export async function createClient(client: Omit<Client, 'id' | 'user_id' | 'crea
       comune: client.comune,
       indirizzo: client.indirizzo,
       user_id: client.telefono,
+      idraulico_id: user.id,
     })
     .select('id')
     .single();

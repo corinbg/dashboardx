@@ -65,6 +65,7 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
       stato: request.stato,
       spam_fuori_zona: request.spamFuoriZona,
       user_id: request.Numero,
+      idraulico_id: user.id,
     })
     .select('id')
     .single();
