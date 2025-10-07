@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle, Trash2 } from 'lucide-react';
 import { Client, Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 
@@ -10,16 +10,20 @@ interface ClientProfileProps {
   onClose: () => void;
   onTabChange: (tab: string) => void;
   setConversationSearchPhoneNumber: (phone: string | null) => void;
+  onDelete?: (clientId: string) => Promise<void>;
 }
 
-export function ClientProfile({ 
-  client, 
-  requests, 
-  isOpen, 
-  onClose, 
-  onTabChange, 
-  setConversationSearchPhoneNumber 
+export function ClientProfile({
+  client,
+  requests,
+  isOpen,
+  onClose,
+  onTabChange,
+  setConversationSearchPhoneNumber,
+  onDelete
 }: ClientProfileProps) {
+  const [deleting, setDeleting] = useState(false);
+
   if (!isOpen || !client) return null;
 
   const clientRequests = requests.filter(req => 
@@ -32,6 +36,23 @@ export function ClientProfile({
       setConversationSearchPhoneNumber(client.telefono);
       onTabChange('conversazioni');
       onClose();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!client || !onDelete) return;
+
+    if (window.confirm(`Sei sicuro di voler eliminare il cliente "${client.nominativo}"? Questa azione non può essere annullata.`)) {
+      setDeleting(true);
+      try {
+        await onDelete(client.id);
+        onClose();
+      } catch (error) {
+        console.error('Error deleting client:', error);
+        alert('Errore durante l\'eliminazione del cliente');
+      } finally {
+        setDeleting(false);
+      }
     }
   };
 
@@ -77,6 +98,21 @@ export function ClientProfile({
                   >
                     <MessageCircle className="h-4 w-4 mr-1" />
                     Conversazioni
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Elimina cliente"
+                  >
+                    {deleting ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-1"></div>
+                    ) : (
+                      <Trash2 className="h-4 w-4 mr-1" />
+                    )}
+                    {deleting ? 'Eliminazione...' : 'Elimina'}
                   </button>
                 )}
                 <button

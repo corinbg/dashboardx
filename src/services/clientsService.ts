@@ -107,3 +107,17 @@ export async function updateClient(id: string, updates: Partial<Omit<Client, 'id
 
   return true;
 }
+
+export async function deleteClient(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('clients')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting client:', error);
+    return false;
+  }
+
+  return true;
+}

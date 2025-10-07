@@ -11,9 +11,10 @@ import { createClient, getUniqueCities } from '../services/clientsService';
 interface ClientsPageProps {
   onTabChange: (tab: string) => void;
   setConversationSearchPhoneNumber: (phone: string | null) => void;
+  onDeleteClient: (clientId: string) => Promise<void>;
 }
 
-export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: ClientsPageProps) {
+export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onDeleteClient }: ClientsPageProps) {
   const { clients, requests, loading, refreshData } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [cityFilter, setCityFilter] = useState('all');
@@ -551,6 +552,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber }: C
         isOpen={modalOpen}
         onClose={closeModal}
         onTabChange={onTabChange}
+        onDelete={onDeleteClient}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
       />
       

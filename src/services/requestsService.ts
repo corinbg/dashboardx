@@ -45,7 +45,7 @@ export async function updateRequestStatus(id: string, stato: Request['stato']): 
 
 export async function createRequest(request: Omit<Request, 'id'>): Promise<string | null> {
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) {
     console.error('User not authenticated');
     return null;
@@ -76,4 +76,18 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
   }
 
   return data.id;
+}
+
+export async function deleteRequest(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('requests')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting request:', error);
+    return false;
+  }
+
+  return true;
 }

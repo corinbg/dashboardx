@@ -19,14 +19,16 @@ interface RequestsPageProps {
   initialRequestId?: string | null;
   onInitialRequestHandled?: () => void;
   onNewRequest: () => void;
+  onDeleteRequest: (requestId: string) => Promise<void>;
 }
 
-export function RequestsPage({ 
-  onTabChange, 
+export function RequestsPage({
+  onTabChange,
   setConversationSearchPhoneNumber,
   initialRequestId,
   onInitialRequestHandled,
-  onNewRequest
+  onNewRequest,
+  onDeleteRequest
 }: RequestsPageProps) {
   const { requests, clients, loading } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -382,6 +384,7 @@ export function RequestsPage({
         onViewClientProfile={handleViewClientProfileFromRequest}
         onTabChange={onTabChange}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+        onDelete={onDeleteRequest}
       />
 
       {/* Client Profile Modal */}

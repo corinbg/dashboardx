@@ -19,8 +19,8 @@ import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
 import { QuickStatusUpdateModal } from './components/Requests/QuickStatusUpdateModal';
 import { NewEventModal } from './components/Calendar/NewEventModal';
-import { createClient } from './services/clientsService';
-import { createRequest } from './services/requestsService';
+import { createClient, deleteClient } from './services/clientsService';
+import { createRequest, deleteRequest } from './services/requestsService';
 import { createEvent } from './services/calendarService';
 
 // Funzione per controllare se siamo sulla route di conferma email
@@ -229,6 +229,24 @@ function AppContent({
     }
   };
 
+  const handleDeleteRequest = async (requestId: string) => {
+    const result = await deleteRequest(requestId);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to delete request');
+    }
+  };
+
+  const handleDeleteClient = async (clientId: string) => {
+    const result = await deleteClient(clientId);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to delete client');
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -241,19 +259,21 @@ function AppContent({
         );
       case 'richieste':
         return (
-          <RequestsPage 
+          <RequestsPage
             onTabChange={setActiveTab}
             setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
             initialRequestId={initialRequestId}
             onInitialRequestHandled={onInitialRequestHandled}
             onNewRequest={handleNewRequest}
+            onDeleteRequest={handleDeleteRequest}
           />
         );
       case 'clienti':
         return (
-          <ClientsPage 
+          <ClientsPage
             onTabChange={setActiveTab}
             setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+            onDeleteClient={handleDeleteClient}
           />
         );
       case 'checklist':

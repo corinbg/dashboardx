@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink, MessageCircle, EyeOff, Eye, PhoneCall, CheckCircle2 } from 'lucide-react';
+import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink, MessageCircle, EyeOff, Eye, PhoneCall, CheckCircle2, Trash2 } from 'lucide-react';
 import { Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 import { UrgencyBadge } from '../UI/UrgencyBadge';
@@ -13,18 +13,21 @@ interface RequestDrawerProps {
   onViewClientProfile?: (request: Request) => void;
   onTabChange?: (tab: string) => void;
   setConversationSearchPhoneNumber?: (phone: string | null) => void;
+  onDelete?: (requestId: string) => Promise<void>;
 }
 
-export function RequestDrawer({ 
-  request, 
-  isOpen, 
-  onClose, 
-  onStatusUpdate, 
+export function RequestDrawer({
+  request,
+  isOpen,
+  onClose,
+  onStatusUpdate,
   onViewClientProfile,
   onTabChange,
-  setConversationSearchPhoneNumber 
+  setConversationSearchPhoneNumber,
+  onDelete
 }: RequestDrawerProps) {
   const [updating, setUpdating] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { updateRequestStatus } = useApp();
   
   if (!isOpen || !request) return null;
@@ -60,7 +63,24 @@ export function RequestDrawer({
     if (request?.Numero && setConversationSearchPhoneNumber && onTabChange) {
       setConversationSearchPhoneNumber(request.Numero);
       onTabChange('conversazioni');
-      onClose(); // Chiudi il drawer
+      onClose();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!request || !onDelete) return;
+
+    if (window.confirm('Sei sicuro di voler eliminare questa richiesta? Questa azione non può essere annullata.')) {
+      setDeleting(true);
+      try {
+        await onDelete(request.id);
+        onClose();
+      } catch (error) {
+        console.error('Error deleting request:', error);
+        alert('Errore durante l\'eliminazione della richiesta');
+      } finally {
+        setDeleting(false);
+      }
     }
   };
 
@@ -245,8 +265,25 @@ export function RequestDrawer({
                   </div>
                 </button>
               )}
+
+              {onDelete && (
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="w-full text-left px-3 py-2 text-sm rounded-md text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center">
+                    {deleting ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                    ) : (
+                      <Trash2 className="h-4 w-4 mr-2" />
+                    )}
+                    {deleting ? 'Eliminazione...' : 'Elimina richiesta'}
+                  </div>
+                </button>
+              )}
             </div>
-            
+
             {/* Status Update Section */}
             <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
