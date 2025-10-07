@@ -74,7 +74,7 @@ export interface CalendarEvent {
   indirizzo: string | null;
   note: string | null;
   stato: EventStatus;
-  user_id: string;
+  idraulico_id: string;
   created_at: string;
   updated_at: string;
 }

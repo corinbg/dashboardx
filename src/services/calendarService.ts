@@ -104,7 +104,7 @@ export async function createEvent(eventData: CreateEventData): Promise<string | 
       indirizzo: eventData.indirizzo || null,
       note: eventData.note || null,
       stato: eventData.stato || 'Programmato',
-      user_id: user.id,
+      idraulico_id: user.id,
     })
     .select('id')
     .maybeSingle();

@@ -32,7 +32,7 @@ export async function getChecklistItems(): Promise<ChecklistItem[]> {
       created_at,
       updated_at
     `)
-    .eq('user_id', user.id)
+    .eq('idraulico_id', user.id)
     .order('ordine', { ascending: true })
     .order('created_at', { ascending: true });
 
@@ -94,7 +94,7 @@ export async function createChecklistItem(text: string): Promise<string | null> 
     .insert({
       testo: text,
       completata: false,
-      user_id: user.id,
+      idraulico_id: user.id,
       priorita: 'none',
       categoria: 'riparazione',
       ricorrente: 'none',
@@ -131,7 +131,7 @@ export async function createAdvancedChecklistItem(item: {
   const { data: maxOrderData } = await supabase
     .from('checklist_items')
     .select('ordine')
-    .eq('user_id', user.id)
+    .eq('idraulico_id', user.id)
     .order('ordine', { ascending: false })
     .limit(1)
     .single();
@@ -143,7 +143,7 @@ export async function createAdvancedChecklistItem(item: {
     .insert({
       testo: item.testo,
       completata: false,
-      user_id: user.id,
+      idraulico_id: user.id,
       priorita: item.priorita || 'none',
       categoria: item.categoria || 'riparazione',
       categoria_custom: item.categoriaCustom,
@@ -255,7 +255,7 @@ export async function updateChecklistItemOrder(items: { id: string; ordine: numb
           updated_at: new Date().toISOString(),
         })
         .eq('id', item.id)
-        .eq('user_id', user.id); // Extra security check
+        .eq('idraulico_id', user.id); // Extra security check
 
       if (error) {
         console.error(`❌ Error updating order for item ${item.id}:`, {
