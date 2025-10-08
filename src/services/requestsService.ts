@@ -78,6 +78,32 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
   return data.id;
 }
 
+export async function updateRequest(id: string, updates: Partial<Omit<Request, 'id'>>): Promise<boolean> {
+  const updateData: any = {};
+
+  if (updates.Nome !== undefined) updateData.Nome = updates.Nome;
+  if (updates.comune !== undefined) updateData.comune = updates.comune;
+  if (updates.Indirizzo !== undefined) updateData.Indirizzo = updates.Indirizzo;
+  if (updates.Problema !== undefined) updateData.Problema = updates.Problema;
+  if (updates.Urgenza !== undefined) updateData.Urgenza = updates.Urgenza;
+  if (updates.Numero !== undefined) updateData.Numero = updates.Numero;
+  if (updates.PreferenzaRicontatto !== undefined) updateData['Preferenza Ricontatto'] = updates.PreferenzaRicontatto;
+  if (updates.stato !== undefined) updateData.stato = updates.stato;
+  if (updates.spamFuoriZona !== undefined) updateData.spam_fuori_zona = updates.spamFuoriZona;
+
+  const { error } = await supabase
+    .from('requests')
+    .update(updateData)
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating request:', error);
+    return false;
+  }
+
+  return true;
+}
+
 export async function deleteRequest(id: string): Promise<boolean> {
   const { error } = await supabase
     .from('requests')

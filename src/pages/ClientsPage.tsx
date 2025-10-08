@@ -12,9 +12,10 @@ interface ClientsPageProps {
   onTabChange: (tab: string) => void;
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   onDeleteClient: (clientId: string) => Promise<void>;
+  onUpdateClient: (clientId: string, updates: Partial<Client>) => Promise<void>;
 }
 
-export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onDeleteClient }: ClientsPageProps) {
+export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onDeleteClient, onUpdateClient }: ClientsPageProps) {
   const { clients, requests, loading, refreshData } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [cityFilter, setCityFilter] = useState('all');
@@ -553,6 +554,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onD
         onClose={closeModal}
         onTabChange={onTabChange}
         onDelete={onDeleteClient}
+        onUpdate={onUpdateClient}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
       />
       

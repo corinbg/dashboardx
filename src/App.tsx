@@ -19,8 +19,8 @@ import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
 import { QuickStatusUpdateModal } from './components/Requests/QuickStatusUpdateModal';
 import { NewEventModal } from './components/Calendar/NewEventModal';
-import { createClient, deleteClient } from './services/clientsService';
-import { createRequest, deleteRequest } from './services/requestsService';
+import { createClient, deleteClient, updateClient } from './services/clientsService';
+import { createRequest, deleteRequest, updateRequest } from './services/requestsService';
 import { createEvent } from './services/calendarService';
 
 // Funzione per controllare se siamo sulla route di conferma email
@@ -247,6 +247,24 @@ function AppContent({
     }
   };
 
+  const handleUpdateRequest = async (requestId: string, updates: Partial<any>) => {
+    const result = await updateRequest(requestId, updates);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to update request');
+    }
+  };
+
+  const handleUpdateClient = async (clientId: string, updates: Partial<any>) => {
+    const result = await updateClient(clientId, updates);
+    if (result) {
+      await refreshData();
+    } else {
+      throw new Error('Failed to update client');
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -266,6 +284,8 @@ function AppContent({
             onInitialRequestHandled={onInitialRequestHandled}
             onNewRequest={handleNewRequest}
             onDeleteRequest={handleDeleteRequest}
+            onUpdateRequest={handleUpdateRequest}
+            onUpdateClient={handleUpdateClient}
           />
         );
       case 'clienti':
@@ -274,6 +294,7 @@ function AppContent({
             onTabChange={setActiveTab}
             setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
             onDeleteClient={handleDeleteClient}
+            onUpdateClient={handleUpdateClient}
           />
         );
       case 'checklist':

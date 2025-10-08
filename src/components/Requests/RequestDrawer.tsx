@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink, MessageCircle, EyeOff, Eye, PhoneCall, CheckCircle2, Trash2 } from 'lucide-react';
+import { X, User, MapPin, Wrench, Phone, Clock, Calendar, AlertCircle, Flag, ExternalLink, MessageCircle, EyeOff, Eye, PhoneCall, CheckCircle2, Trash2, Edit2, Save } from 'lucide-react';
 import { Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 import { UrgencyBadge } from '../UI/UrgencyBadge';
 import { useApp } from '../../contexts/AppContext';
 import { ConfirmDialog } from '../UI/ConfirmDialog';
+import { PhoneInputWithCountryCode } from '../UI/PhoneInputWithCountryCode';
 
 interface RequestDrawerProps {
   request: Request | null;
@@ -15,6 +16,7 @@ interface RequestDrawerProps {
   onTabChange?: (tab: string) => void;
   setConversationSearchPhoneNumber?: (phone: string | null) => void;
   onDelete?: (requestId: string) => Promise<void>;
+  onUpdate?: (requestId: string, updates: Partial<Request>) => Promise<void>;
 }
 
 export function RequestDrawer({
@@ -25,13 +27,41 @@ export function RequestDrawer({
   onViewClientProfile,
   onTabChange,
   setConversationSearchPhoneNumber,
-  onDelete
+  onDelete,
+  onUpdate
 }: RequestDrawerProps) {
   const [updating, setUpdating] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editData, setEditData] = useState({
+    Nome: '',
+    Numero: '',
+    comune: '',
+    Indirizzo: '',
+    Problema: '',
+    Urgenza: 'Media' as Request['Urgenza'],
+    PreferenzaRicontatto: '',
+    stato: 'Nuovo' as Request['stato']
+  });
   const { updateRequestStatus } = useApp();
   
+  React.useEffect(() => {
+    if (request) {
+      setEditData({
+        Nome: request.Nome || '',
+        Numero: request.Numero || '',
+        comune: request.comune || '',
+        Indirizzo: request.Indirizzo || '',
+        Problema: request.Problema || '',
+        Urgenza: request.Urgenza || 'Media',
+        PreferenzaRicontatto: request.PreferenzaRicontatto || '',
+        stato: request.stato || 'Nuovo'
+      });
+    }
+  }, [request]);
+
   if (!isOpen || !request) return null;
 
   const formatDate = (dateString: string) => {
@@ -89,6 +119,23 @@ export function RequestDrawer({
     }
   };
 
+  const handleSave = async () => {
+    if (!request || !onUpdate) return;
+
+    setSaving(true);
+    try {
+      await onUpdate(request.id, editData);
+      const updatedRequest = { ...request, ...editData };
+      onStatusUpdate?.(updatedRequest);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating request:', error);
+      alert('Errore durante l\'aggiornamento della richiesta');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -111,72 +158,233 @@ export function RequestDrawer({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 id="drawer-title" className="text-lg font-semibold text-gray-900 dark:text-white">
-              Dettagli Richiesta
+              {isEditing ? 'Modifica Richiesta' : 'Dettagli Richiesta'}
             </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Chiudi dettagli"
-            >
-              <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-            </button>
+            <div className="flex items-center space-x-2">
+              {!isEditing && onUpdate && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  title="Modifica richiesta"
+                >
+                  <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                </button>
+              )}
+              {isEditing && (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditData({
+                        Nome: request.Nome || '',
+                        Numero: request.Numero || '',
+                        comune: request.comune || '',
+                        Indirizzo: request.Indirizzo || '',
+                        Problema: request.Problema || '',
+                        Urgenza: request.Urgenza || 'Media',
+                        PreferenzaRicontatto: request.PreferenzaRicontatto || '',
+                        stato: request.stato || 'Nuovo'
+                      });
+                    }}
+                    disabled={saving}
+                    className="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="inline-flex items-center px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <Save className="h-4 w-4 mr-1" />
+                    {saving ? 'Salvataggio...' : 'Salva'}
+                  </button>
+                </>
+              )}
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Chiudi dettagli"
+              >
+                <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
           </div>
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            {/* Client Info */}
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            {isEditing ? (
+              <div className="space-y-4">
                 <div>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {request.Nome}
-                    </p>
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Cliente</p>
+                  <label htmlFor="edit-nome" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Nome Cliente *
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-nome"
+                    required
+                    value={editData.Nome}
+                    onChange={(e) => setEditData({ ...editData, Nome: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                <div className="flex flex-col items-start">
-                  <a 
-                    href={`tel:${request.Numero}`}
-                    className="inline-block text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                    onClick={(e) => e.stopPropagation()}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Telefono *
+                  </label>
+                  <PhoneInputWithCountryCode
+                    value={editData.Numero}
+                    onChange={(value) => setEditData({ ...editData, Numero: value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="edit-comune" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Comune
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-comune"
+                    value={editData.comune}
+                    onChange={(e) => setEditData({ ...editData, comune: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="edit-indirizzo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Indirizzo
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-indirizzo"
+                    value={editData.Indirizzo}
+                    onChange={(e) => setEditData({ ...editData, Indirizzo: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="edit-problema" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Problema *
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-problema"
+                    required
+                    value={editData.Problema}
+                    onChange={(e) => setEditData({ ...editData, Problema: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="edit-urgenza" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Urgenza *
+                  </label>
+                  <select
+                    id="edit-urgenza"
+                    required
+                    value={editData.Urgenza}
+                    onChange={(e) => setEditData({ ...editData, Urgenza: e.target.value as Request['Urgenza'] })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {request.Numero}
-                  </a>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
+                    <option value="Bassa">Bassa</option>
+                    <option value="Media">Media</option>
+                    <option value="Alta">Alta</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="edit-preferenza" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Preferenza Ricontatto *
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-preferenza"
+                    required
+                    value={editData.PreferenzaRicontatto}
+                    onChange={(e) => setEditData({ ...editData, PreferenzaRicontatto: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="edit-stato" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Stato *
+                  </label>
+                  <select
+                    id="edit-stato"
+                    required
+                    value={editData.stato}
+                    onChange={(e) => setEditData({ ...editData, stato: e.target.value as Request['stato'] })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Nuovo">Nuovo</option>
+                    <option value="Non letto">Non letto</option>
+                    <option value="Letto">Letto</option>
+                    <option value="Contattato">Contattato</option>
+                    <option value="Completato">Completato</option>
+                  </select>
                 </div>
               </div>
+            ) : (
+              <>
+                {/* Client Info */}
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {request.Nome}
+                        </p>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Cliente</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start space-x-2">
-                <MapPin className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
-                <div className="flex-1">
-                  {request.comune && (
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {request.comune}
-                    </p>
-                  )}
-                  {request.Indirizzo && (
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">
-                      {request.Indirizzo}
-                    </p>
-                  )}
-                  {!request.comune && !request.Indirizzo && request.Luogo && (
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {request.Luogo}
-                    </p>
-                  )}
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Indirizzo</p>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <div className="flex flex-col items-start">
+                      <a
+                        href={`tel:${request.Numero}`}
+                        className="inline-block text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {request.Numero}
+                      </a>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-2">
+                    <MapPin className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
+                    <div className="flex-1">
+                      {request.comune && (
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {request.comune}
+                        </p>
+                      )}
+                      {request.Indirizzo && (
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">
+                          {request.Indirizzo}
+                        </p>
+                      )}
+                      {!request.comune && !request.Indirizzo && request.Luogo && (
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {request.Luogo}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Indirizzo</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Request Details */}
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
+                {/* Request Details */}
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
               <div className="flex items-start space-x-2">
                 <Wrench className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
                 <div>
@@ -233,14 +441,16 @@ export function RequestDrawer({
                       </p>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-
+                  </div>
+                )}
+              </div>
+              </>
+            )}
           </div>
 
           {/* Actions */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-3">
+          {!isEditing && (
+            <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-3">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">
               Azioni
             </h3>
@@ -347,7 +557,8 @@ export function RequestDrawer({
                 })}
               </div>
             </div>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

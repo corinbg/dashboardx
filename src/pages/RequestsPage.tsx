@@ -20,6 +20,8 @@ interface RequestsPageProps {
   onInitialRequestHandled?: () => void;
   onNewRequest: () => void;
   onDeleteRequest: (requestId: string) => Promise<void>;
+  onUpdateRequest: (requestId: string, updates: Partial<Request>) => Promise<void>;
+  onUpdateClient: (clientId: string, updates: Partial<Client>) => Promise<void>;
 }
 
 export function RequestsPage({
@@ -28,7 +30,9 @@ export function RequestsPage({
   initialRequestId,
   onInitialRequestHandled,
   onNewRequest,
-  onDeleteRequest
+  onDeleteRequest,
+  onUpdateRequest,
+  onUpdateClient
 }: RequestsPageProps) {
   const { requests, clients, loading } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -385,6 +389,7 @@ export function RequestsPage({
         onTabChange={onTabChange}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
         onDelete={onDeleteRequest}
+        onUpdate={onUpdateRequest}
       />
 
       {/* Client Profile Modal */}
@@ -394,6 +399,7 @@ export function RequestsPage({
         isOpen={clientModalOpen}
         onClose={closeClientModal}
         onTabChange={onTabChange}
+        onUpdate={onUpdateClient}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
       />
       

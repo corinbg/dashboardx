@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle, Trash2 } from 'lucide-react';
+import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle, Trash2, Edit2, Save } from 'lucide-react';
 import { Client, Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 import { ConfirmDialog } from '../UI/ConfirmDialog';
+import { PhoneInputWithCountryCode } from '../UI/PhoneInputWithCountryCode';
 
 interface ClientProfileProps {
   client: Client | null;
@@ -12,6 +13,7 @@ interface ClientProfileProps {
   onTabChange: (tab: string) => void;
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   onDelete?: (clientId: string) => Promise<void>;
+  onUpdate?: (clientId: string, updates: Partial<Client>) => Promise<void>;
 }
 
 export function ClientProfile({
@@ -21,10 +23,30 @@ export function ClientProfile({
   onClose,
   onTabChange,
   setConversationSearchPhoneNumber,
-  onDelete
+  onDelete,
+  onUpdate
 }: ClientProfileProps) {
   const [deleting, setDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editData, setEditData] = useState({
+    nominativo: '',
+    telefono: '',
+    comune: '',
+    indirizzo: ''
+  });
+
+  React.useEffect(() => {
+    if (client) {
+      setEditData({
+        nominativo: client.nominativo || '',
+        telefono: client.telefono || '',
+        comune: client.comune || '',
+        indirizzo: client.indirizzo || ''
+      });
+    }
+  }, [client]);
 
   if (!isOpen || !client) return null;
 
@@ -58,6 +80,21 @@ export function ClientProfile({
       alert('Errore durante l\'eliminazione del cliente');
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!client || !onUpdate) return;
+
+    setSaving(true);
+    try {
+      await onUpdate(client.id, editData);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating client:', error);
+      alert('Errore durante l\'aggiornamento del cliente');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -95,7 +132,7 @@ export function ClientProfile({
                 Profilo Cliente
               </h2>
               <div className="flex items-center space-x-2">
-                {client.telefono && (
+                {!isEditing && client.telefono && (
                   <button
                     onClick={handleViewConversations}
                     className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -105,7 +142,17 @@ export function ClientProfile({
                     Conversazioni
                   </button>
                 )}
-                {onDelete && (
+                {!isEditing && onUpdate && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    title="Modifica cliente"
+                  >
+                    <Edit2 className="h-4 w-4 mr-1" />
+                    Modifica
+                  </button>
+                )}
+                {!isEditing && onDelete && (
                   <button
                     onClick={handleDeleteClick}
                     disabled={deleting}
@@ -115,6 +162,33 @@ export function ClientProfile({
                     <Trash2 className="h-4 w-4 mr-1" />
                     Elimina
                   </button>
+                )}
+                {isEditing && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setIsEditing(false);
+                        setEditData({
+                          nominativo: client.nominativo || '',
+                          telefono: client.telefono || '',
+                          comune: client.comune || '',
+                          indirizzo: client.indirizzo || ''
+                        });
+                      }}
+                      disabled={saving}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Annulla
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Save className="h-4 w-4 mr-1" />
+                      {saving ? 'Salvataggio...' : 'Salva'}
+                    </button>
+                  </>
                 )}
                 <button
                   onClick={onClose}
@@ -134,78 +208,136 @@ export function ClientProfile({
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                     Dati Personali
                   </h3>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {client.nominativo || 'N/A'}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Nome completo</p>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                      <div>
-                        <a 
-                          href={`tel:${client.telefono}`}
-                          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          {client.telefono}
-                        </a>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
-                      </div>
-                    </div>
-
-                    {(client.comune || client.indirizzo) && (
-                      <div className="flex items-start space-x-2">
-                        <MapPin className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
-                        <div className="flex-1">
-                          {client.comune && (
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {client.comune}
-                            </p>
-                          )}
-                          {client.indirizzo && (
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">
-                              {client.indirizzo}
-                            </p>
-                          )}
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Indirizzo</p>
+                  {!isEditing ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            {client.nominativo || 'N/A'}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Nome completo</p>
                         </div>
                       </div>
-                    )}
-                  </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <div>
+                          <a
+                            href={`tel:${client.telefono}`}
+                            className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {client.telefono}
+                          </a>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Telefono</p>
+                        </div>
+                      </div>
+
+                      {(client.comune || client.indirizzo) && (
+                        <div className="flex items-start space-x-2">
+                          <MapPin className="h-5 w-5 text-gray-400 mt-0.5" aria-hidden="true" />
+                          <div className="flex-1">
+                            {client.comune && (
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                {client.comune}
+                              </p>
+                            )}
+                            {client.indirizzo && (
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">
+                                {client.indirizzo}
+                              </p>
+                            )}
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Indirizzo</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="edit-nominativo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Nome completo *
+                        </label>
+                        <input
+                          type="text"
+                          id="edit-nominativo"
+                          required
+                          value={editData.nominativo}
+                          onChange={(e) => setEditData({ ...editData, nominativo: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Telefono *
+                        </label>
+                        <PhoneInputWithCountryCode
+                          value={editData.telefono}
+                          onChange={(value) => setEditData({ ...editData, telefono: value })}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="edit-comune" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Comune
+                        </label>
+                        <input
+                          type="text"
+                          id="edit-comune"
+                          value={editData.comune}
+                          onChange={(e) => setEditData({ ...editData, comune: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="edit-indirizzo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Indirizzo
+                        </label>
+                        <input
+                          type="text"
+                          id="edit-indirizzo"
+                          value={editData.indirizzo}
+                          onChange={(e) => setEditData({ ...editData, indirizzo: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    Statistiche
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <span className="text-sm text-gray-600 dark:text-gray-300">Richieste totali</span>
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {clientRequests.length}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <span className="text-sm text-gray-600 dark:text-gray-300">Completate</span>
-                      <span className="text-lg font-semibold text-green-600 dark:text-green-400">
-                        {clientRequests.filter(r => r.stato === 'Completato').length}
-                      </span>
+                {!isEditing && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                      Statistiche
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span className="text-sm text-gray-600 dark:text-gray-300">Richieste totali</span>
+                        <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {clientRequests.length}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span className="text-sm text-gray-600 dark:text-gray-300">Completate</span>
+                        <span className="text-lg font-semibold text-green-600 dark:text-green-400">
+                          {clientRequests.filter(r => r.stato === 'Completato').length}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Request History */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                  Storico Richieste ({clientRequests.length})
-                </h3>
+              {!isEditing && (
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    Storico Richieste ({clientRequests.length})
+                  </h3>
                 
                 {clientRequests.length > 0 ? (
                   <div className="space-y-3">
@@ -255,7 +387,8 @@ export function ClientProfile({
                     Nessuna richiesta trovata per questo cliente.
                   </p>
                 )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
