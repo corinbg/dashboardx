@@ -89,22 +89,29 @@ export async function getUniqueCities(): Promise<string[]> {
 }
 
 export async function updateClient(id: string, updates: Partial<Omit<Client, 'id'>>): Promise<boolean> {
-  const { error } = await supabase
+  const updateData: any = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (updates.nominativo !== undefined) updateData.nominativo = updates.nominativo;
+  if (updates.telefono !== undefined) updateData.telefono = updates.telefono;
+  if (updates.comune !== undefined) updateData.comune = updates.comune;
+  if (updates.indirizzo !== undefined) updateData.indirizzo = updates.indirizzo;
+
+  console.log('Updating client:', id, 'with data:', updateData);
+
+  const { data, error } = await supabase
     .from('clients')
-    .update({
-      nominativo: updates.nominativo,
-      telefono: updates.telefono,
-      comune: updates.comune,
-      indirizzo: updates.indirizzo,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id);
+    .update(updateData)
+    .eq('id', id)
+    .select();
 
   if (error) {
     console.error('Error updating client:', error);
     return false;
   }
 
+  console.log('Client updated successfully:', data);
   return true;
 }
 

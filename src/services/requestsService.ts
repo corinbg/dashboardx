@@ -79,28 +79,37 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
 }
 
 export async function updateRequest(id: string, updates: Partial<Omit<Request, 'id'>>): Promise<boolean> {
-  const updateData: any = {};
+  const updateData: any = {
+    updated_at: new Date().toISOString(),
+  };
 
   if (updates.Nome !== undefined) updateData.Nome = updates.Nome;
   if (updates.comune !== undefined) updateData.comune = updates.comune;
   if (updates.Indirizzo !== undefined) updateData.Indirizzo = updates.Indirizzo;
   if (updates.Problema !== undefined) updateData.Problema = updates.Problema;
-  if (updates.Urgenza !== undefined) updateData.Urgenza = updates.Urgenza;
+  if (updates.Urgenza !== undefined) {
+    // Convert string urgency to boolean (Alta = true, others = false)
+    updateData.Urgenza = updates.Urgenza === 'Alta';
+  }
   if (updates.Numero !== undefined) updateData.Numero = updates.Numero;
   if (updates.PreferenzaRicontatto !== undefined) updateData['Preferenza Ricontatto'] = updates.PreferenzaRicontatto;
   if (updates.stato !== undefined) updateData.stato = updates.stato;
   if (updates.spamFuoriZona !== undefined) updateData.spam_fuori_zona = updates.spamFuoriZona;
 
-  const { error } = await supabase
+  console.log('Updating request:', id, 'with data:', updateData);
+
+  const { data, error } = await supabase
     .from('requests')
     .update(updateData)
-    .eq('id', id);
+    .eq('id', id)
+    .select();
 
   if (error) {
     console.error('Error updating request:', error);
     return false;
   }
 
+  console.log('Request updated successfully:', data);
   return true;
 }
 
