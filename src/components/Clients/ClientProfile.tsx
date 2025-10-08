@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle, Trash2, Edit2, Save } from 'lucide-react';
+import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle, Trash2, Edit2, Save, AlertCircle, ChevronRight } from 'lucide-react';
 import { Client, Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 import { ConfirmDialog } from '../UI/ConfirmDialog';
@@ -14,6 +14,7 @@ interface ClientProfileProps {
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   onDelete?: (clientId: string) => Promise<void>;
   onUpdate?: (clientId: string, updates: Partial<Client>) => Promise<void>;
+  onRequestClick?: (request: Request) => void;
 }
 
 export function ClientProfile({
@@ -24,7 +25,8 @@ export function ClientProfile({
   onTabChange,
   setConversationSearchPhoneNumber,
   onDelete,
-  onUpdate
+  onUpdate,
+  onRequestClick
 }: ClientProfileProps) {
   const [deleting, setDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -383,9 +385,10 @@ export function ClientProfile({
                 {clientRequests.length > 0 ? (
                   <div className="space-y-3">
                     {clientRequests.map((request, index) => (
-                      <div 
+                      <button
                         key={request.id}
-                        className="border border-gray-200 dark:border-gray-600 rounded-lg p-4"
+                        onClick={() => onRequestClick?.(request)}
+                        className="w-full text-left border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -394,16 +397,19 @@ export function ClientProfile({
                               {formatDate(request.richiestaAt)}
                             </span>
                           </div>
-                          <StatusBadge status={request.stato} size="sm" />
+                          <div className="flex items-center space-x-2">
+                            <StatusBadge status={request.stato} size="sm" />
+                            <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                          </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2 mb-2">
                           <Wrench className="h-4 w-4 text-gray-400" aria-hidden="true" />
                           <span className="text-sm text-gray-600 dark:text-gray-300">
                             {request.Problema}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-start space-x-2">
                           <FileText className="h-4 w-4 text-gray-400 mt-0.5" aria-hidden="true" />
                           <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -420,7 +426,7 @@ export function ClientProfile({
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 ) : (

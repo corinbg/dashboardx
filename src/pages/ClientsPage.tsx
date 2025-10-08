@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Search, Filter, ChevronDown, ChevronUp, User, Phone, MapPin, Home, Users, MessageCircle, Plus, ArrowUpDown, MessageSquare } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
-import { Client, ViewMode } from '../types';
+import { Client, ViewMode, Request } from '../types';
 import { ClientProfile } from '../components/Clients/ClientProfile';
 import { NewClientModal } from '../components/Clients/NewClientModal';
+import { RequestDrawer } from '../components/Requests/RequestDrawer';
 import { EmptyState } from '../components/UI/EmptyState';
 import { ViewToggle } from '../components/UI/ViewToggle';
 import { createClient, getUniqueCities } from '../services/clientsService';
@@ -13,9 +14,11 @@ interface ClientsPageProps {
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   onDeleteClient: (clientId: string) => Promise<void>;
   onUpdateClient: (clientId: string, updates: Partial<Client>) => Promise<void>;
+  onUpdateRequest: (requestId: string, updates: Partial<Request>) => Promise<void>;
+  onDeleteRequest: (requestId: string) => Promise<void>;
 }
 
-export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onDeleteClient, onUpdateClient }: ClientsPageProps) {
+export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onDeleteClient, onUpdateClient, onUpdateRequest, onDeleteRequest }: ClientsPageProps) {
   const { clients, requests, loading, refreshData } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [cityFilter, setCityFilter] = useState('all');
@@ -30,6 +33,8 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onD
     return window.innerWidth < 768 ? 'card' : 'table';
   });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
+  const [requestDrawerOpen, setRequestDrawerOpen] = useState(false);
 
   // Load unique cities for filter
   React.useEffect(() => {
@@ -101,6 +106,16 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onD
   const closeModal = () => {
     setModalOpen(false);
     setSelectedClient(null);
+  };
+
+  const handleRequestClick = (request: Request) => {
+    setSelectedRequest(request);
+    setRequestDrawerOpen(true);
+  };
+
+  const closeRequestDrawer = () => {
+    setRequestDrawerOpen(false);
+    setSelectedRequest(null);
   };
 
   const handleViewConversationsFromClientList = (client: Client) => {
@@ -556,8 +571,20 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onD
         onDelete={onDeleteClient}
         onUpdate={onUpdateClient}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+        onRequestClick={handleRequestClick}
       />
-      
+
+      {/* Request Drawer */}
+      <RequestDrawer
+        request={selectedRequest}
+        isOpen={requestDrawerOpen}
+        onClose={closeRequestDrawer}
+        onTabChange={onTabChange}
+        setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+        onUpdate={onUpdateRequest}
+        onDelete={onDeleteRequest}
+      />
+
       {/* New Client Modal */}
       <NewClientModal
         isOpen={newClientModalOpen}

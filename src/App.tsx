@@ -295,6 +295,8 @@ function AppContent({
             setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
             onDeleteClient={handleDeleteClient}
             onUpdateClient={handleUpdateClient}
+            onUpdateRequest={handleUpdateRequest}
+            onDeleteRequest={handleDeleteRequest}
           />
         );
       case 'checklist':
