@@ -29,21 +29,18 @@ export function ConfirmDialog({
   };
 
   return (
-    <>
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-dialog-title"
-      >
+    <div className="fixed inset-0 z-[60] overflow-y-auto" aria-labelledby="confirm-dialog-title" role="dialog" aria-modal="true">
+      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full transform transition-all duration-300 scale-100 opacity-100"
+          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+
+        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div
+          className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-6">
@@ -99,6 +96,6 @@ export function ConfirmDialog({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
