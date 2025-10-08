@@ -86,6 +86,35 @@ export function ClientProfile({
   const handleSave = async () => {
     if (!client || !onUpdate) return;
 
+    // Check if any synced fields have changed
+    const hasNameChange = editData.nominativo !== client.nominativo;
+    const hasCityChange = editData.comune !== client.comune;
+    const hasAddressChange = editData.indirizzo !== client.indirizzo;
+    const hasSyncedChanges = hasNameChange || hasCityChange || hasAddressChange;
+
+    // Count affected requests
+    const affectedRequestsCount = clientRequests.length;
+
+    // Show confirmation if there are synced changes and affected requests
+    if (hasSyncedChanges && affectedRequestsCount > 0) {
+      const changedFields = [];
+      if (hasNameChange) changedFields.push('nome');
+      if (hasCityChange) changedFields.push('città');
+      if (hasAddressChange) changedFields.push('indirizzo');
+
+      const fieldsText = changedFields.join(', ');
+      const confirmed = window.confirm(
+        `Stai modificando ${fieldsText} del cliente.\n\n` +
+        `Questa modifica aggiornerà automaticamente ${affectedRequestsCount} ` +
+        `${affectedRequestsCount === 1 ? 'richiesta associata' : 'richieste associate'}.\n\n` +
+        `Vuoi continuare?`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       await onUpdate(client.id, editData);
@@ -255,6 +284,18 @@ export function ClientProfile({
                     </div>
                   ) : (
                     <div className="space-y-4">
+                      {clientRequests.length > 0 && (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3 mb-4">
+                          <div className="flex items-start space-x-2">
+                            <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                            <div className="text-sm text-blue-800 dark:text-blue-200">
+                              <p className="font-medium mb-1">Sincronizzazione automatica</p>
+                              <p>Le modifiche a nome, città e indirizzo verranno applicate automaticamente a {clientRequests.length} {clientRequests.length === 1 ? 'richiesta associata' : 'richieste associate'}.</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       <div>
                         <label htmlFor="edit-nominativo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Nome completo *

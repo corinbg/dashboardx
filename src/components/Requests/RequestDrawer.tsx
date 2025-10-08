@@ -122,6 +122,31 @@ export function RequestDrawer({
   const handleSave = async () => {
     if (!request || !onUpdate) return;
 
+    // Check if any synced fields have changed
+    const hasNameChange = editData.Nome !== request.Nome;
+    const hasCityChange = editData.comune !== request.comune;
+    const hasAddressChange = editData.Indirizzo !== request.Indirizzo;
+    const hasSyncedChanges = hasNameChange || hasCityChange || hasAddressChange;
+
+    // Show confirmation if there are synced changes
+    if (hasSyncedChanges) {
+      const changedFields = [];
+      if (hasNameChange) changedFields.push('nome');
+      if (hasCityChange) changedFields.push('città');
+      if (hasAddressChange) changedFields.push('indirizzo');
+
+      const fieldsText = changedFields.join(', ');
+      const confirmed = window.confirm(
+        `Stai modificando ${fieldsText} della richiesta.\n\n` +
+        `Questa modifica aggiornerà automaticamente anche i dati del cliente associato.\n\n` +
+        `Vuoi continuare?`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       await onUpdate(request.id, editData);
@@ -215,6 +240,16 @@ export function RequestDrawer({
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
             {isEditing ? (
               <div className="space-y-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3 mb-4">
+                  <div className="flex items-start space-x-2">
+                    <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-blue-800 dark:text-blue-200">
+                      <p className="font-medium mb-1">Sincronizzazione automatica</p>
+                      <p>Le modifiche a nome, città e indirizzo verranno applicate automaticamente al cliente associato.</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label htmlFor="edit-nome" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Nome Cliente *

@@ -109,7 +109,7 @@ export async function updateRequest(id: string, updates: Partial<Omit<Request, '
     return false;
   }
 
-  console.log('Request updated successfully:', data);
+  console.log('Request updated successfully. Associated client will be automatically synced by database trigger.');
   return true;
 }
 
