@@ -30,8 +30,10 @@ export function ClientProfile({
 }: ClientProfileProps) {
   const [deleting, setDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSaveConfirmDialog, setShowSaveConfirmDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState<{fields: string[], data: any, affectedCount: number} | null>(null);
   const [editData, setEditData] = useState({
     nominativo: '',
     telefono: '',
@@ -104,29 +106,41 @@ export function ClientProfile({
       if (hasCityChange) changedFields.push('città');
       if (hasAddressChange) changedFields.push('indirizzo');
 
-      const fieldsText = changedFields.join(', ');
-      const confirmed = window.confirm(
-        `Stai modificando ${fieldsText} del cliente.\n\n` +
-        `Questa modifica aggiornerà automaticamente ${affectedRequestsCount} ` +
-        `${affectedRequestsCount === 1 ? 'richiesta associata' : 'richieste associate'}.\n\n` +
-        `Vuoi continuare?`
-      );
-
-      if (!confirmed) {
-        return;
-      }
+      setPendingChanges({ fields: changedFields, data: editData, affectedCount: affectedRequestsCount });
+      setShowSaveConfirmDialog(true);
+      return;
     }
+
+    // No synced changes or no affected requests, save directly
+    await performSave(editData);
+  };
+
+  const performSave = async (data: any) => {
+    if (!client || !onUpdate) return;
 
     setSaving(true);
     try {
-      await onUpdate(client.id, editData);
+      await onUpdate(client.id, data);
       setIsEditing(false);
+      setShowSaveConfirmDialog(false);
+      setPendingChanges(null);
     } catch (error) {
       console.error('Error updating client:', error);
       alert('Errore durante l\'aggiornamento del cliente');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSaveConfirm = async () => {
+    if (pendingChanges) {
+      await performSave(pendingChanges.data);
+    }
+  };
+
+  const handleSaveCancel = () => {
+    setShowSaveConfirmDialog(false);
+    setPendingChanges(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -450,6 +464,21 @@ export function ClientProfile({
         confirmLabel="Elimina Cliente"
         cancelLabel="Annulla"
         isLoading={deleting}
+      />
+
+      <ConfirmDialog
+        isOpen={showSaveConfirmDialog}
+        onClose={handleSaveCancel}
+        onConfirm={handleSaveConfirm}
+        title="Conferma Modifica"
+        message={
+          pendingChanges
+            ? `Stai modificando ${pendingChanges.fields.join(', ')} del cliente.\n\nQuesta modifica aggiornerà automaticamente ${pendingChanges.affectedCount} ${pendingChanges.affectedCount === 1 ? 'richiesta associata' : 'richieste associate'}.\n\nVuoi continuare?`
+            : ''
+        }
+        confirmLabel="Conferma Modifica"
+        cancelLabel="Annulla"
+        isLoading={saving}
       />
     </>
   );
