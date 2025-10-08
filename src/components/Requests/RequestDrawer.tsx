@@ -41,9 +41,9 @@ export function RequestDrawer({
     comune: '',
     Indirizzo: '',
     Problema: '',
-    Urgenza: 'Media' as Request['Urgenza'],
+    Urgenza: false,
     PreferenzaRicontatto: '',
-    stato: 'Nuovo' as Request['stato']
+    stato: 'Non letto' as Request['stato']
   });
   const { updateRequestStatus } = useApp();
   
@@ -55,9 +55,9 @@ export function RequestDrawer({
         comune: request.comune || '',
         Indirizzo: request.Indirizzo || '',
         Problema: request.Problema || '',
-        Urgenza: request.Urgenza || 'Media',
+        Urgenza: request.Urgenza || false,
         PreferenzaRicontatto: request.PreferenzaRicontatto || '',
-        stato: request.stato || 'Nuovo'
+        stato: request.stato || 'Non letto'
       });
     }
   }, [request]);
@@ -206,9 +206,9 @@ export function RequestDrawer({
                         comune: request.comune || '',
                         Indirizzo: request.Indirizzo || '',
                         Problema: request.Problema || '',
-                        Urgenza: request.Urgenza || 'Media',
+                        Urgenza: request.Urgenza || false,
                         PreferenzaRicontatto: request.PreferenzaRicontatto || '',
-                        stato: request.stato || 'Nuovo'
+                        stato: request.stato || 'Non letto'
                       });
                     }}
                     disabled={saving}
@@ -317,18 +317,16 @@ export function RequestDrawer({
 
                 <div>
                   <label htmlFor="edit-urgenza" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Urgenza *
+                    Urgenza
                   </label>
                   <select
                     id="edit-urgenza"
-                    required
-                    value={editData.Urgenza}
-                    onChange={(e) => setEditData({ ...editData, Urgenza: e.target.value as Request['Urgenza'] })}
+                    value={editData.Urgenza ? 'true' : 'false'}
+                    onChange={(e) => setEditData({ ...editData, Urgenza: e.target.value === 'true' })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="Bassa">Bassa</option>
-                    <option value="Media">Media</option>
-                    <option value="Alta">Alta</option>
+                    <option value="false">No</option>
+                    <option value="true">Si</option>
                   </select>
                 </div>
 
