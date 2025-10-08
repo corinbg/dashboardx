@@ -235,6 +235,9 @@ export function ChecklistPage() {
     }
     
     try {
+      // Save current scroll position before update
+      const scrollY = window.scrollY;
+
       if (editingItem) {
         // Modifica attività esistente
         await updateChecklistItem(editingItem.id, {
@@ -250,9 +253,14 @@ export function ChecklistPage() {
         // Crea nuova attività
         await addAdvancedChecklistItem(taskData);
       }
-      
+
       setShowNewTaskForm(false);
       setEditingItem(null);
+
+      // Restore scroll position after state update
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollY);
+      });
     } catch (error) {
       console.error('Error adding item:', error);
       alert('Errore durante l\'aggiunta dell\'elemento');
@@ -260,8 +268,16 @@ export function ChecklistPage() {
   };
 
   const handleEditItem = (item: ChecklistItem) => {
+    // Save current scroll position
+    const scrollY = window.scrollY;
+
     setEditingItem(item);
     setShowNewTaskForm(true);
+
+    // Restore scroll position after state update
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollY);
+    });
   };
 
   const handleCancelEdit = () => {
