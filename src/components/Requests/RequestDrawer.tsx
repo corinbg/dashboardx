@@ -62,7 +62,17 @@ export function RequestDrawer({
         stato: request.stato || 'Non letto'
       });
     }
-  }, [request]);
+  }, [
+    request?.id,
+    request?.Nome,
+    request?.Numero,
+    request?.comune,
+    request?.Indirizzo,
+    request?.Problema,
+    request?.Urgenza,
+    request?.PreferenzaRicontatto,
+    request?.stato
+  ]);
 
   if (!isOpen || !request) return null;
 

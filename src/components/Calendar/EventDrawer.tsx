@@ -59,7 +59,19 @@ export function EventDrawer({ event, isOpen, onClose, onUpdate, onDelete }: Even
 
       setUseExistingClient(!!event.cliente_id);
     }
-  }, [event, isOpen]);
+  }, [
+    event?.id,
+    event?.titolo,
+    event?.cliente_id,
+    event?.cliente_nome,
+    event?.data_inizio,
+    event?.data_fine,
+    event?.tipo_intervento,
+    event?.indirizzo,
+    event?.note,
+    event?.stato,
+    isOpen
+  ]);
 
   const loadClients = async () => {
     const clientsList = await getClients();

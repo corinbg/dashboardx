@@ -50,7 +50,13 @@ export function ClientProfile({
         indirizzo: client.indirizzo || ''
       });
     }
-  }, [client]);
+  }, [
+    client?.id,
+    client?.nominativo,
+    client?.telefono,
+    client?.comune,
+    client?.indirizzo
+  ]);
 
   if (!isOpen || !client) return null;
 
