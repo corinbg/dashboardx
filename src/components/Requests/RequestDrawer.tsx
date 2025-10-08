@@ -33,8 +33,10 @@ export function RequestDrawer({
   const [updating, setUpdating] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSaveConfirmDialog, setShowSaveConfirmDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState<{fields: string[], data: any} | null>(null);
   const [editData, setEditData] = useState({
     Nome: '',
     Numero: '',
@@ -135,30 +137,43 @@ export function RequestDrawer({
       if (hasCityChange) changedFields.push('città');
       if (hasAddressChange) changedFields.push('indirizzo');
 
-      const fieldsText = changedFields.join(', ');
-      const confirmed = window.confirm(
-        `Stai modificando ${fieldsText} della richiesta.\n\n` +
-        `Questa modifica aggiornerà automaticamente anche i dati del cliente associato.\n\n` +
-        `Vuoi continuare?`
-      );
-
-      if (!confirmed) {
-        return;
-      }
+      setPendingChanges({ fields: changedFields, data: editData });
+      setShowSaveConfirmDialog(true);
+      return;
     }
+
+    // No synced changes, save directly
+    await performSave(editData);
+  };
+
+  const performSave = async (data: any) => {
+    if (!request || !onUpdate) return;
 
     setSaving(true);
     try {
-      await onUpdate(request.id, editData);
-      const updatedRequest = { ...request, ...editData };
+      await onUpdate(request.id, data);
+      const updatedRequest = { ...request, ...data };
       onStatusUpdate?.(updatedRequest);
       setIsEditing(false);
+      setShowSaveConfirmDialog(false);
+      setPendingChanges(null);
     } catch (error) {
       console.error('Error updating request:', error);
       alert('Errore durante l\'aggiornamento della richiesta');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSaveConfirm = async () => {
+    if (pendingChanges) {
+      await performSave(pendingChanges.data);
+    }
+  };
+
+  const handleSaveCancel = () => {
+    setShowSaveConfirmDialog(false);
+    setPendingChanges(null);
   };
 
   return (
@@ -604,6 +619,21 @@ export function RequestDrawer({
         confirmLabel="Elimina Richiesta"
         cancelLabel="Annulla"
         isLoading={deleting}
+      />
+
+      <ConfirmDialog
+        isOpen={showSaveConfirmDialog}
+        onClose={handleSaveCancel}
+        onConfirm={handleSaveConfirm}
+        title="Conferma Modifica"
+        message={
+          pendingChanges
+            ? `Stai modificando ${pendingChanges.fields.join(', ')} della richiesta.\n\nQuesta modifica aggiornerà automaticamente anche i dati del cliente associato.\n\nVuoi continuare?`
+            : ''
+        }
+        confirmLabel="Conferma Modifica"
+        cancelLabel="Annulla"
+        isLoading={saving}
       />
     </>
   );
