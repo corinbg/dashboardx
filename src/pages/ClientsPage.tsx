@@ -108,6 +108,30 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onD
     setSelectedClient(null);
   };
 
+  const handleUpdateClientWrapper = async (clientId: string, updates: Partial<Client>) => {
+    await onUpdateClient(clientId, updates);
+
+    // Update selectedClient with fresh data after update
+    if (selectedClient && selectedClient.id === clientId) {
+      const updatedClient = clients.find(c => c.id === clientId);
+      if (updatedClient) {
+        setSelectedClient({ ...updatedClient, ...updates });
+      }
+    }
+  };
+
+  const handleUpdateRequestWrapper = async (requestId: string, updates: Partial<Request>) => {
+    await onUpdateRequest(requestId, updates);
+
+    // Update selectedRequest with fresh data after update
+    if (selectedRequest && selectedRequest.id === requestId) {
+      const updatedRequest = requests.find(r => r.id === requestId);
+      if (updatedRequest) {
+        setSelectedRequest({ ...updatedRequest, ...updates });
+      }
+    }
+  };
+
   const handleRequestClick = (request: Request) => {
     setSelectedRequest(request);
     setRequestDrawerOpen(true);
@@ -569,7 +593,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onD
         onClose={closeModal}
         onTabChange={onTabChange}
         onDelete={onDeleteClient}
-        onUpdate={onUpdateClient}
+        onUpdate={handleUpdateClientWrapper}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
         onRequestClick={handleRequestClick}
       />
@@ -581,7 +605,7 @@ export function ClientsPage({ onTabChange, setConversationSearchPhoneNumber, onD
         onClose={closeRequestDrawer}
         onTabChange={onTabChange}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
-        onUpdate={onUpdateRequest}
+        onUpdate={handleUpdateRequestWrapper}
         onDelete={onDeleteRequest}
       />
 

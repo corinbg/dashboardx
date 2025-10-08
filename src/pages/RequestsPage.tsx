@@ -207,6 +207,18 @@ export function RequestsPage({
     // Update the selected request immediately for instant UI feedback
     setSelectedRequest(updatedRequest);
   };
+
+  const handleUpdateRequestWrapper = async (requestId: string, updates: Partial<Request>) => {
+    await onUpdateRequest(requestId, updates);
+
+    // Update selectedRequest with fresh data after update
+    if (selectedRequest && selectedRequest.id === requestId) {
+      const updatedRequest = requests.find(r => r.id === requestId);
+      if (updatedRequest) {
+        setSelectedRequest({ ...updatedRequest, ...updates });
+      }
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -389,7 +401,7 @@ export function RequestsPage({
         onTabChange={onTabChange}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
         onDelete={onDeleteRequest}
-        onUpdate={onUpdateRequest}
+        onUpdate={handleUpdateRequestWrapper}
       />
 
       {/* Client Profile Modal */}

@@ -41,6 +41,15 @@ export function CalendarPage() {
     const success = await updateEvent(id, updates);
     if (success) {
       await loadEvents();
+
+      // Update selectedEvent with fresh data from database
+      if (selectedEvent && selectedEvent.id === id) {
+        const eventsData = await getEvents();
+        const updatedEvent = eventsData.find(e => e.id === id);
+        if (updatedEvent) {
+          setSelectedEvent(updatedEvent);
+        }
+      }
     }
   };
 
