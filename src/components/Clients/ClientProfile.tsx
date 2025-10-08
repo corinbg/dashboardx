@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, User, Phone, MapPin, Home, Calendar, Wrench, FileText, MessageCircle, Trash2 } from 'lucide-react';
 import { Client, Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
+import { ConfirmDialog } from '../UI/ConfirmDialog';
 
 interface ClientProfileProps {
   client: Client | null;
@@ -23,6 +24,7 @@ export function ClientProfile({
   onDelete
 }: ClientProfileProps) {
   const [deleting, setDeleting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   if (!isOpen || !client) return null;
 
@@ -39,20 +41,23 @@ export function ClientProfile({
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     if (!client || !onDelete) return;
 
-    if (window.confirm(`Sei sicuro di voler eliminare il cliente "${client.nominativo}"? Questa azione non può essere annullata.`)) {
-      setDeleting(true);
-      try {
-        await onDelete(client.id);
-        onClose();
-      } catch (error) {
-        console.error('Error deleting client:', error);
-        alert('Errore durante l\'eliminazione del cliente');
-      } finally {
-        setDeleting(false);
-      }
+    setDeleting(true);
+    try {
+      await onDelete(client.id);
+      setShowConfirmDialog(false);
+      onClose();
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      alert('Errore durante l\'eliminazione del cliente');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -102,17 +107,13 @@ export function ClientProfile({
                 )}
                 {onDelete && (
                   <button
-                    onClick={handleDelete}
+                    onClick={handleDeleteClick}
                     disabled={deleting}
                     className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Elimina cliente"
                   >
-                    {deleting ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-1"></div>
-                    ) : (
-                      <Trash2 className="h-4 w-4 mr-1" />
-                    )}
-                    {deleting ? 'Eliminazione...' : 'Elimina'}
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Elimina
                   </button>
                 )}
                 <button
@@ -259,6 +260,17 @@ export function ClientProfile({
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare il cliente "${client?.nominativo}"? Questa azione non può essere annullata e verranno eliminati tutti i dati associati.`}
+        confirmLabel="Elimina Cliente"
+        cancelLabel="Annulla"
+        isLoading={deleting}
+      />
     </>
   );
 }

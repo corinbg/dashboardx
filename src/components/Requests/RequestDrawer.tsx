@@ -4,6 +4,7 @@ import { Request } from '../../types';
 import { StatusBadge } from '../UI/StatusBadge';
 import { UrgencyBadge } from '../UI/UrgencyBadge';
 import { useApp } from '../../contexts/AppContext';
+import { ConfirmDialog } from '../UI/ConfirmDialog';
 
 interface RequestDrawerProps {
   request: Request | null;
@@ -28,6 +29,7 @@ export function RequestDrawer({
 }: RequestDrawerProps) {
   const [updating, setUpdating] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { updateRequestStatus } = useApp();
   
   if (!isOpen || !request) return null;
@@ -67,20 +69,23 @@ export function RequestDrawer({
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     if (!request || !onDelete) return;
 
-    if (window.confirm('Sei sicuro di voler eliminare questa richiesta? Questa azione non può essere annullata.')) {
-      setDeleting(true);
-      try {
-        await onDelete(request.id);
-        onClose();
-      } catch (error) {
-        console.error('Error deleting request:', error);
-        alert('Errore durante l\'eliminazione della richiesta');
-      } finally {
-        setDeleting(false);
-      }
+    setDeleting(true);
+    try {
+      await onDelete(request.id);
+      setShowConfirmDialog(false);
+      onClose();
+    } catch (error) {
+      console.error('Error deleting request:', error);
+      alert('Errore durante l\'eliminazione della richiesta');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -268,17 +273,13 @@ export function RequestDrawer({
 
               {onDelete && (
                 <button
-                  onClick={handleDelete}
+                  onClick={handleDeleteClick}
                   disabled={deleting}
                   className="w-full text-left px-3 py-2 text-sm rounded-md text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="flex items-center">
-                    {deleting ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                    ) : (
-                      <Trash2 className="h-4 w-4 mr-2" />
-                    )}
-                    {deleting ? 'Eliminazione...' : 'Elimina richiesta'}
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Elimina richiesta
                   </div>
                 </button>
               )}
@@ -349,6 +350,17 @@ export function RequestDrawer({
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Conferma Eliminazione"
+        message="Sei sicuro di voler eliminare questa richiesta? Questa azione non può essere annullata e tutti i dati associati verranno eliminati."
+        confirmLabel="Elimina Richiesta"
+        cancelLabel="Annulla"
+        isLoading={deleting}
+      />
     </>
   );
 }
