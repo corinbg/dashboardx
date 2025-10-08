@@ -3,6 +3,7 @@ import { AlertTriangle, Calendar, Clock, GripVertical, CreditCard as Edit2, Tras
 import { ChecklistItem as ChecklistItemType } from '../../types';
 import { Check, Loader } from 'lucide-react';
 import { CategoryTag } from './CategoryTag';
+import { ConfirmDialog } from '../UI/ConfirmDialog';
 
 interface ChecklistItemProps {
   item: ChecklistItemType;
@@ -13,15 +14,16 @@ interface ChecklistItemProps {
   dragHandleProps?: any;
 }
 
-export function ChecklistItemComponent({ 
-  item, 
-  onToggle, 
-  onEdit, 
+export function ChecklistItemComponent({
+  item,
+  onToggle,
+  onEdit,
   onDelete,
   isDragging = false,
-  dragHandleProps 
+  dragHandleProps
 }: ChecklistItemProps) {
   const [isToggling, setIsToggling] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', {
@@ -202,7 +204,7 @@ export function ChecklistItemComponent({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(item.id);
+                    setShowDeleteConfirm(true);
                   }}
                   className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
                   title="Elimina attività"
@@ -248,6 +250,19 @@ export function ChecklistItemComponent({
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={() => {
+          onDelete?.(item.id);
+          setShowDeleteConfirm(false);
+        }}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare l'attività "${item.testo}"? Questa azione non può essere annullata.`}
+        confirmLabel="Elimina Attività"
+        cancelLabel="Annulla"
+      />
     </div>
   );
 }

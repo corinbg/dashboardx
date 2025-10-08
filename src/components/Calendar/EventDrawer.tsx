@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Calendar, Clock, User, MapPin, FileText, Tag, Trash2, CreditCard as Edit2, CheckCircle } from 'lucide-react';
 import { CalendarEvent, EventType, EventStatus } from '../../types';
 import { getClients } from '../../services/clientsService';
+import { ConfirmDialog } from '../UI/ConfirmDialog';
 
 interface EventDrawerProps {
   event: CalendarEvent | null;
@@ -519,47 +520,16 @@ export function EventDrawer({ event, isOpen, onClose, onUpdate, onDelete }: Even
         </div>
       </div>
 
-      {showDeleteConfirm && (
-        <div className="fixed z-50 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-              <div>
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
-                  <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
-                </div>
-                <div className="mt-3 text-center sm:mt-5">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                    Elimina Appuntamento
-                  </h3>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Sei sicuro di voler eliminare questo appuntamento? Questa azione non può essere annullata.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                <button
-                  onClick={handleDelete}
-                  disabled={loading}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:col-start-2 sm:text-sm disabled:opacity-50"
-                >
-                  {loading ? 'Eliminazione...' : 'Elimina'}
-                </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={loading}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-                >
-                  Annulla
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare l'appuntamento "${event?.titolo}"? Questa azione non può essere annullata.`}
+        confirmLabel="Elimina Appuntamento"
+        cancelLabel="Annulla"
+        isLoading={loading}
+      />
     </div>
   );
 }
