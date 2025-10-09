@@ -386,14 +386,6 @@ export function ChecklistPage() {
                   <Grid3X3 className="h-4 w-4" />
                 </button>
               </div>
-              
-              <button
-                onClick={() => setShowNewTaskForm(true)}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nuova Attività
-              </button>
             </div>
           </div>
           
@@ -480,7 +472,7 @@ export function ChecklistPage() {
                 ? "Prova a modificare i filtri per vedere più risultati."
                 : "Ottimo lavoro! Non hai attività in sospeso."}
               action={!showNewTaskForm ? {
-                label: "Aggiungi Prima Attività",
+                label: "Aggiungi Attività",
                 onClick: () => setShowNewTaskForm(true)
               } : undefined}
             />
