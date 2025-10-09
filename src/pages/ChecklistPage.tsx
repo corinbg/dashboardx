@@ -465,16 +465,12 @@ export function ChecklistPage() {
           <div className="mb-8">
             <EmptyState
               type="checklist"
-              title={searchTerm || priorityFilter !== 'all' || categoryFilter !== 'all' || dateFilter !== 'all' || statusFilter !== 'all' 
-                ? "Nessuna attività trovata" 
+              title={searchTerm || priorityFilter !== 'all' || categoryFilter !== 'all' || dateFilter !== 'all' || statusFilter !== 'all'
+                ? "Nessuna attività trovata"
                 : "Nessuna attività da fare"}
               description={searchTerm || priorityFilter !== 'all' || categoryFilter !== 'all' || dateFilter !== 'all' || statusFilter !== 'all'
                 ? "Prova a modificare i filtri per vedere più risultati."
-                : "Ottimo lavoro! Non hai attività in sospeso."}
-              action={!showNewTaskForm ? {
-                label: "Aggiungi Attività",
-                onClick: () => setShowNewTaskForm(true)
-              } : undefined}
+                : "Usa la barra di ricerca sopra per aggiungere una nuova attività."}
             />
           </div>
         )}
