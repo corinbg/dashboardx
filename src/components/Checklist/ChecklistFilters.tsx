@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, Filter, Calendar, AlertTriangle, Tag, RotateCcw } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Search, Filter, Calendar, AlertTriangle, Tag, RotateCcw, Plus } from 'lucide-react';
 import { Priority, Category } from '../../types';
 
 interface ChecklistFiltersProps {
@@ -14,6 +14,7 @@ interface ChecklistFiltersProps {
   statusFilter: 'all' | 'completed' | 'pending';
   onStatusFilterChange: (status: 'all' | 'completed' | 'pending') => void;
   onReset: () => void;
+  onQuickAdd?: (text: string) => void;
 }
 
 export function ChecklistFilters({
@@ -27,22 +28,65 @@ export function ChecklistFilters({
   onDateFilterChange,
   statusFilter,
   onStatusFilterChange,
-  onReset
+  onReset,
+  onQuickAdd
 }: ChecklistFiltersProps) {
+  const [showAddButton, setShowAddButton] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchTerm.trim() !== '' && onQuickAdd) {
+      e.preventDefault();
+      onQuickAdd(searchTerm.trim());
+      onSearchChange('');
+      setShowAddButton(false);
+    }
+  };
+
+  const handleQuickAdd = () => {
+    if (searchTerm.trim() !== '' && onQuickAdd) {
+      onQuickAdd(searchTerm.trim());
+      onSearchChange('');
+      setShowAddButton(false);
+      inputRef.current?.focus();
+    }
+  };
+
+  const handleInputChange = (value: string) => {
+    onSearchChange(value);
+    setShowAddButton(value.trim() !== '' && !!onQuickAdd);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
-      {/* Search */}
+      {/* Search with Quick Add */}
       <div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
+            ref={inputRef}
             type="search"
-            placeholder="Cerca attività..."
+            placeholder="Cerca o aggiungi attività..."
             value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full pl-10 pr-24 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
+          {showAddButton && (
+            <button
+              onClick={handleQuickAdd}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Aggiungi
+            </button>
+          )}
         </div>
+        {showAddButton && (
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Premi Invio o clicca "Aggiungi" per creare l'attività
+          </p>
+        )}
       </div>
 
       {/* Filter Row */}

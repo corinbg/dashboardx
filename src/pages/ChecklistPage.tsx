@@ -425,6 +425,7 @@ export function ChecklistPage() {
             statusFilter={statusFilter}
             onStatusFilterChange={setStatusFilter}
             onReset={handleResetFilters}
+            onQuickAdd={user ? addChecklistItem : undefined}
           />
         </div>
 
