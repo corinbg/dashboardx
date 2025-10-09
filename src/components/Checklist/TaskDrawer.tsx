@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, AlertTriangle, Tag, Trash2, CreditCard as Edit2, Check, Clock, Repeat } from 'lucide-react';
+import { X, Calendar, AlertTriangle, Tag, Trash2, CreditCard as Edit2, Check, Clock, Repeat, RotateCcw } from 'lucide-react';
 import { ChecklistItem, Priority, Category } from '../../types';
 import { CategoryTag } from './CategoryTag';
 import { PrioritySelector } from './PrioritySelector';
@@ -251,9 +251,9 @@ export function TaskDrawer({ task, isOpen, onClose, onUpdate, onDelete, onToggle
                         )}
                       </div>
 
-                      {!task.completata && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Azione Rapida</p>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Azione Rapida</p>
+                        {!task.completata ? (
                           <button
                             onClick={handleToggleComplete}
                             disabled={loading}
@@ -262,8 +262,17 @@ export function TaskDrawer({ task, isOpen, onClose, onUpdate, onDelete, onToggle
                             <Check className="h-4 w-4 mr-2" />
                             Segna come completata
                           </button>
-                        </div>
-                      )}
+                        ) : (
+                          <button
+                            onClick={handleToggleComplete}
+                            disabled={loading}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                          >
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Segna come non completata
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <form className="space-y-4">
