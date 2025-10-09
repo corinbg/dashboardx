@@ -10,6 +10,7 @@ import { updateChecklistItemOrder } from '../services/checklistService';
 import { ChecklistItemComponent } from '../components/Checklist/ChecklistItem';
 import { NewTaskForm } from '../components/Checklist/NewTaskForm';
 import { ChecklistFilters } from '../components/Checklist/ChecklistFilters';
+import { TaskDrawer } from '../components/Checklist/TaskDrawer';
 import { EmptyState } from '../components/UI/EmptyState';
 import { ChecklistItem, Priority, Category } from '../types';
 
@@ -60,6 +61,8 @@ export function ChecklistPage() {
   const [editingItem, setEditingItem] = useState<ChecklistItem | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [selectedTask, setSelectedTask] = useState<ChecklistItem | null>(null);
+  const [isTaskDrawerOpen, setIsTaskDrawerOpen] = useState(false);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -268,16 +271,25 @@ export function ChecklistPage() {
   };
 
   const handleEditItem = (item: ChecklistItem) => {
-    // Save current scroll position
-    const scrollY = window.scrollY;
+    setSelectedTask(item);
+    setIsTaskDrawerOpen(true);
+  };
 
-    setEditingItem(item);
-    setShowNewTaskForm(true);
+  const handleTaskClick = (item: ChecklistItem) => {
+    setSelectedTask(item);
+    setIsTaskDrawerOpen(true);
+  };
 
-    // Restore scroll position after state update
-    requestAnimationFrame(() => {
-      window.scrollTo(0, scrollY);
-    });
+  const handleUpdateTask = async (id: string, updates: Partial<ChecklistItem>) => {
+    await updateChecklistItem(id, updates);
+
+    // Update selectedTask with fresh data after update
+    if (selectedTask && selectedTask.id === id) {
+      const updatedTask = checklist.find(t => t.id === id);
+      if (updatedTask) {
+        setSelectedTask({ ...updatedTask, ...updates });
+      }
+    }
   };
 
   const handleCancelEdit = () => {
@@ -410,8 +422,8 @@ export function ChecklistPage() {
                       key={item.id}
                       item={item}
                       onToggle={toggleChecklistItem}
-                     onEdit={handleEditItem}
-                     onDelete={deleteChecklistItem}
+                      onEdit={handleTaskClick}
+                      onDelete={deleteChecklistItem}
                     />
                   ))}
                 </div>
@@ -472,8 +484,8 @@ export function ChecklistPage() {
                     key={item.id}
                     item={item}
                     onToggle={toggleChecklistItem}
-                    onEdit={handleEditItem}
-                   onDelete={deleteChecklistItem}
+                    onEdit={handleTaskClick}
+                    onDelete={deleteChecklistItem}
                   />
                 ))}
               </div>
@@ -481,6 +493,18 @@ export function ChecklistPage() {
           </div>
         )}
       </main>
+
+      <TaskDrawer
+        task={selectedTask}
+        isOpen={isTaskDrawerOpen}
+        onClose={() => {
+          setIsTaskDrawerOpen(false);
+          setSelectedTask(null);
+        }}
+        onUpdate={handleUpdateTask}
+        onDelete={deleteChecklistItem}
+        onToggle={toggleChecklistItem}
+      />
     </div>
   );
 }

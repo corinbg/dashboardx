@@ -125,14 +125,14 @@ export function ChecklistItemComponent({
   };
   return (
     <div
-      className={`flex items-start space-x-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getImportanceClasses()} ${
+      className={`group flex items-start space-x-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getImportanceClasses()} ${
         isDragging ? 'opacity-50 rotate-2 shadow-lg' : ''
       } ${item.completata ? 'opacity-75' : ''} ${onEdit ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-600' : ''}`}
       onClick={handleItemClick}
       onKeyDown={handleKeyDown}
       role={onEdit ? "button" : undefined}
       tabIndex={onEdit ? 0 : undefined}
-      aria-label={onEdit ? `Modifica attività: ${item.testo}` : undefined}
+      aria-label={onEdit ? `Visualizza attività: ${item.testo}` : undefined}
     >
       {/* Drag Handle */}
       {dragHandleProps && (
@@ -186,20 +186,8 @@ export function ChecklistItemComponent({
               {item.testo}
             </p>
             
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-1 ml-2">
-              {onEdit && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(item);
-                  }}
-                  className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  title="Modifica attività"
-                >
-                  <Edit2 className="h-3 w-3" />
-                </button>
-              )}
+            {/* Action Buttons - Hidden, click on item to open drawer */}
+            <div className="flex items-center space-x-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
               {onDelete && (
                 <button
                   onClick={(e) => {
