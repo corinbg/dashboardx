@@ -68,11 +68,11 @@ export function ChecklistPage() {
   React.useEffect(() => {
     if (selectedTask && isTaskDrawerOpen) {
       const updatedTask = checklist.find(t => t.id === selectedTask.id);
-      if (updatedTask) {
+      if (updatedTask && JSON.stringify(updatedTask) !== JSON.stringify(selectedTask)) {
         setSelectedTask(updatedTask);
       }
     }
-  }, [checklist]);
+  }, [checklist, selectedTask, isTaskDrawerOpen]);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -138,6 +138,13 @@ export function ChecklistPage() {
     });
   }, [checklist, searchTerm, priorityFilter, categoryFilter, dateFilter, statusFilter]);
 
+  // Check if any filters are active
+  const hasActiveFilters = searchTerm !== '' ||
+                          priorityFilter !== 'all' ||
+                          categoryFilter !== 'all' ||
+                          dateFilter !== 'all' ||
+                          statusFilter !== 'all';
+
   // Sort items with memoization
   const sortedItems = React.useMemo(() => {
     return [...filteredItems].sort((a, b) => {
@@ -145,27 +152,32 @@ export function ChecklistPage() {
       if (a.completata !== b.completata) {
         return a.completata ? 1 : -1;
       }
-      
-      // Then by priority
+
+      // If no filters are active, use manual order only for non-completed items
+      if (!hasActiveFilters && !a.completata && !b.completata) {
+        return a.ordine - b.ordine;
+      }
+
+      // Then by priority (only when filters are active or items are completed)
       const priorityOrder = { 'alta': 0, 'media': 1, 'bassa': 2, 'none': 3 };
       const aPriority = priorityOrder[a.priorita];
       const bPriority = priorityOrder[b.priorita];
-      
+
       if (aPriority !== bPriority) {
         return aPriority - bPriority;
       }
-      
+
       // Then by due date
       if (a.dataScadenza && b.dataScadenza) {
         return new Date(a.dataScadenza).getTime() - new Date(b.dataScadenza).getTime();
       }
       if (a.dataScadenza && !b.dataScadenza) return -1;
       if (!a.dataScadenza && b.dataScadenza) return 1;
-      
+
       // Finally by order
       return a.ordine - b.ordine;
     });
-  }, [filteredItems]);
+  }, [filteredItems, hasActiveFilters]);
 
   // Separate todo and completed items with memoization
   const todoItems = React.useMemo(() => {
