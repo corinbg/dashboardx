@@ -63,6 +63,16 @@ export function ChecklistPage() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedTask, setSelectedTask] = useState<ChecklistItem | null>(null);
   const [isTaskDrawerOpen, setIsTaskDrawerOpen] = useState(false);
+
+  // Sync selectedTask when checklist updates
+  React.useEffect(() => {
+    if (selectedTask && isTaskDrawerOpen) {
+      const updatedTask = checklist.find(t => t.id === selectedTask.id);
+      if (updatedTask) {
+        setSelectedTask(updatedTask);
+      }
+    }
+  }, [checklist]);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -292,6 +302,19 @@ export function ChecklistPage() {
     }
   };
 
+  const handleToggleTask = async (id: string) => {
+    // Optimistically update the selectedTask before the API call
+    if (selectedTask && selectedTask.id === id) {
+      setSelectedTask({
+        ...selectedTask,
+        completata: !selectedTask.completata,
+        completataAt: !selectedTask.completata ? new Date().toISOString() : null
+      });
+    }
+
+    await toggleChecklistItem(id);
+  };
+
   const handleCancelEdit = () => {
     setShowNewTaskForm(false);
     setEditingItem(null);
@@ -503,7 +526,7 @@ export function ChecklistPage() {
         }}
         onUpdate={handleUpdateTask}
         onDelete={deleteChecklistItem}
-        onToggle={toggleChecklistItem}
+        onToggle={handleToggleTask}
       />
     </div>
   );
