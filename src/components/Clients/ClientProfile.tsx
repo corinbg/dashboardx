@@ -178,40 +178,51 @@ export function ClientProfile({
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
           <div className="flex flex-col h-full max-h-[90vh]">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-white">
-                Profilo Cliente
-              </h2>
-              <div className="flex items-center space-x-2">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-start justify-between gap-2">
+                <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-white flex-shrink-0">
+                  Profilo Cliente
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="flex-shrink-0 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Chiudi profilo cliente"
+                >
+                  <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2 mt-4">
                 {!isEditing && client.telefono && (
                   <button
                     onClick={handleViewConversations}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-nowrap"
                     title="Visualizza conversazioni"
                   >
-                    <MessageCircle className="h-4 w-4 mr-1" />
-                    Conversazioni
+                    <MessageCircle className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Conversazioni</span>
                   </button>
                 )}
                 {!isEditing && onUpdate && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-nowrap"
                     title="Modifica cliente"
                   >
-                    <Edit2 className="h-4 w-4 mr-1" />
-                    Modifica
+                    <Edit2 className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Modifica</span>
                   </button>
                 )}
                 {!isEditing && onDelete && (
                   <button
                     onClick={handleDeleteClick}
                     disabled={deleting}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                     title="Elimina cliente"
                   >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Elimina
+                    <Trash2 className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Elimina</span>
                   </button>
                 )}
                 {isEditing && (
@@ -227,27 +238,21 @@ export function ClientProfile({
                         });
                       }}
                       disabled={saving}
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                     >
                       Annulla
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                     >
-                      <Save className="h-4 w-4 mr-1" />
-                      {saving ? 'Salvataggio...' : 'Salva'}
+                      <Save className="h-4 w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">{saving ? 'Salvataggio...' : 'Salva'}</span>
+                      <span className="sm:hidden">💾</span>
                     </button>
                   </>
                 )}
-                <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  aria-label="Chiudi profilo cliente"
-                >
-                  <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                </button>
               </div>
             </div>
 
