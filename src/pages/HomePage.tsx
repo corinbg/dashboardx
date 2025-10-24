@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  ClipboardList, 
-  Users, 
-  CheckSquare, 
-  MessageCircle, 
+import {
+  ClipboardList,
+  Users,
+  CheckSquare,
+  MessageCircle,
   Plus,
   Phone,
   Check,
@@ -14,6 +14,10 @@ import {
   TrendingUp,
   Calendar
 } from 'lucide-react';
+import { useApp } from '../contexts/AppContext';
+import { getEventsByDate } from '../services/calendarService';
+import { getAllConversations } from '../services/conversationsService';
+import { CalendarEvent } from '../types';
 
 interface HomePageProps {
   onTabChange: (tab: string) => void;
@@ -21,17 +25,101 @@ interface HomePageProps {
   onNewClient: () => void;
 }
 
-export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePageProps) {
-  const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
+interface AgendaItem {
+  orario: string;
+  cliente: string;
+  luogo: string;
+  urgente: boolean;
+}
 
-  // Update date and time every minute
+interface Aggiornamento {
+  tipo: 'richiesta' | 'checklist' | 'conversazione';
+  testo: string;
+  tempo: string;
+  timestamp: Date;
+}
+
+export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePageProps) {
+  const { requests, clients, checklist, loading } = useApp();
+  const [currentDateTime, setCurrentDateTime] = React.useState(new Date());
+  const [todayEvents, setTodayEvents] = React.useState<CalendarEvent[]>([]);
+  const [recentConversationsCount, setRecentConversationsCount] = React.useState(0);
+  const [aggiornamenti, setAggiornamenti] = React.useState<Aggiornamento[]>([]);
+
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
-    }, 60000); // Update every minute
+    }, 60000);
 
     return () => clearInterval(timer);
   }, []);
+
+  React.useEffect(() => {
+    const loadTodayEvents = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const events = await getEventsByDate(today);
+      setTodayEvents(events);
+    };
+
+    loadTodayEvents();
+  }, []);
+
+  React.useEffect(() => {
+    const loadRecentConversations = async () => {
+      try {
+        const allConversations = await getAllConversations();
+        const twentyFourHoursAgo = new Date();
+        twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+        const recentConversations = allConversations.filter(conv => {
+          if (!conv.lastMessage) return false;
+          const messageDate = new Date(conv.lastMessage.timestamp);
+          return messageDate >= twentyFourHoursAgo;
+        });
+
+        setRecentConversationsCount(recentConversations.length);
+      } catch (error) {
+        console.error('Error loading recent conversations:', error);
+        setRecentConversationsCount(0);
+      }
+    };
+
+    loadRecentConversations();
+  }, []);
+
+  React.useEffect(() => {
+    const updates: Aggiornamento[] = [];
+
+    requests.slice(0, 5).forEach(req => {
+      updates.push({
+        tipo: 'richiesta',
+        testo: `Nuova richiesta da ${req.Nome}`,
+        tempo: '',
+        timestamp: new Date(req.richiestaAt)
+      });
+    });
+
+    checklist
+      .filter(item => item.completata && item.completataAt)
+      .slice(0, 3)
+      .forEach(item => {
+        updates.push({
+          tipo: 'checklist',
+          testo: `Attività "${item.testo.substring(0, 30)}${item.testo.length > 30 ? '...' : ''}" completata`,
+          tempo: '',
+          timestamp: new Date(item.completataAt!)
+        });
+      });
+
+    updates.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+    const topUpdates = updates.slice(0, 4).map(update => ({
+      ...update,
+      tempo: getRelativeTime(update.timestamp)
+    }));
+
+    setAggiornamenti(topUpdates);
+  }, [requests, checklist]);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('it-IT', {
@@ -49,28 +137,111 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
     });
   };
 
-  // Mock data per la dashboard
-  const mockStats = {
-    richieste: { totale: 24, urgenti: 5, nonUrgenti: 19 },
-    clienti: { totale: 156, topClients: ['Marco Rossi (8)', 'Anna Verdi (6)'] },
-    checklist: { aperteOggi: 7 },
-    conversazioni: { nuove24h: 3 }
+  const getRelativeTime = (date: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return `${diffInSeconds} sec fa`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min fa`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h fa`;
+    return `${Math.floor(diffInSeconds / 86400)}gg fa`;
   };
 
-  const mockAgenda = [
-    { orario: '09:00', cliente: 'Marco Rossi', luogo: 'Via Settembrini 3', urgente: true },
-    { orario: '11:30', cliente: 'Anna Verdi', luogo: 'Corso Buenos Aires 15', urgente: false },
-    { orario: '14:00', cliente: 'Giuseppe Bianchi', luogo: 'Via Torino 42', urgente: true },
-    { orario: '16:30', cliente: 'Maria Neri', luogo: 'Viale Monza 88', urgente: false },
-    { orario: '18:00', cliente: 'Luigi Ferrari', luogo: 'Via Padova 156', urgente: false }
-  ];
+  const stats = React.useMemo(() => {
+    const urgentCount = requests.filter(r => r.Urgenza === true || r.Urgenza === 'true' || r.Urgenza === 'Sì').length;
+    const nonUrgentCount = requests.length - urgentCount;
 
-  const mockAggiornamenti = [
-    { tipo: 'richiesta', testo: 'Nuova richiesta da Marco Rossi', tempo: '2 min fa' },
-    { tipo: 'checklist', testo: 'Attività "Controllo scorte" completata', tempo: '15 min fa' },
-    { tipo: 'conversazione', testo: 'Nuova conversazione con Anna Verdi', tempo: '1h fa' },
-    { tipo: 'richiesta', testo: 'Richiesta urgente da Giuseppe Bianchi', tempo: '2h fa' }
-  ];
+    const clientRequestCounts = new Map<string, number>();
+    clients.forEach(client => {
+      if (client.telefono) {
+        const count = requests.filter(req =>
+          req.Numero && client.telefono &&
+          req.Numero.replace(/\s+/g, '') === client.telefono.replace(/\s+/g, '')
+        ).length;
+        if (count > 0) {
+          clientRequestCounts.set(client.nominativo || 'N/A', count);
+        }
+      }
+    });
+
+    const topClients = Array.from(clientRequestCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 2)
+      .map(([name, count]) => `${name} (${count})`);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(today);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const checklistToday = checklist.filter(item => {
+      if (item.completata) return false;
+      if (!item.dataScadenza) return false;
+      const dueDate = new Date(item.dataScadenza);
+      return dueDate >= today && dueDate <= todayEnd;
+    }).length;
+
+    return {
+      richieste: { totale: requests.length, urgenti: urgentCount, nonUrgenti: nonUrgentCount },
+      clienti: { totale: clients.length, topClients },
+      checklist: { aperteOggi: checklistToday },
+      conversazioni: { nuove24h: recentConversationsCount }
+    };
+  }, [requests, clients, checklist, recentConversationsCount]);
+
+  const agenda: AgendaItem[] = React.useMemo(() => {
+    return todayEvents.slice(0, 5).map(event => {
+      const startTime = new Date(event.data_inizio);
+      return {
+        orario: startTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
+        cliente: event.cliente_nome || event.titolo,
+        luogo: event.indirizzo || 'Nessun indirizzo specificato',
+        urgente: event.tipo_intervento === 'Riparazione'
+      };
+    });
+  }, [todayEvents]);
+
+  const weeklyStats = React.useMemo(() => {
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - 7);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const completedThisWeek = requests.filter(req => {
+      if (req.stato !== 'Completato') return false;
+      const reqDate = new Date(req.richiestaAt);
+      return reqDate >= weekStart && reqDate <= now;
+    }).length;
+
+    const checklistTodayCount = checklist.filter(item => {
+      if (item.completata) return false;
+      if (!item.dataScadenza) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dueDate = new Date(item.dataScadenza);
+      const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+      const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      return dueDateOnly.getTime() === todayOnly.getTime();
+    }).length;
+
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const newClientsThisMonth = clients.filter(client => {
+      if (!client.created_at) return false;
+      const createdDate = new Date(client.created_at);
+      return createdDate >= monthStart && createdDate <= now;
+    }).length;
+
+    const completionRate = requests.length > 0
+      ? Math.round((requests.filter(r => r.stato === 'Completato').length / requests.length) * 10)
+      : 7;
+
+    return {
+      completedWeek: completedThisWeek,
+      checklistToday: checklistTodayCount,
+      newClientsMonth: newClientsThisMonth,
+      satisfaction: completionRate
+    };
+  }, [requests, clients, checklist]);
 
   const getAggiornamentiIcon = (tipo: string) => {
     switch (tipo) {
@@ -80,6 +251,14 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
       default: return <Clock className="h-4 w-4" />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -116,7 +295,7 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
             {/* Sezione Riepilogo */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Card Richieste */}
-              <div 
+              <div
                 onClick={() => onTabChange('richieste')}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
@@ -126,22 +305,22 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
                 <div className="flex items-center justify-between mb-4">
                   <ClipboardList className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {mockStats.richieste.totale}
+                    {stats.richieste.totale}
                   </span>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Richieste</h3>
                 <div className="flex space-x-2">
                   <span className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 px-2 py-1 rounded-full text-xs font-medium">
-                    {mockStats.richieste.urgenti} urgenti
+                    {stats.richieste.urgenti} urgenti
                   </span>
                   <span className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium">
-                    {mockStats.richieste.nonUrgenti} normali
+                    {stats.richieste.nonUrgenti} normali
                   </span>
                 </div>
               </div>
 
               {/* Card Clienti */}
-              <div 
+              <div
                 onClick={() => onTabChange('clienti')}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
@@ -151,22 +330,26 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
                 <div className="flex items-center justify-between mb-4">
                   <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {mockStats.clienti.totale}
+                    {stats.clienti.totale}
                   </span>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Clienti</h3>
                 <div className="space-y-1">
-                  {mockStats.clienti.topClients.map((client, index) => (
-                    <div key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                      <Star className="h-3 w-3 mr-1 text-yellow-400" />
-                      {client}
-                    </div>
-                  ))}
+                  {stats.clienti.topClients.length > 0 ? (
+                    stats.clienti.topClients.map((client, index) => (
+                      <div key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <Star className="h-3 w-3 mr-1 text-yellow-400" />
+                        {client}
+                      </div>
+                    ))
+                  ) : (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Nessun cliente con richieste</span>
+                  )}
                 </div>
               </div>
 
               {/* Card Checklist */}
-              <div 
+              <div
                 onClick={() => onTabChange('checklist')}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
@@ -176,13 +359,13 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
                 <div className="flex items-center justify-between mb-4">
                   <CheckSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {mockStats.checklist.aperteOggi}
+                    {stats.checklist.aperteOggi}
                   </span>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Checklist</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Attività aperte oggi</span>
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onTabChange('checklist');
@@ -195,7 +378,7 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
               </div>
 
               {/* Card Conversazioni */}
-              <div 
+              <div
                 onClick={() => onTabChange('conversazioni')}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 role="button"
@@ -205,13 +388,15 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
                 <div className="flex items-center justify-between mb-4">
                   <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {mockStats.conversazioni.nuove24h}
+                    {stats.conversazioni.nuove24h}
                   </span>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Conversazioni</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Nuove ultime 24h</span>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  {stats.conversazioni.nuove24h > 0 && (
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  )}
                 </div>
               </div>
             </div>
@@ -264,84 +449,106 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">Agenda di Oggi</h3>
                 <Calendar className="h-5 w-5 text-gray-400" />
               </div>
-              <div className="space-y-3">
-                {mockAgenda.slice(0, 5).map((appuntamento, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-start space-x-3 p-3 rounded-md transition-colors ${
-                      appuntamento.urgente 
-                        ? 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500' 
-                        : 'bg-gray-50 dark:bg-gray-700'
-                    }`}
-                  >
-                    <div className="flex-shrink-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {appuntamento.orario}
+              {agenda.length > 0 ? (
+                <div className="space-y-3">
+                  {agenda.map((appuntamento, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-start space-x-3 p-3 rounded-md transition-colors ${
+                        appuntamento.urgente
+                          ? 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500'
+                          : 'bg-gray-50 dark:bg-gray-700'
+                      }`}
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {appuntamento.orario}
+                        </div>
+                        {appuntamento.urgente && (
+                          <AlertTriangle className="h-3 w-3 text-red-500 mt-1" />
+                        )}
                       </div>
-                      {appuntamento.urgente && (
-                        <AlertTriangle className="h-3 w-3 text-red-500 mt-1" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {appuntamento.cliente}
-                      </p>
-                      <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {appuntamento.luogo}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {appuntamento.cliente}
+                        </p>
+                        <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          {appuntamento.luogo}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Nessun appuntamento oggi</p>
+                </div>
+              )}
             </div>
 
             {/* Statistiche Minime */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">18</div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
+                  {weeklyStats.completedWeek}
+                </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Completate settimana</div>
               </div>
-              
+
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">3</div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                  {weeklyStats.checklistToday}
+                </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Checklist oggi</div>
               </div>
-              
+
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">7</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1">
+                  {weeklyStats.newClientsMonth}
+                </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">Nuovi clienti mese</div>
               </div>
-              
+
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">7</div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                    {weeklyStats.satisfaction}
+                  </div>
                   <TrendingUp className="h-4 w-4 text-green-500 ml-1" />
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">Soddisfazione</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">Tasso completamento</div>
               </div>
             </div>
 
             {/* Ultimi Aggiornamenti */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Ultimi Aggiornamenti</h3>
-              <div className="space-y-3">
-                {mockAggiornamenti.map((aggiornamento, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 p-1.5 bg-gray-100 dark:bg-gray-700 rounded-full">
-                      {getAggiornamentiIcon(aggiornamento.tipo)}
+              {aggiornamenti.length > 0 ? (
+                <div className="space-y-3">
+                  {aggiornamenti.map((aggiornamento, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 p-1.5 bg-gray-100 dark:bg-gray-700 rounded-full">
+                        {getAggiornamentiIcon(aggiornamento.tipo)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900 dark:text-white">
+                          {aggiornamento.testo}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {aggiornamento.tempo}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 dark:text-white">
-                        {aggiornamento.testo}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {aggiornamento.tempo}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Clock className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Nessun aggiornamento recente</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

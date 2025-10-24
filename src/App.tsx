@@ -14,7 +14,6 @@ import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
 import { HomePage } from './pages/HomePage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
-import { FAQPage } from './pages/FAQPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
@@ -306,13 +305,11 @@ function AppContent({
         return <CalendarPage />;
       case 'conversazioni':
         return (
-          <ConversazioniPage
+          <ConversazioniPage 
             initialPhoneNumber={conversationSearchPhoneNumber}
             onPhoneNumberCleared={() => setConversationSearchPhoneNumber(null)}
           />
         );
-      case 'faq':
-        return <FAQPage />;
       default:
         return (
           <HomePage

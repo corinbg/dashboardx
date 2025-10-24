@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle, Home, HelpCircle } from 'lucide-react';
+import { Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle, Home } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -9,47 +9,41 @@ interface NavbarProps {
 }
 
 const tabs = [
-  {
-    id: 'home',
-    label: 'Home',
+  { 
+    id: 'home', 
+    label: 'Home', 
     icon: Home,
     description: 'Dashboard principale'
   },
-  {
-    id: 'richieste',
-    label: 'Richieste',
+  { 
+    id: 'richieste', 
+    label: 'Richieste', 
     icon: FileText,
     description: 'Gestione richieste di servizio'
   },
-  {
-    id: 'clienti',
-    label: 'Clienti',
+  { 
+    id: 'clienti', 
+    label: 'Clienti', 
     icon: Users,
     description: 'Database clienti e contatti'
   },
-  {
-    id: 'checklist',
-    label: 'Checklist',
+  { 
+    id: 'checklist', 
+    label: 'Checklist', 
     icon: CheckSquare,
     description: 'Lista attività da completare'
   },
-  {
-    id: 'conversazioni',
-    label: 'Conversazioni',
+  { 
+    id: 'conversazioni', 
+    label: 'Conversazioni', 
     icon: MessageCircle,
     description: 'Chat e messaggi clienti'
   },
-  {
-    id: 'calendario',
-    label: 'Calendario',
+  { 
+    id: 'calendario', 
+    label: 'Calendario', 
     icon: Calendar,
     description: 'Gestione appuntamenti'
-  },
-  {
-    id: 'faq',
-    label: 'FAQ',
-    icon: HelpCircle,
-    description: 'Domande frequenti e guida'
   }
 ];
 
