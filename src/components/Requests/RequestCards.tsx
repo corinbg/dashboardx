@@ -84,7 +84,7 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
       {requests.map((request, index) => {
         const isUrgent = request.Urgenza;
         const isUnread = request.stato === 'Non letto';
@@ -113,7 +113,7 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
             onKeyDown={(e) => handleKeyDown(e, index, request)}
             className={`${cardBgClass} rounded-lg shadow-sm border ${borderClass} p-4 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all transform hover:scale-[1.02] ${
               selectedIndex === index ? 'ring-2 ring-blue-500 border-blue-500' : ''
-            }`}
+            } w-full overflow-hidden`}
             role="button"
             aria-label={`View request details for ${request.Nome}`}
           >
@@ -166,19 +166,19 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
             </div>
 
             {/* Service Type */}
-            <div className="flex items-center mb-2">
-              <Wrench className="h-4 w-4 text-gray-400 mr-2" aria-hidden="true" />
-              <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+            <div className="flex items-start mb-2">
+              <Wrench className="h-4 w-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <p className="text-sm text-gray-600 dark:text-gray-300 break-words">
                 {request.Problema}
               </p>
             </div>
 
             {/* Phone with Call Action */}
             <div className="flex items-center mb-2 group">
-              <Phone className="h-4 w-4 text-gray-400 mr-2" aria-hidden="true" />
+              <Phone className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" aria-hidden="true" />
               <button
                 onClick={(e) => handleQuickCall(e, request.Numero)}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded flex-1 text-left"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded flex-1 text-left truncate"
                 title={`Chiama ${request.Numero}`}
               >
                 {request.Numero}
@@ -186,32 +186,34 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
             </div>
 
             {/* Callback Time */}
-            <div className="flex items-center mb-2">
-              <Clock className="h-4 w-4 text-gray-400 mr-2" aria-hidden="true" />
-              <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+            <div className="flex items-start mb-2">
+              <Clock className="h-4 w-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <p className="text-sm text-gray-600 dark:text-gray-300 break-words">
                 {request.PreferenzaRicontatto}
               </p>
             </div>
 
             {/* Date */}
             <div className="flex items-center mb-3">
-              <Calendar className="h-4 w-4 text-gray-400 mr-2" aria-hidden="true" />
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+              <Calendar className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" aria-hidden="true" />
+              <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
                 {formatDate(request.richiestaAt)}
               </p>
             </div>
 
             {/* Status and Quick Actions */}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-              <StatusBadge status={request.stato} size="sm" />
-              
+            <div className="flex items-center justify-between gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+              <div className="flex-shrink-0">
+                <StatusBadge status={request.stato} size="sm" />
+              </div>
+
               {/* Quick Status Actions */}
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 {request.stato !== 'Completato' && (
                   <button
                     onClick={(e) => handleQuickStatusUpdate(e, request.id, 'Completato')}
                     disabled={updatingStatus === request.id}
-                    className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/50 hover:bg-green-200 dark:hover:bg-green-900/70 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 transition-colors"
+                    className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/50 hover:bg-green-200 dark:hover:bg-green-900/70 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 transition-colors whitespace-nowrap"
                     title="Segna come completato"
                   >
                     {updatingStatus === request.id ? (
@@ -219,7 +221,8 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                     ) : (
                       <>
                         <CheckCircle className="h-3 w-3 mr-1" />
-                        Completa
+                        <span className="hidden sm:inline">Completa</span>
+                        <span className="sm:hidden">✓</span>
                       </>
                     )}
                   </button>
@@ -229,7 +232,7 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                   <button
                     onClick={(e) => handleQuickStatusUpdate(e, request.id, 'Contattato')}
                     disabled={updatingStatus === request.id}
-                    className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 hover:bg-blue-200 dark:hover:bg-blue-900/70 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                    className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 hover:bg-blue-200 dark:hover:bg-blue-900/70 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors whitespace-nowrap"
                     title="Segna come contattato"
                   >
                     {updatingStatus === request.id ? (
@@ -237,29 +240,13 @@ export function RequestCards({ requests, onRequestClick, selectedIndex, onSelect
                     ) : (
                       <>
                         <CalendarCheck className="h-3 w-3 mr-1" />
-                        Contatta
+                        <span className="hidden sm:inline">Contatta</span>
+                        <span className="sm:hidden">📞</span>
                       </>
                     )}
                   </button>
                 )}
               </div>
-            </div>
-            <div className="flex items-center flex-1">
-              <span className="text-sm text-gray-600 dark:text-gray-300 mr-3 flex-1">
-                {request.Numero}
-              </span>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleQuickCall(e, request.Numero);
-                }}
-                className="flex-shrink-0 p-2 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-                title={`Chiama ${request.Numero}`}
-                aria-label={`Chiama ${request.Numero}`}
-              >
-                <Phone className="h-4 w-4" />
-              </button>
             </div>
           </div>
         );
