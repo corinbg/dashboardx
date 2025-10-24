@@ -28,6 +28,7 @@ export function CentroAssistenzaPage() {
     priority: 'normale'
   });
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +80,8 @@ export function CentroAssistenzaPage() {
       action: 'Guarda ora',
       link: '#video',
       color: 'bg-red-500',
-      available: 'Disponibili sempre'
+      available: 'Disponibili sempre',
+      comingSoon: true
     }
   ];
 
@@ -100,13 +102,15 @@ export function CentroAssistenzaPage() {
       icon: FileText,
       title: 'Documentazione',
       description: 'Documentazione tecnica completa',
-      link: '#docs'
+      link: '#docs',
+      comingSoon: true
     },
     {
       icon: Users,
       title: 'Community',
       description: 'Unisciti alla community degli utenti',
-      link: '#community'
+      link: '#community',
+      comingSoon: true
     }
   ];
 
@@ -157,7 +161,11 @@ export function CentroAssistenzaPage() {
     }
   ];
 
-  const handleNavigation = (link: string) => {
+  const handleNavigation = (link: string, comingSoon?: boolean) => {
+    if (comingSoon) {
+      setShowComingSoonModal(true);
+      return;
+    }
     if (link.startsWith('#')) {
       return;
     }
@@ -168,6 +176,29 @@ export function CentroAssistenzaPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Coming Soon Modal */}
+      {showComingSoonModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowComingSoonModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center border-2 border-blue-500" onClick={(e) => e.stopPropagation()}>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-6">
+              <Clock className="h-10 w-10 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Prossimamente
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+              Questa funzionalità sarà disponibile molto presto. Stiamo lavorando per offrirti la migliore esperienza possibile.
+            </p>
+            <button
+              onClick={() => setShowComingSoonModal(false)}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            >
+              Ho capito
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
 
         {/* Hero Header */}
@@ -202,16 +233,28 @@ export function CentroAssistenzaPage() {
             Opzioni di Supporto
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {supportOptions.map((option, index) => {
+            {supportOptions.map((option: any, index) => {
               const IconComponent = option.icon;
+              const Element = option.comingSoon ? 'button' : 'a';
+              const props = option.comingSoon ? {
+                onClick: () => setShowComingSoonModal(true),
+                className: "relative bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-left"
+              } : {
+                href: option.link,
+                target: option.link.startsWith('http') ? '_blank' : undefined,
+                rel: option.link.startsWith('http') ? 'noopener noreferrer' : undefined,
+                className: "bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              };
               return (
-                <a
+                <Element
                   key={index}
-                  href={option.link}
-                  target={option.link.startsWith('http') ? '_blank' : undefined}
-                  rel={option.link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  {...props}
                 >
+                  {option.comingSoon && (
+                    <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">
+                      Presto
+                    </div>
+                  )}
                   <div className={`${option.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
                     <IconComponent className="h-6 w-6 text-white" />
                   </div>
@@ -231,7 +274,7 @@ export function CentroAssistenzaPage() {
                     <Clock className="h-4 w-4 text-gray-400 mr-2" />
                     <span className="text-xs text-gray-500 dark:text-gray-400">{option.available}</span>
                   </div>
-                </a>
+                </Element>
               );
             })}
           </div>
@@ -244,14 +287,19 @@ export function CentroAssistenzaPage() {
             Accesso Rapido
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickLinks.map((link, index) => {
+            {quickLinks.map((link: any, index) => {
               const IconComponent = link.icon;
               return (
                 <button
                   key={index}
-                  onClick={() => handleNavigation(link.link)}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onClick={() => handleNavigation(link.link, link.comingSoon)}
+                  className="relative bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
+                  {link.comingSoon && (
+                    <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">
+                      Presto
+                    </div>
+                  )}
                   <IconComponent className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-3" />
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
                     {link.title}
@@ -428,7 +476,10 @@ export function CentroAssistenzaPage() {
             Risorse Aggiuntive
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
+            <button onClick={() => setShowComingSoonModal(true)} className="relative text-center hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg p-4 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">
+                Presto
+              </div>
               <div className="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Book className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
@@ -438,8 +489,11 @@ export function CentroAssistenzaPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Guide complete per ogni funzionalità della piattaforma
               </p>
-            </div>
-            <div className="text-center">
+            </button>
+            <button onClick={() => setShowComingSoonModal(true)} className="relative text-center hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg p-4 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">
+                Presto
+              </div>
               <div className="bg-green-100 dark:bg-green-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Video className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
@@ -449,8 +503,11 @@ export function CentroAssistenzaPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Impara con le nostre guide video passo-passo
               </p>
-            </div>
-            <div className="text-center">
+            </button>
+            <button onClick={() => setShowComingSoonModal(true)} className="relative text-center hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg p-4 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">
+                Presto
+              </div>
               <div className="bg-purple-100 dark:bg-purple-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               </div>
@@ -460,7 +517,7 @@ export function CentroAssistenzaPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Confrontati con altri utenti e condividi esperienze
               </p>
-            </div>
+            </button>
           </div>
         </div>
 
