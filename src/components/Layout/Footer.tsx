@@ -40,7 +40,7 @@ export function Footer() {
   ];
 
   const legalLinks = [
-    { label: 'Privacy Policy', url: '/privacy' },
+    { label: 'Privacy Policy', id: 'privacy' },
     { label: 'Termini di Servizio', url: '/terms' },
     { label: 'Cookie Policy', url: '/cookies' }
   ];
@@ -212,12 +212,25 @@ export function Footer() {
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
               {legalLinks.map((link, index) => (
                 <React.Fragment key={link.label}>
-                  <a
-                    href={link.url}
-                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
-                  >
-                    {link.label}
-                  </a>
+                  {link.id ? (
+                    <button
+                      onClick={() => {
+                        const event = new CustomEvent('footer-nav', { detail: { tab: link.id } });
+                        window.dispatchEvent(event);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                    >
+                      {link.label}
+                    </button>
+                  ) : (
+                    <a
+                      href={link.url}
+                      className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                   {index < legalLinks.length - 1 && (
                     <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
                   )}

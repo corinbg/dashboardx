@@ -17,6 +17,7 @@ import { FaqPage } from './pages/FaqPage';
 import { CentroAssistenzaPage } from './pages/CentroAssistenzaPage';
 import { GuideTutorialPage } from './pages/GuideTutorialPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
@@ -319,6 +320,8 @@ function AppContent({
         return <CentroAssistenzaPage />;
       case 'guide-tutorial':
         return <GuideTutorialPage />;
+      case 'privacy':
+        return <PrivacyPolicyPage onBack={() => setActiveTab('home')} />;
       default:
         return (
           <HomePage
