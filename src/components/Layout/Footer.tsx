@@ -160,24 +160,32 @@ export function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="/help"
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('footer-nav', { detail: { tab: 'centro-assistenza' } });
+                    window.dispatchEvent(event);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                 >
                   Centro Assistenza
-                </a>
+                </button>
               </li>
               <li>
-                <a
-                  href="/faq"
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('footer-nav', { detail: { tab: 'faq' } });
+                    window.dispatchEvent(event);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                 >
                   FAQ
-                </a>
+                </button>
               </li>
               <li>
                 <a
-                  href="/guide"
+                  href="#guide"
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                 >
                   Guide e Tutorial

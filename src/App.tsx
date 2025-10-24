@@ -14,6 +14,7 @@ import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
 import { HomePage } from './pages/HomePage';
 import { FaqPage } from './pages/FaqPage';
+import { CentroAssistenzaPage } from './pages/CentroAssistenzaPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
@@ -313,6 +314,8 @@ function AppContent({
         );
       case 'faq':
         return <FaqPage />;
+      case 'centro-assistenza':
+        return <CentroAssistenzaPage />;
       default:
         return (
           <HomePage
