@@ -94,7 +94,7 @@ export function CentroAssistenzaPage() {
       icon: Book,
       title: 'Guide e Tutorial',
       description: 'Istruzioni dettagliate per ogni funzionalità',
-      link: '#guide'
+      link: 'guide-tutorial'
     },
     {
       icon: FileText,

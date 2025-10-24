@@ -184,12 +184,16 @@ export function Footer() {
                 </button>
               </li>
               <li>
-                <a
-                  href="#guide"
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('footer-nav', { detail: { tab: 'guide-tutorial' } });
+                    window.dispatchEvent(event);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                 >
                   Guide e Tutorial
-                </a>
+                </button>
               </li>
               <li>
                 <a

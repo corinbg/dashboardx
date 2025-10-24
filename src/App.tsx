@@ -15,6 +15,7 @@ import { ConversazioniPage } from './pages/ConversazioniPage';
 import { HomePage } from './pages/HomePage';
 import { FaqPage } from './pages/FaqPage';
 import { CentroAssistenzaPage } from './pages/CentroAssistenzaPage';
+import { GuideTutorialPage } from './pages/GuideTutorialPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
@@ -316,6 +317,8 @@ function AppContent({
         return <FaqPage />;
       case 'centro-assistenza':
         return <CentroAssistenzaPage />;
+      case 'guide-tutorial':
+        return <GuideTutorialPage />;
       default:
         return (
           <HomePage
