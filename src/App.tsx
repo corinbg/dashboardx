@@ -13,6 +13,7 @@ import { ChecklistPage } from './pages/ChecklistPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ConversazioniPage } from './pages/ConversazioniPage';
 import { HomePage } from './pages/HomePage';
+import { FaqPage } from './pages/FaqPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
@@ -305,11 +306,13 @@ function AppContent({
         return <CalendarPage />;
       case 'conversazioni':
         return (
-          <ConversazioniPage 
+          <ConversazioniPage
             initialPhoneNumber={conversationSearchPhoneNumber}
             onPhoneNumberCleared={() => setConversationSearchPhoneNumber(null)}
           />
         );
+      case 'faq':
+        return <FaqPage />;
       default:
         return (
           <HomePage

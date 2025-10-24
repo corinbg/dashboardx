@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle, Home } from 'lucide-react';
+import { Moon, Sun, Menu, X, LogOut, FileText, Users, CheckSquare, Calendar, MessageCircle, Home, HelpCircle } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -39,11 +39,17 @@ const tabs = [
     icon: MessageCircle,
     description: 'Chat e messaggi clienti'
   },
-  { 
-    id: 'calendario', 
-    label: 'Calendario', 
+  {
+    id: 'calendario',
+    label: 'Calendario',
     icon: Calendar,
     description: 'Gestione appuntamenti'
+  },
+  {
+    id: 'faq',
+    label: 'FAQ',
+    icon: HelpCircle,
+    description: 'Domande frequenti'
   }
 ];
 
