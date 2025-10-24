@@ -195,14 +195,6 @@ export function Footer() {
                   Guide e Tutorial
                 </button>
               </li>
-              <li>
-                <a
-                  href={`mailto:${contactInfo.email}`}
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
-                >
-                  Contatta il Supporto
-                </a>
-              </li>
             </ul>
           </div>
         </div>
