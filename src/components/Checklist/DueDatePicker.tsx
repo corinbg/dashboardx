@@ -54,34 +54,38 @@ export function DueDatePicker({
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2">
         <button
+          type="button"
           onClick={() => handleQuickDate(0)}
           disabled={disabled}
-          className="inline-flex items-center px-2 py-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 rounded-md disabled:opacity-50"
+          className="inline-flex items-center px-2 py-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 rounded-md disabled:opacity-50 transition-colors"
         >
           <Calendar className="h-3 w-3 mr-1" />
           Oggi
         </button>
         <button
+          type="button"
           onClick={() => handleQuickDate(1)}
           disabled={disabled}
-          className="inline-flex items-center px-2 py-1 text-xs bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 rounded-md disabled:opacity-50"
+          className="inline-flex items-center px-2 py-1 text-xs bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 rounded-md disabled:opacity-50 transition-colors"
         >
           <Calendar className="h-3 w-3 mr-1" />
           Domani
         </button>
         <button
+          type="button"
           onClick={() => handleQuickDate(7)}
           disabled={disabled}
-          className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-300 rounded-md disabled:opacity-50"
+          className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-300 rounded-md disabled:opacity-50 transition-colors"
         >
           <Calendar className="h-3 w-3 mr-1" />
           Settimana
         </button>
         {dueDate && (
           <button
+            type="button"
             onClick={() => onChange({ reminderDate, recurrence })}
             disabled={disabled}
-            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50"
+            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50 transition-colors"
           >
             <X className="h-3 w-3 mr-1" />
             Rimuovi
