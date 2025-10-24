@@ -42,6 +42,7 @@ export function GuideTutorialPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category>('tutte');
   const [selectedFormat, setSelectedFormat] = useState<Format>('tutti');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showComingSoon] = useState(true);
 
   const categories = [
     { id: 'tutte' as Category, label: 'Tutte le Guide', icon: Layers },
@@ -236,7 +237,39 @@ export function GuideTutorialPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative">
+      {/* Coming Soon Overlay */}
+      {showComingSoon && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center border-2 border-purple-500">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full mb-6">
+              <Book className="h-10 w-10 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Prossimamente
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+              Stiamo preparando guide e tutorial dettagliati per aiutarti a utilizzare al meglio tutte le funzionalità della piattaforma.
+            </p>
+            <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 mb-6">
+              <p className="text-sm text-purple-900 dark:text-purple-200 font-medium">
+                Nel frattempo, puoi consultare il Centro Assistenza per qualsiasi domanda.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const event = new CustomEvent('footer-nav', { detail: { tab: 'centro-assistenza' } });
+                window.dispatchEvent(event);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            >
+              Vai al Centro Assistenza
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
 
         {/* Hero Section */}
