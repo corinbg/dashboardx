@@ -18,6 +18,7 @@ import { CentroAssistenzaPage } from './pages/CentroAssistenzaPage';
 import { GuideTutorialPage } from './pages/GuideTutorialPage';
 import EmailConfirmPage from './pages/EmailConfirmPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
@@ -322,6 +323,8 @@ function AppContent({
         return <GuideTutorialPage />;
       case 'privacy':
         return <PrivacyPolicyPage onBack={() => setActiveTab('home')} />;
+      case 'cookies':
+        return <CookiePolicyPage onBack={() => setActiveTab('home')} />;
       default:
         return (
           <HomePage

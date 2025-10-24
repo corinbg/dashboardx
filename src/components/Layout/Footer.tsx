@@ -42,7 +42,7 @@ export function Footer() {
   const legalLinks = [
     { label: 'Privacy Policy', id: 'privacy' },
     { label: 'Termini di Servizio', url: '/terms' },
-    { label: 'Cookie Policy', url: '/cookies' }
+    { label: 'Cookie Policy', id: 'cookies' }
   ];
 
   return (
