@@ -7,6 +7,7 @@ export interface Conversation {
   updated_at: string;
   is_closed: boolean;
   closed_at?: string;
+  is_favorite?: boolean;
 }
 
 export interface Message {
@@ -128,7 +129,7 @@ export async function getConversationMessages(conversationId: string): Promise<M
 
 export async function searchConversationsByPhone(phoneNumber: string): Promise<ConversationWithLastMessage[]> {
   console.log(`🔍 Searching conversations for phone: ${phoneNumber}`);
-  
+
   try {
     const { data: conversations, error } = await supabase
       .from('conversations')
@@ -165,7 +166,7 @@ export async function searchConversationsByPhone(phoneNumber: string): Promise<C
             .select('nominativo')
             .eq('telefono', conversation.user_id)
             .single();
-          
+
           clientName = client?.nominativo || undefined;
         } catch (error) {
           // Client not found
@@ -185,6 +186,91 @@ export async function searchConversationsByPhone(phoneNumber: string): Promise<C
 
   } catch (error) {
     console.error('Error in searchConversationsByPhone:', error);
+    throw error;
+  }
+}
+
+export async function toggleFavoriteConversation(conversationId: string, isFavorite: boolean): Promise<boolean> {
+  console.log(`⭐ Toggling favorite for conversation ${conversationId} to ${isFavorite}`);
+
+  try {
+    const { error } = await supabase
+      .from('conversations')
+      .update({ is_favorite: isFavorite })
+      .eq('id', conversationId);
+
+    if (error) {
+      console.error('Error toggling favorite:', error);
+      throw error;
+    }
+
+    console.log(`✅ Successfully toggled favorite for conversation ${conversationId}`);
+    return true;
+  } catch (error) {
+    console.error('Error in toggleFavoriteConversation:', error);
+    return false;
+  }
+}
+
+export async function getFavoriteConversations(): Promise<ConversationWithLastMessage[]> {
+  console.log('⭐ Fetching favorite conversations');
+
+  try {
+    const { data: conversations, error } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('is_favorite', true)
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching favorite conversations:', error);
+      throw error;
+    }
+
+    if (!conversations || conversations.length === 0) {
+      console.log('No favorite conversations found');
+      return [];
+    }
+
+    // Get last messages for favorite conversations
+    const conversationsWithMessages = await Promise.all(
+      conversations.map(async (conversation) => {
+        const { data: lastMessage } = await supabase
+          .from('messages')
+          .select('id, conversation_id, sender_type, text_line, timestamp')
+          .eq('conversation_id', conversation.id)
+          .order('timestamp', { ascending: false })
+          .limit(1)
+          .single();
+
+        // Try to get client name
+        let clientName: string | undefined;
+        try {
+          const { data: client } = await supabase
+            .from('clients')
+            .select('nominativo')
+            .eq('telefono', conversation.user_id)
+            .single();
+
+          clientName = client?.nominativo || undefined;
+        } catch (error) {
+          // Client not found
+        }
+
+        return {
+          ...conversation,
+          lastMessage: lastMessage || undefined,
+          clientName,
+          unreadCount: 0,
+        };
+      })
+    );
+
+    console.log(`✅ Found ${conversationsWithMessages.length} favorite conversations`);
+    return conversationsWithMessages;
+
+  } catch (error) {
+    console.error('Error in getFavoriteConversations:', error);
     throw error;
   }
 }

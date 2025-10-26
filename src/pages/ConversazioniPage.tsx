@@ -3,7 +3,7 @@ import { Search, MessageCircle, Phone, Clock, ChevronUp, Loader2, Users, AlertTr
 import { supabase } from '../lib/supabase';
 import { useApp } from '../contexts/AppContext';
 import { ConversationCard } from '../components/Conversations/ConversationCard';
-import { getAllConversations, searchConversationsByPhone, getConversationMessages, ConversationWithLastMessage } from '../services/conversationsService';
+import { getAllConversations, searchConversationsByPhone, getConversationMessages, ConversationWithLastMessage, toggleFavoriteConversation, getFavoriteConversations } from '../services/conversationsService';
 
 interface ConversazioniPageProps {
   initialPhoneNumber?: string | null;
@@ -52,6 +52,7 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'closed'>('all');
   const [dateFilter, setDateFilter] = useState<'today' | 'last7days' | 'last30days' | 'all'>('all');
+  const [showFavorites, setShowFavorites] = useState(false);
 
   // Load all conversations on component mount
   useEffect(() => {
@@ -467,10 +468,49 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
     setDateFilter(newDate);
   };
 
+  const handleToggleFavorite = async (conversationId: string, currentFavoriteState: boolean) => {
+    const newFavoriteState = !currentFavoriteState;
+
+    const success = await toggleFavoriteConversation(conversationId, newFavoriteState);
+
+    if (success) {
+      setConversations(prevConversations =>
+        prevConversations.map(conv =>
+          conv.id === conversationId
+            ? { ...conv, is_favorite: newFavoriteState }
+            : conv
+        )
+      );
+    }
+  };
+
+  const handleShowFavorites = async () => {
+    setLoading(true);
+    setError(null);
+    setShowFavorites(true);
+
+    try {
+      const favoriteConversations = await getFavoriteConversations();
+      setConversations(favoriteConversations);
+      applyFilters(favoriteConversations, statusFilter, dateFilter);
+    } catch (err) {
+      console.error('Error loading favorite conversations:', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento dei preferiti');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShowAllConversationsFromFavorites = async () => {
+    setShowFavorites(false);
+    await handleShowAllConversations();
+  };
+
   const getStatusCounts = () => {
     const open = conversations.filter(c => !c.is_closed).length;
     const closed = conversations.filter(c => c.is_closed).length;
-    return { total: conversations.length, open, closed };
+    const favorites = conversations.filter(c => c.is_favorite).length;
+    return { total: conversations.length, open, closed, favorites };
   };
 
   const statusCounts = getStatusCounts();
@@ -612,10 +652,22 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
                 Accesso Rapido
               </h3>
               <div className="space-y-2">
-                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
-                  ⭐ Conversazioni Preferite
+                <button
+                  onClick={handleShowFavorites}
+                  disabled={loading}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                    showFavorites
+                      ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  ⭐ Conversazioni Preferite {statusCounts.favorites > 0 && `(${statusCounts.favorites})`}
                 </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                <button
+                  onClick={showFavorites ? handleShowAllConversationsFromFavorites : handleShowAllConversations}
+                  disabled={loading}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   🕒 Recenti
                 </button>
               </div>
@@ -835,6 +887,8 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
                       clientName={conversation.clientName}
                       phoneNumber={conversation.user_id}
                       unreadCount={conversation.unreadCount}
+                      isStarred={conversation.is_favorite || false}
+                      onToggleStar={() => handleToggleFavorite(conversation.id, conversation.is_favorite || false)}
                       onClick={() => handleConversationClick(conversation)}
                     />
                   ))}
