@@ -336,40 +336,21 @@ export function TaskDrawer({ task, isOpen, onClose, onUpdate, onDelete, onToggle
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Data Scadenza
+                          Date e Scadenze
                         </label>
                         <DueDatePicker
-                          value={editData.dataScadenza}
-                          onChange={(dataScadenza) => setEditData({ ...editData, dataScadenza })}
+                          dueDate={editData.dataScadenza}
+                          reminderDate={editData.dataPromemoria}
+                          recurrence={editData.ricorrente}
+                          onChange={({ dueDate, reminderDate, recurrence }) =>
+                            setEditData({
+                              ...editData,
+                              dataScadenza: dueDate || '',
+                              dataPromemoria: reminderDate || '',
+                              ricorrente: recurrence || 'none'
+                            })
+                          }
                         />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Data Promemoria
-                        </label>
-                        <input
-                          type="datetime-local"
-                          value={editData.dataPromemoria}
-                          onChange={(e) => setEditData({ ...editData, dataPromemoria: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Ricorrenza
-                        </label>
-                        <select
-                          value={editData.ricorrente}
-                          onChange={(e) => setEditData({ ...editData, ricorrente: e.target.value as any })}
-                          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2"
-                        >
-                          <option value="none">Nessuna</option>
-                          <option value="giornaliero">Giornaliero</option>
-                          <option value="settimanale">Settimanale</option>
-                          <option value="mensile">Mensile</option>
-                        </select>
                       </div>
                     </form>
                   )}
