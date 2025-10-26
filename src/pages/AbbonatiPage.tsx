@@ -49,7 +49,7 @@ export function AbbonatiPage() {
               Contattaci:
             </h3>
             <a
-              href="mailto:supporto@impresapronta.it"
+              href="mailto:impresapronta@gmail.com"
               className="flex items-center p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors group"
             >
               <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
@@ -57,7 +57,7 @@ export function AbbonatiPage() {
               </div>
               <div>
                 <div className="font-medium text-gray-900 dark:text-white">Email</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">supporto@impresapronta.it</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">impresapronta@gmail.com</div>
               </div>
             </a>
 
