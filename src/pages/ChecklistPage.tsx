@@ -462,24 +462,44 @@ export function ChecklistPage() {
         {todoItems.length > 0 ? (
           <>
             <div className="mb-6">
-              {Object.entries(groupedTodoItems).map(([groupKey, items]) => {
-                const { title, icon, color } = getGroupTitle(groupKey);
-                return (
-                  <GroupedChecklistSection
-                    key={groupKey}
-                    title={title}
-                    items={items}
-                    icon={icon}
-                    color={color}
-                    defaultExpanded={true}
-                    onToggle={toggleChecklistItem}
-                    onEdit={handleTaskClick}
-                    onDelete={deleteChecklistItem}
-                    onReorder={(reorderedItems) => handleGroupReorder(groupKey, reorderedItems)}
-                    isCompact={viewDensity === 'compact'}
-                  />
-                );
-              })}
+              {(() => {
+                const entries = Object.entries(groupedTodoItems);
+
+                if (groupBy === 'priority') {
+                  const priorityOrder = ['alta', 'media', 'bassa', 'none'];
+                  entries.sort((a, b) => {
+                    const aIndex = priorityOrder.indexOf(a[0]);
+                    const bIndex = priorityOrder.indexOf(b[0]);
+                    return aIndex - bIndex;
+                  });
+                } else if (groupBy === 'date') {
+                  const dateOrder = ['overdue', 'today', 'this-week', 'this-month', 'future', 'no-date'];
+                  entries.sort((a, b) => {
+                    const aIndex = dateOrder.indexOf(a[0]);
+                    const bIndex = dateOrder.indexOf(b[0]);
+                    return aIndex - bIndex;
+                  });
+                }
+
+                return entries.map(([groupKey, items]) => {
+                  const { title, icon, color } = getGroupTitle(groupKey);
+                  return (
+                    <GroupedChecklistSection
+                      key={groupKey}
+                      title={title}
+                      items={items}
+                      icon={icon}
+                      color={color}
+                      defaultExpanded={true}
+                      onToggle={toggleChecklistItem}
+                      onEdit={handleTaskClick}
+                      onDelete={deleteChecklistItem}
+                      onReorder={(reorderedItems) => handleGroupReorder(groupKey, reorderedItems)}
+                      isCompact={viewDensity === 'compact'}
+                    />
+                  );
+                });
+              })()}
             </div>
 
             {groupBy === 'none' && (
