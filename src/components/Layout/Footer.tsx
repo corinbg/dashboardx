@@ -58,6 +58,11 @@ export function Footer() {
               La soluzione professionale per la gestione completa della tua impresa.
               Organizza richieste, clienti e attività in un unico posto.
             </p>
+            <div className="pt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-500">
+                P.IVA: 13249370969
+              </p>
+            </div>
           </div>
 
           {/* Sezione Link Rapidi */}
