@@ -4,6 +4,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import { useApp } from './contexts/AppContext';
 import { AppProvider } from './contexts/AppContext';
+import { supabase } from './lib/supabase';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { Navbar } from './components/Layout/Navbar';
 import { Footer } from './components/Layout/Footer';
 import { LoginForm } from './components/Auth/LoginForm';
@@ -21,7 +23,6 @@ import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { TermsOfServicePage } from './pages/TermsOfServicePage';
 import { AbbonatiPage } from './pages/AbbonatiPage';
-import ProtectedDashboard from './pages/ProtectedDashboard';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
@@ -37,6 +38,8 @@ function isEmailConfirmRoute(): boolean {
   return path === '/email-confirm' || path === '/email-confirm/';
 }
 
+type SubscriptionStatus = 'pending' | 'active' | 'trial' | 'inactive' | 'expired';
+
 function MainApp() {
   const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
@@ -46,6 +49,55 @@ function MainApp() {
   const [newRequestModalOpen, setNewRequestModalOpen] = useState(false);
   const [quickStatusUpdateModalOpen, setQuickStatusUpdateModalOpen] = useState(false);
   const [newEventModalOpen, setNewEventModalOpen] = useState(false);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  // Check subscription status when user is authenticated
+  useEffect(() => {
+    if (user) {
+      checkSubscriptionAccess();
+    }
+  }, [user]);
+
+  const checkSubscriptionAccess = async () => {
+    try {
+      setSubscriptionLoading(true);
+      setSubscriptionError(null);
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('subscription_status')
+        .eq('id', user!.id)
+        .maybeSingle();
+
+      if (profileError) {
+        throw new Error('Errore nel recupero del profilo');
+      }
+
+      if (!profile) {
+        setHasAccess(false);
+        setActiveTab('abbonati');
+        setSubscriptionLoading(false);
+        return;
+      }
+
+      const status = profile.subscription_status as SubscriptionStatus;
+
+      if (status === 'active' || status === 'trial') {
+        setHasAccess(true);
+      } else {
+        setHasAccess(false);
+        setActiveTab('abbonati');
+      }
+
+      setSubscriptionLoading(false);
+    } catch (err) {
+      console.error('Error checking subscription:', err);
+      setSubscriptionError('Errore di connessione');
+      setSubscriptionLoading(false);
+    }
+  };
 
   // Read request_id from URL on component mount
   useEffect(() => {
@@ -54,9 +106,8 @@ function MainApp() {
     if (requestId) {
       console.log('📖 Found request_id in URL:', requestId);
       setInitialRequestId(requestId);
-      setActiveTab('richieste'); // Switch to requests tab
-      
-      // Clean URL to avoid confusion
+      setActiveTab('richieste');
+
       const newUrl = window.location.pathname;
       window.history.replaceState({}, '', newUrl);
     }
@@ -121,11 +172,51 @@ function MainApp() {
     return <LoginForm />;
   }
 
-  // Show main application if user is authenticated
+  // Show subscription loading state
+  if (subscriptionLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-blue-600 dark:text-blue-400 animate-spin mx-auto mb-4" />
+          <p className="text-lg text-gray-600 dark:text-gray-400">Verifica abbonamento in corso...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show subscription error
+  if (subscriptionError) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="flex items-center text-red-600 dark:text-red-400 mb-4">
+            <AlertCircle className="h-6 w-6 mr-2" />
+            <h2 className="text-lg font-semibold">Errore di connessione</h2>
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Non è stato possibile verificare il tuo abbonamento. Controlla la tua connessione e riprova.
+          </p>
+          <button
+            onClick={checkSubscriptionAccess}
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Riprova
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show subscription page if user doesn't have access
+  if (hasAccess === false) {
+    return <AbbonatiPage />;
+  }
+
+  // Show main application if user is authenticated and has access
   return (
     <AppProvider>
-      <AppContent 
-        activeTab={activeTab} 
+      <AppContent
+        activeTab={activeTab}
         setActiveTab={setActiveTab}
         conversationSearchPhoneNumber={conversationSearchPhoneNumber}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
@@ -334,10 +425,6 @@ function AppContent({
         return <CookiePolicyPage onBack={() => setActiveTab('home')} />;
       case 'terms':
         return <TermsOfServicePage onBack={() => setActiveTab('home')} />;
-      case 'abbonati':
-        return <AbbonatiPage />;
-      case 'dashboard-protetta':
-        return <ProtectedDashboard />;
       default:
         return (
           <HomePage
