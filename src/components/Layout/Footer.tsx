@@ -28,7 +28,7 @@ export function Footer() {
 
   const contactInfo = {
     phone: '+39 352 084 5493',
-    email: 'info@impresapronta.it',
+    email: 'impresapronta@gmail.it',
     address: 'Via Galileo Galilei 2, 20062 Cassano d\'Adda, Italia'
   };
 
