@@ -207,21 +207,20 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
     weekStart.setDate(now.getDate() - 7);
     weekStart.setHours(0, 0, 0, 0);
 
-    const completedThisWeek = requests.filter(req => {
-      if (req.stato !== 'Completato') return false;
-      const reqDate = new Date(req.richiestaAt);
-      return reqDate >= weekStart && reqDate <= now;
+    const completedThisWeek = checklist.filter(item => {
+      if (!item.completata || !item.completataAt) return false;
+      const completedDate = new Date(item.completataAt);
+      return completedDate >= weekStart && completedDate <= now;
     }).length;
 
     const checklistTodayCount = checklist.filter(item => {
-      if (item.completata) return false;
-      if (!item.dataScadenza) return false;
+      if (!item.completata || !item.completataAt) return false;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const dueDate = new Date(item.dataScadenza);
-      const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
-      const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      return dueDateOnly.getTime() === todayOnly.getTime();
+      const todayEnd = new Date(today);
+      todayEnd.setHours(23, 59, 59, 999);
+      const completedDate = new Date(item.completataAt);
+      return completedDate >= today && completedDate <= todayEnd;
     }).length;
 
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
