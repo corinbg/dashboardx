@@ -20,6 +20,8 @@ import EmailConfirmPage from './pages/EmailConfirmPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { TermsOfServicePage } from './pages/TermsOfServicePage';
+import { AbbonatiPage } from './pages/AbbonatiPage';
+import ProtectedDashboard from './pages/ProtectedDashboard';
 import { FloatingActionButton } from './components/UI/FloatingActionButton';
 import { NewClientModal } from './components/Clients/NewClientModal';
 import { NewRequestModal } from './components/Requests/NewRequestModal';
@@ -332,6 +334,10 @@ function AppContent({
         return <CookiePolicyPage onBack={() => setActiveTab('home')} />;
       case 'terms':
         return <TermsOfServicePage onBack={() => setActiveTab('home')} />;
+      case 'abbonati':
+        return <AbbonatiPage />;
+      case 'dashboard-protetta':
+        return <ProtectedDashboard />;
       default:
         return (
           <HomePage
