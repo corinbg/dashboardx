@@ -211,7 +211,7 @@ export async function deleteChecklistItem(id: string): Promise<boolean> {
 export async function toggleChecklistItem(id: string, completed: boolean): Promise<boolean> {
   const { error } = await supabase
     .from('checklist_items')
-    .update({ 
+    .update({
       completata: completed,
       completata_at: completed ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
