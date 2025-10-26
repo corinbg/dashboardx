@@ -422,15 +422,21 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
                 </button>
                 
                 <button
-                  onClick={() => onTabChange('checklist')}
+                  onClick={() => {
+                    onTabChange('checklist');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <CheckSquare className="h-5 w-5 mb-2" />
                   <div className="text-sm font-medium">Vai a checklist</div>
                 </button>
-                
+
                 <button
-                  onClick={() => onTabChange('conversazioni')}
+                  onClick={() => {
+                    onTabChange('conversazioni');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg p-4 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
                   <Phone className="h-5 w-5 mb-2" />
