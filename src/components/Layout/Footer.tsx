@@ -3,15 +3,12 @@ import {
   Phone,
   Mail,
   MapPin,
-  Facebook,
-  Instagram,
-  Linkedin,
-  MessageCircle,
   Home,
   FileText,
   Users,
   CheckSquare,
-  Calendar
+  Calendar,
+  MessageCircle
 } from 'lucide-react';
 
 export function Footer() {
@@ -31,13 +28,6 @@ export function Footer() {
     email: 'impresapronta@gmail.it',
     address: 'Via Galileo Galilei 2, 20062 Cassano d\'Adda, Italia'
   };
-
-  const socialLinks = [
-    { name: 'Facebook', icon: Facebook, url: 'https://facebook.com', color: 'hover:text-blue-600 dark:hover:text-blue-400' },
-    { name: 'Instagram', icon: Instagram, url: 'https://instagram.com', color: 'hover:text-pink-600 dark:hover:text-pink-400' },
-    { name: 'LinkedIn', icon: Linkedin, url: 'https://linkedin.com', color: 'hover:text-blue-700 dark:hover:text-blue-500' },
-    { name: 'WhatsApp', icon: MessageCircle, url: `https://wa.me/${contactInfo.phone.replace(/\s/g, '')}`, color: 'hover:text-green-600 dark:hover:text-green-400' }
-  ];
 
   const legalLinks = [
     { label: 'Privacy Policy', id: 'privacy' },
@@ -68,24 +58,6 @@ export function Footer() {
               La soluzione professionale per la gestione completa della tua impresa.
               Organizza richieste, clienti e attività in un unico posto.
             </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => {
-                const IconComponent = social.icon;
-                return (
-                  <a
-                    key={social.name}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`text-gray-500 dark:text-gray-400 ${social.color} transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1`}
-                    aria-label={social.name}
-                    title={social.name}
-                  >
-                    <IconComponent className="h-5 w-5" />
-                  </a>
-                );
-              })}
-            </div>
           </div>
 
           {/* Sezione Link Rapidi */}
