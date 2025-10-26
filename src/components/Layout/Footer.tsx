@@ -58,11 +58,6 @@ export function Footer() {
               La soluzione professionale per la gestione completa della tua impresa.
               Organizza richieste, clienti e attività in un unico posto.
             </p>
-            <div className="pt-2">
-              <p className="text-xs text-gray-500 dark:text-gray-500">
-                P.IVA: 13249370969
-              </p>
-            </div>
           </div>
 
           {/* Sezione Link Rapidi */}
@@ -179,6 +174,11 @@ export function Footer() {
         {/* Divisore */}
         <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+
+            {/* P.IVA */}
+            <div className="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
+              P.IVA: 13249370969
+            </div>
 
             {/* Copyright */}
             <div className="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
