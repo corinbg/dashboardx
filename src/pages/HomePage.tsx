@@ -232,8 +232,8 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
     }).length;
 
     const completionRate = requests.length > 0
-      ? Math.round((requests.filter(r => r.stato === 'Completato').length / requests.length) * 10)
-      : 7;
+      ? Math.round((requests.filter(r => r.stato === 'Completato').length / requests.length) * 100)
+      : 0;
 
     return {
       completedWeek: completedThisWeek,
