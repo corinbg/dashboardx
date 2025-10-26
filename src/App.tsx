@@ -205,6 +205,8 @@ function AppContent({
     const result = await createClient(clientData);
     if (result) {
       await refreshData();
+      setActiveTab('clienti');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       throw new Error('Failed to create client');
     }
@@ -221,6 +223,8 @@ function AppContent({
     const result = await createRequest(requestWithTimestamp);
     if (result) {
       await refreshData();
+      setActiveTab('richieste');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       throw new Error('Failed to create request');
     }
