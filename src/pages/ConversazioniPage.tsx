@@ -545,9 +545,9 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto flex flex-col md:flex-row min-h-screen pb-24">
+      <main className="max-w-7xl mx-auto flex flex-col md:flex-row h-[calc(100vh-8rem)]">
         {/* Left Sidebar - Filters & Quick Access */}
-        <div className={`md:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 ${mobileFiltersOpen ? 'block' : 'hidden md:block'}`}>
+        <div className={`md:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto ${mobileFiltersOpen ? 'block' : 'hidden md:block'}`}>
           <div className="p-4 space-y-6">
             {/* Search Section */}
             <div>
