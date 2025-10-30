@@ -5,10 +5,11 @@ import { useAuth } from './contexts/AuthContext';
 import { useApp } from './contexts/AppContext';
 import { AppProvider } from './contexts/AppContext';
 import { supabase } from './lib/supabase';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Navbar } from './components/Layout/Navbar';
 import { Footer } from './components/Layout/Footer';
 import { LoginForm } from './components/Auth/LoginForm';
+import { LoadingScreen } from './components/UI/LoadingScreen';
 import { RequestsPage } from './pages/RequestsPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { ChecklistPage } from './pages/ChecklistPage';
@@ -157,14 +158,7 @@ function MainApp() {
 
   // Show loading while authentication state is being determined
   if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Caricamento...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Verifica autenticazione..." />;
   }
 
   // Show login form if user is not authenticated
@@ -174,13 +168,7 @@ function MainApp() {
 
   // Show subscription loading state
   if (subscriptionLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-blue-600 dark:text-blue-400 animate-spin mx-auto" />
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Verifica abbonamento..." />;
   }
 
   // Show subscription error

@@ -18,6 +18,7 @@ import { useApp } from '../contexts/AppContext';
 import { getEventsByDate } from '../services/calendarService';
 import { getAllConversations } from '../services/conversationsService';
 import { CalendarEvent } from '../types';
+import { InlineLoadingSpinner } from '../components/UI/LoadingScreen';
 
 interface HomePageProps {
   onTabChange: (tab: string) => void;
@@ -254,7 +255,7 @@ export function HomePage({ onTabChange, onNewRequest, onNewClient }: HomePagePro
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <InlineLoadingSpinner />
       </div>
     );
   }
