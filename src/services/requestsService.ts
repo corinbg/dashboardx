@@ -16,6 +16,8 @@ export async function getRequests(): Promise<Request[]> {
   return data.map(row => ({
     id: row.id,
     Nome: row.Nome,
+    comune: row.comune,
+    Indirizzo: row.Indirizzo,
     Luogo: row.Luogo,
     Problema: row.Problema,
     Urgenza: row.Urgenza,
@@ -23,7 +25,7 @@ export async function getRequests(): Promise<Request[]> {
     PreferenzaRicontatto: row['Preferenza Ricontatto'],
     richiestaAt: row.richiesta_at,
     stato: row.stato as Request['stato'],
-    spamFuoriZona: row.spam_fuori_zo,
+    spamFuoriZona: row.spam_fuori_zona,
   }));
 }
 
@@ -43,7 +45,7 @@ export async function updateRequestStatus(id: string, stato: Request['stato']): 
 
 export async function createRequest(request: Omit<Request, 'id'>): Promise<string | null> {
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) {
     console.error('User not authenticated');
     return null;
@@ -53,14 +55,17 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
     .from('requests')
     .insert({
       Nome: request.Nome,
-      Luogo: request.Luogo,
+      comune: request.comune,
+      Indirizzo: request.Indirizzo,
       Problema: request.Problema,
       Urgenza: request.Urgenza,
       Numero: request.Numero,
       'Preferenza Ricontatto': request.PreferenzaRicontatto,
       richiesta_at: request.richiestaAt,
       stato: request.stato,
-      spam_fuori_zo: request.spamFuoriZona,
+      spam_fuori_zona: request.spamFuoriZona,
+      user_id: request.Numero,
+      idraulico_id: user.id,
     })
     .select('id')
     .single();
@@ -71,4 +76,50 @@ export async function createRequest(request: Omit<Request, 'id'>): Promise<strin
   }
 
   return data.id;
+}
+
+export async function updateRequest(id: string, updates: Partial<Omit<Request, 'id'>>): Promise<boolean> {
+  const updateData: any = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (updates.Nome !== undefined) updateData.Nome = updates.Nome;
+  if (updates.comune !== undefined) updateData.comune = updates.comune;
+  if (updates.Indirizzo !== undefined) updateData.Indirizzo = updates.Indirizzo;
+  if (updates.Problema !== undefined) updateData.Problema = updates.Problema;
+  if (updates.Urgenza !== undefined) updateData.Urgenza = updates.Urgenza;
+  if (updates.Numero !== undefined) updateData.Numero = updates.Numero;
+  if (updates.PreferenzaRicontatto !== undefined) updateData['Preferenza Ricontatto'] = updates.PreferenzaRicontatto;
+  if (updates.stato !== undefined) updateData.stato = updates.stato;
+  if (updates.spamFuoriZona !== undefined) updateData.spam_fuori_zona = updates.spamFuoriZona;
+
+  console.log('Updating request:', id, 'with data:', updateData);
+
+  const { data, error } = await supabase
+    .from('requests')
+    .update(updateData)
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    console.error('Error updating request:', error);
+    return false;
+  }
+
+  console.log('Request updated successfully. Associated client will be automatically synced by database trigger.');
+  return true;
+}
+
+export async function deleteRequest(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('requests')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting request:', error);
+    return false;
+  }
+
+  return true;
 }

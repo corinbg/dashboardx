@@ -16,19 +16,16 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
           view === 'table'
             ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300'
             : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
-        } ${window.innerWidth < 768 ? 'hidden md:inline-flex' : ''}`}
+        }`}
         title="Vista tabella"
         aria-pressed={view === 'table'}
-        disabled={window.innerWidth < 768}
       >
         <Table className="h-4 w-4" aria-hidden="true" />
         <span className="ml-2 hidden sm:inline">Tabella</span>
       </button>
       <button
         onClick={() => onViewChange('card')}
-        className={`inline-flex items-center px-3 py-2 text-sm font-medium ${
-          window.innerWidth < 768 ? 'rounded-md border' : 'rounded-r-md border border-l-0'
-        } focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+        className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-r-md border border-l-0 focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
           view === 'card'
             ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300'
             : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'

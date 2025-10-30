@@ -3,7 +3,14 @@ import { useAuth } from './AuthContext';
 import { Request, Client, ChecklistItem } from '../types';
 import { getRequests, updateRequestStatus } from '../services/requestsService';
 import { getClients } from '../services/clientsService';
-import { getChecklistItems, createChecklistItem as createChecklistItemService, toggleChecklistItem as toggleChecklistItemService } from '../services/checklistService';
+import { 
+  getChecklistItems, 
+  createChecklistItem as createChecklistItemService, 
+  createAdvancedChecklistItem as createAdvancedChecklistItemService,
+  updateChecklistItem as updateChecklistItemService,
+  deleteChecklistItem as deleteChecklistItemService,
+  toggleChecklistItem as toggleChecklistItemService 
+} from '../services/checklistService';
 
 interface AppContextType {
   requests: Request[];
@@ -11,9 +18,29 @@ interface AppContextType {
   checklist: ChecklistItem[];
   loading: boolean;
   addChecklistItem: (text: string) => Promise<void>;
+  addAdvancedChecklistItem: (item: {
+    testo: string;
+    priorita?: string;
+    categoria?: string;
+    categoriaCustom?: string;
+    dataScadenza?: string;
+    dataPromemoria?: string;
+    ricorrente?: string;
+  }) => Promise<void>;
+  updateChecklistItem: (id: string, updates: {
+    testo?: string;
+    priorita?: string;
+    categoria?: string;
+    categoriaCustom?: string;
+    dataScadenza?: string;
+    dataPromemoria?: string;
+    ricorrente?: string;
+  }) => Promise<void>;
+  deleteChecklistItem: (id: string) => Promise<void>;
   toggleChecklistItem: (id: string) => Promise<void>;
   updateRequestStatus: (id: string, status: Request['stato']) => Promise<void>;
   refreshData: () => Promise<void>;
+  setChecklist: React.Dispatch<React.SetStateAction<ChecklistItem[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -76,6 +103,43 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const addAdvancedChecklistItem = async (item: {
+    testo: string;
+    priorita?: string;
+    categoria?: string;
+    categoriaCustom?: string;
+    dataScadenza?: string;
+    dataPromemoria?: string;
+    ricorrente?: string;
+  }) => {
+    const newItemId = await createAdvancedChecklistItemService(item);
+    if (newItemId) {
+      await refreshData();
+    }
+  };
+
+  const updateChecklistItemHandler = async (id: string, updates: {
+    testo?: string;
+    priorita?: string;
+    categoria?: string;
+    categoriaCustom?: string;
+    dataScadenza?: string;
+    dataPromemoria?: string;
+    ricorrente?: string;
+  }) => {
+    const success = await updateChecklistItemService(id, updates);
+    if (success) {
+      await refreshData();
+    }
+  };
+
+  const deleteChecklistItemHandler = async (id: string) => {
+    const success = await deleteChecklistItemService(id);
+    if (success) {
+      await refreshData();
+    }
+  };
+
   const toggleChecklistItem = async (id: string) => {
     const item = checklist.find(item => item.id === id);
     if (item) {
@@ -100,9 +164,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       checklist,
       loading,
       addChecklistItem,
+      addAdvancedChecklistItem,
+      updateChecklistItem: updateChecklistItemHandler,
+      deleteChecklistItem: deleteChecklistItemHandler,
       toggleChecklistItem,
       updateRequestStatus: updateRequestStatusHandler,
       refreshData,
+      setChecklist,
     }}>
       {children}
     </AppContext.Provider>

@@ -1,14 +1,29 @@
 import React from 'react';
+import { AlertTriangle, Calendar, Clock, GripVertical, CreditCard as Edit2, Trash2 } from 'lucide-react';
 import { ChecklistItem as ChecklistItemType } from '../../types';
 import { Check, Loader } from 'lucide-react';
+import { CategoryTag } from './CategoryTag';
+import { ConfirmDialog } from '../UI/ConfirmDialog';
 
 interface ChecklistItemProps {
   item: ChecklistItemType;
   onToggle: (id: string) => Promise<void>;
+  onEdit?: (item: ChecklistItemType) => void;
+  onDelete?: (id: string) => void;
+  isDragging?: boolean;
+  dragHandleProps?: any;
 }
 
-export function ChecklistItemComponent({ item, onToggle }: ChecklistItemProps) {
+export function ChecklistItemComponent({
+  item,
+  onToggle,
+  onEdit,
+  onDelete,
+  isDragging = false,
+  dragHandleProps
+}: ChecklistItemProps) {
   const [isToggling, setIsToggling] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', {
@@ -19,6 +34,69 @@ export function ChecklistItemComponent({ item, onToggle }: ChecklistItemProps) {
       minute: '2-digit'
     });
   };
+
+  const getImportanceClasses = () => {
+    // Se l'attività è completata, usa un colore neutro
+    if (item.completata) {
+      return 'border-l-4 border-l-green-500 bg-green-50 dark:bg-green-900/20';
+    }
+
+    // Calcola punteggio deadline (1-5)
+    let deadlineScore = 1; // default: nessuna scadenza o molto in futuro
+    
+    if (item.dataScadenza) {
+      const due = new Date(item.dataScadenza);
+      const now = new Date();
+      const diffDays = Math.ceil((due.getTime() - now.getTime()) / (1000 * 3600 * 24));
+      
+      if (diffDays < 0) deadlineScore = 5; // Overdue
+      else if (diffDays === 0) deadlineScore = 4; // Due today
+      else if (diffDays <= 3) deadlineScore = 3; // Due within 3 days
+      else if (diffDays <= 7) deadlineScore = 2; // Due within 1 week
+      else deadlineScore = 1; // Due later than 1 week
+    }
+
+    // Calcola punteggio priorità (1-3)
+    let priorityScore = 1;
+    switch (item.priorita) {
+      case 'alta': priorityScore = 3; break;
+      case 'media': priorityScore = 2; break;
+      case 'bassa': priorityScore = 1; break;
+      default: priorityScore = 1; break;
+    }
+
+    // Punteggio totale importanza (2-8)
+    const importanceScore = deadlineScore + priorityScore;
+
+    // Mappa punteggio a classi CSS
+    const scoreToClasses = {
+      2: 'border-l-4 border-l-gray-300 dark:border-l-gray-600 bg-slate-50 dark:bg-gray-800',
+      3: 'border-l-4 border-l-green-400 dark:border-l-green-500 bg-green-50 dark:bg-green-900/30',
+      4: 'border-l-4 border-l-emerald-400 dark:border-l-emerald-500 bg-emerald-50 dark:bg-emerald-800/30',
+      5: 'border-l-4 border-l-amber-400 dark:border-l-amber-500 bg-amber-50 dark:bg-amber-800/30',
+      6: 'border-l-4 border-l-orange-400 dark:border-l-orange-500 bg-orange-50 dark:bg-orange-700/30',
+      7: 'border-l-4 border-l-red-400 dark:border-l-red-500 bg-red-100 dark:bg-red-800/30',
+      8: 'border-l-4 border-l-red-500 dark:border-l-red-600 bg-red-200 dark:bg-red-900/40'
+    };
+
+    return scoreToClasses[importanceScore as keyof typeof scoreToClasses] || scoreToClasses[2];
+  };
+
+  const getDueDateStatus = () => {
+    if (!item.dataScadenza) return null;
+    
+    const due = new Date(item.dataScadenza);
+    const now = new Date();
+    const diffDays = Math.ceil((due.getTime() - now.getTime()) / (1000 * 3600 * 24));
+    
+    if (diffDays < 0) return { type: 'overdue', text: `Scaduta da ${Math.abs(diffDays)} giorni`, color: 'text-red-600', icon: '🔴' };
+    if (diffDays === 0) return { type: 'today', text: 'Scade oggi', color: 'text-red-600', icon: '🔴' };
+    if (diffDays === 1) return { type: 'tomorrow', text: 'Scade domani', color: 'text-amber-600', icon: '🟡' };
+    if (diffDays <= 3) return { type: 'soon', text: `Scade in ${diffDays} giorni`, color: 'text-amber-600', icon: '🟡' };
+    return { type: 'future', text: `Scade in ${diffDays} giorni`, color: 'text-gray-600', icon: '📅' };
+  };
+
+  const dueDateStatus = getDueDateStatus();
 
   const handleToggle = async () => {
     if (isToggling) return;
@@ -33,18 +111,60 @@ export function ChecklistItemComponent({ item, onToggle }: ChecklistItemProps) {
     }
   };
 
+  const handleItemClick = () => {
+    if (onEdit) {
+      onEdit(item);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleItemClick();
+    }
+  };
   return (
-    <div className="flex items-start space-x-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-sm transition-shadow">
+    <div
+      className={`group flex items-start space-x-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 ${getImportanceClasses()} ${
+        isDragging ? 'opacity-50 rotate-2 shadow-lg' : ''
+      } ${item.completata ? 'opacity-75' : ''} ${onEdit ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-600' : ''}`}
+      onClick={handleItemClick}
+      onKeyDown={handleKeyDown}
+      role={onEdit ? "button" : undefined}
+      tabIndex={onEdit ? 0 : undefined}
+      aria-label={onEdit ? `Visualizza attività: ${item.testo}` : undefined}
+    >
+      {/* Drag Handle */}
+      {dragHandleProps && (
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="h-4 w-4" />
+        </div>
+      )}
+
+      {/* Priority Indicator */}
+      <div className="flex items-center justify-center w-6 h-6 flex-shrink-0">
+        {item.priorita === 'alta' && <AlertTriangle className="h-4 w-4 text-red-500" />}
+        {item.priorita === 'media' && <AlertTriangle className="h-4 w-4 text-amber-500" />}
+        {item.priorita === 'bassa' && <AlertTriangle className="h-4 w-4 text-green-500" />}
+      </div>
+
       <button
-        onClick={handleToggle}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleToggle();
+        }}
         disabled={isToggling}
         className={`flex-shrink-0 w-5 h-5 border-2 rounded-md flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-60 ${
           item.completata
             ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
         }`}
-        title={item.completata ? 'Mark as not completed' : 'Mark as completed'}
-        aria-label={item.completata ? 'Mark as not completed' : 'Mark as completed'}
+        title={item.completata ? 'Segna come non completata' : 'Segna come completata'}
+        aria-label={item.completata ? 'Segna come non completata' : 'Segna come completata'}
       >
         {isToggling ? (
           <Loader className="h-3 w-3 animate-spin" aria-hidden="true" />
@@ -56,19 +176,81 @@ export function ChecklistItemComponent({ item, onToggle }: ChecklistItemProps) {
       </button>
       
       <div className="flex-1 min-w-0">
-        <p className={`text-sm ${
-          item.completata 
-            ? 'text-gray-500 dark:text-gray-400 line-through' 
-            : 'text-gray-900 dark:text-white'
-        }`}>
-          {item.testo}
-        </p>
-        {item.completata && item.completataAt && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            Completed on {formatDate(item.completataAt)}
-          </p>
-        )}
+        <div className="space-y-2">
+          <div className="flex items-start justify-between">
+            <p className={`text-sm font-medium ${
+              item.completata 
+                ? 'text-gray-500 dark:text-gray-400 line-through' 
+                : 'text-gray-900 dark:text-white'
+            }`}>
+              {item.testo}
+            </p>
+            
+            {/* Action Buttons - Hidden, click on item to open drawer */}
+            <div className="flex items-center space-x-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              {onDelete && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteConfirm(true);
+                  }}
+                  className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+                  title="Elimina attività"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {/* Tags and Metadata */}
+          <div className="flex flex-wrap items-center gap-2">
+            <CategoryTag 
+              category={item.categoria} 
+              customName={item.categoriaCustom} 
+              size="sm" 
+            />
+            
+            {dueDateStatus && (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                dueDateStatus.type === 'overdue' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' :
+                dueDateStatus.type === 'today' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' :
+                dueDateStatus.type === 'soon' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300' :
+                'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+              }`}>
+                <Calendar className="h-3 w-3 mr-1" />
+                {dueDateStatus.text}
+              </span>
+            )}
+            
+            {item.ricorrente && item.ricorrente !== 'none' && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">
+                🔄 {item.ricorrente}
+              </span>
+            )}
+          </div>
+          
+          {item.completata && item.completataAt && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center">
+              <Clock className="h-3 w-3 mr-1" />
+              Completata il {formatDate(item.completataAt)}
+            </p>
+          )}
+        </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={() => {
+          onDelete?.(item.id);
+          setShowDeleteConfirm(false);
+        }}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare l'attività "${item.testo}"? Questa azione non può essere annullata.`}
+        confirmLabel="Elimina Attività"
+        cancelLabel="Annulla"
+      />
     </div>
   );
 }

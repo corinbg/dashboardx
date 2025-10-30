@@ -16,7 +16,7 @@ export async function getClients(): Promise<Client[]> {
     id: row.id,
     nominativo: row.nominativo,
     telefono: row.telefono,
-    luogo: row.luogo,
+    comune: row.comune,
     indirizzo: row.indirizzo,
     user_id: row.user_id,
     created_at: row.created_at,
@@ -24,7 +24,7 @@ export async function getClients(): Promise<Client[]> {
   }));
 }
 
-export async function createClient(client: Omit<Client, 'id'>): Promise<string | null> {
+export async function createClient(client: Omit<Client, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<string | null> {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
@@ -32,14 +32,33 @@ export async function createClient(client: Omit<Client, 'id'>): Promise<string |
     return null;
   }
 
+  // Check if client with this phone number already exists
+  const { data: existingClient, error: checkError } = await supabase
+    .from('clients')
+    .select('id, telefono')
+    .eq('telefono', client.telefono)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error('Error checking for existing client:', checkError);
+    return null;
+  }
+
+  if (existingClient) {
+    console.log('Client with phone number already exists:', client.telefono);
+    // Return the existing client ID instead of creating a duplicate
+    return existingClient.id;
+  }
+
   const { data, error } = await supabase
     .from('clients')
     .insert({
       nominativo: client.nominativo,
       telefono: client.telefono,
-      luogo: client.luogo,
+      comune: client.comune,
       indirizzo: client.indirizzo,
-      user_id: user.id,
+      user_id: client.telefono,
+      idraulico_id: user.id,
     })
     .select('id')
     .single();
@@ -52,20 +71,58 @@ export async function createClient(client: Omit<Client, 'id'>): Promise<string |
   return data.id;
 }
 
-export async function updateClient(id: string, updates: Partial<Omit<Client, 'id'>>): Promise<boolean> {
-  const { error } = await supabase
+export async function getUniqueCities(): Promise<string[]> {
+  const { data, error } = await supabase
     .from('clients')
-    .update({
-      nominativo: updates.nominativo,
-      telefono: updates.telefono,
-      luogo: updates.luogo,
-      indirizzo: updates.indirizzo,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id);
+    .select('comune')
+    .not('comune', 'is', null)
+    .order('comune');
+
+  if (error) {
+    console.error('Error fetching cities:', error);
+    return [];
+  }
+
+  // Get unique cities
+  const cities = [...new Set(data.map(row => row.comune).filter(Boolean))];
+  return cities;
+}
+
+export async function updateClient(id: string, updates: Partial<Omit<Client, 'id'>>): Promise<boolean> {
+  const updateData: any = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (updates.nominativo !== undefined) updateData.nominativo = updates.nominativo;
+  if (updates.telefono !== undefined) updateData.telefono = updates.telefono;
+  if (updates.comune !== undefined) updateData.comune = updates.comune;
+  if (updates.indirizzo !== undefined) updateData.indirizzo = updates.indirizzo;
+
+  console.log('Updating client:', id, 'with data:', updateData);
+
+  const { data, error } = await supabase
+    .from('clients')
+    .update(updateData)
+    .eq('id', id)
+    .select();
 
   if (error) {
     console.error('Error updating client:', error);
+    return false;
+  }
+
+  console.log('Client updated successfully. Associated requests will be automatically synced by database trigger.');
+  return true;
+}
+
+export async function deleteClient(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('clients')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting client:', error);
     return false;
   }
 

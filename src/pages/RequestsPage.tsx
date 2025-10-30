@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { HelpCircle } from 'lucide-react';
 import { ViewMode, FilterState, UrgencyFilter, Request, DatePeriodFilter, Client } from '../types';
 import { useApp } from '../contexts/AppContext';
+import { Plus } from 'lucide-react';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { RequestsFilters } from '../components/Requests/RequestsFilters';
 import { RequestTable } from '../components/Requests/RequestTable';
@@ -9,19 +11,28 @@ import { RequestDrawer } from '../components/Requests/RequestDrawer';
 import { ClientProfile } from '../components/Clients/ClientProfile';
 import { ViewToggle } from '../components/UI/ViewToggle';
 import { EmptyState } from '../components/UI/EmptyState';
+import { ContextualHelp, SimpleTooltip } from '../components/UI/ContextualHelp';
 
 interface RequestsPageProps {
   onTabChange: (tab: string) => void;
   setConversationSearchPhoneNumber: (phone: string | null) => void;
   initialRequestId?: string | null;
   onInitialRequestHandled?: () => void;
+  onNewRequest: () => void;
+  onDeleteRequest: (requestId: string) => Promise<void>;
+  onUpdateRequest: (requestId: string, updates: Partial<Request>) => Promise<void>;
+  onUpdateClient: (clientId: string, updates: Partial<Client>) => Promise<void>;
 }
 
-export function RequestsPage({ 
-  onTabChange, 
+export function RequestsPage({
+  onTabChange,
   setConversationSearchPhoneNumber,
   initialRequestId,
-  onInitialRequestHandled
+  onInitialRequestHandled,
+  onNewRequest,
+  onDeleteRequest,
+  onUpdateRequest,
+  onUpdateClient
 }: RequestsPageProps) {
   const { requests, clients, loading } = useApp();
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -40,9 +51,33 @@ export function RequestsPage({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientModalOpen, setClientModalOpen] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   
   const searchRef = useRef<HTMLInputElement>(null);
 
+  // Steps per l'aiuto contextual
+  const helpSteps = [
+    {
+      target: 'search-input',
+      title: 'Ricerca Rapida',
+      content: 'Usa la barra di ricerca per trovare rapidamente richieste per nome, telefono, o indirizzo.',
+      position: 'bottom' as const,
+      action: 'Premi F per accedere rapidamente alla ricerca'
+    },
+    {
+      target: 'filters-section', 
+      title: 'Filtri Intelligenti',
+      content: 'Filtra le richieste per periodo, urgenza e stato per concentrarti su ciò che è importante.',
+      position: 'top' as const,
+      action: 'Usa "Oggi" per vedere solo le richieste di oggi'
+    },
+    {
+      target: 'view-toggle',
+      title: 'Cambia Vista',
+      content: 'Passa tra vista tabella (desktop) e vista schede (mobile) per la migliore esperienza.',
+      position: 'left' as const
+    }
+  ];
   // Handle opening request drawer from URL parameter
   useEffect(() => {
     if (initialRequestId && !loading && requests.length > 0) {
@@ -172,6 +207,18 @@ export function RequestsPage({
     // Update the selected request immediately for instant UI feedback
     setSelectedRequest(updatedRequest);
   };
+
+  const handleUpdateRequestWrapper = async (requestId: string, updates: Partial<Request>) => {
+    await onUpdateRequest(requestId, updates);
+
+    // Update selectedRequest with fresh data after update
+    if (selectedRequest && selectedRequest.id === requestId) {
+      const updatedRequest = requests.find(r => r.id === requestId);
+      if (updatedRequest) {
+        setSelectedRequest({ ...updatedRequest, ...updates });
+      }
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -188,10 +235,12 @@ export function RequestsPage({
     // Search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = 
+      const matchesSearch =
         request.Nome.toLowerCase().includes(searchLower) ||
         request.Numero.toLowerCase().includes(searchLower) ||
-        request.Luogo.toLowerCase().includes(searchLower) ||
+        (request.comune && request.comune.toLowerCase().includes(searchLower)) ||
+        (request.Indirizzo && request.Indirizzo.toLowerCase().includes(searchLower)) ||
+        (request.Luogo && request.Luogo.toLowerCase().includes(searchLower)) ||
         request.Problema.toLowerCase().includes(searchLower);
       if (!matchesSearch) return false;
     }
@@ -230,8 +279,8 @@ export function RequestsPage({
     if (b.stato === 'Completato' && a.stato !== 'Completato') return -1;
 
     // Sort by urgency (urgent first)
-    const aUrgent = a.Urgenza === 'true' || a.Urgenza === 'Sì';
-    const bUrgent = b.Urgenza === 'true' || b.Urgenza === 'Sì';
+    const aUrgent = a.Urgenza;
+    const bUrgent = b.Urgenza;
     if (aUrgent && !bUrgent) return -1;
     if (bUrgent && !aUrgent) return 1;
     
@@ -243,15 +292,15 @@ export function RequestsPage({
   const getPeriodDescription = () => {
     switch (datePeriodFilter) {
       case 'today':
-        return `for today (${new Date().toLocaleDateString('en-US')})`;
+        return `per oggi (${new Date().toLocaleDateString('it-IT')})`;
       case 'last3days':
-        return 'in the last 3 days';
+        return 'negli ultimi 3 giorni';
       case 'last7days':
-        return 'in the last 7 days';
+        return 'negli ultimi 7 giorni';
       case 'all':
-        return 'in total';
+        return 'in totale';
       case 'custom':
-        return `for ${new Date(selectedDate).toLocaleDateString('en-US')}`;
+        return `per ${new Date(selectedDate).toLocaleDateString('it-IT')}`;
       default:
         return '';
     }
@@ -278,17 +327,35 @@ export function RequestsPage({
         ref={searchRef}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
         {/* Header */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Requests
+                <div className="flex items-center space-x-2">
+                  <span>Richieste</span>
+                  <SimpleTooltip content="Gestisci tutte le richieste di servizio. Usa F per cercare, R per resettare filtri.">
+                    <button 
+                      onClick={() => setShowHelp(true)}
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                      title="Mostra aiuto"
+                    >
+                      <HelpCircle className="h-5 w-5" />
+                    </button>
+                  </SimpleTooltip>
+                </div>
               </h1>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {filteredRequests.length} request(s) {getPeriodDescription()}
+                {filteredRequests.length} richiesta/e {getPeriodDescription()}
               </p>
+              <button
+                onClick={onNewRequest}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nuova Richiesta
+              </button>
             </div>
             <div className="mt-4 sm:mt-0">
               <ViewToggle view={viewMode} onViewChange={setViewMode} />
@@ -300,8 +367,8 @@ export function RequestsPage({
         {filteredRequests.length === 0 ? (
           <EmptyState
             type="requests"
-            title="No requests found"
-            description="There are no requests matching the selected filters."
+            title="Nessuna richiesta trovata"
+            description="Non ci sono richieste che corrispondono ai filtri selezionati."
           />
         ) : (
           <div className="space-y-6">
@@ -333,6 +400,8 @@ export function RequestsPage({
         onViewClientProfile={handleViewClientProfileFromRequest}
         onTabChange={onTabChange}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+        onDelete={onDeleteRequest}
+        onUpdate={handleUpdateRequestWrapper}
       />
 
       {/* Client Profile Modal */}
@@ -342,7 +411,15 @@ export function RequestsPage({
         isOpen={clientModalOpen}
         onClose={closeClientModal}
         onTabChange={onTabChange}
+        onUpdate={onUpdateClient}
         setConversationSearchPhoneNumber={setConversationSearchPhoneNumber}
+      />
+      
+      {/* Sistema di aiuto contestuale */}
+      <ContextualHelp
+        steps={helpSteps}
+        isActive={showHelp}
+        onComplete={() => setShowHelp(false)}
       />
     </div>
   );

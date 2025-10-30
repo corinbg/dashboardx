@@ -75,36 +75,36 @@ export type Database = {
           Nome: string
           Luogo: string
           Problema: string
-          Urgenza: string
+          Urgenza: boolean
           Numero: string
           'Preferenza Ricontatto': string
           richiesta_at: string
           stato: 'Non letto' | 'Letto' | 'Contattato' | 'Completato'
-          spam_fuori_zo: boolean
+          spam_fuori_zona: boolean
         }
         Insert: {
           id?: string
           Nome: string
           Luogo: string
           Problema: string
-          Urgenza?: string
+          Urgenza?: boolean
           Numero: string
           'Preferenza Ricontatto': string
           richiesta_at?: string
           stato?: 'Non letto' | 'Letto' | 'Contattato' | 'Completato'
-          spam_fuori_zo?: boolean
+          spam_fuori_zona?: boolean
         }
         Update: {
           id?: string
           Nome?: string
           Luogo?: string
           Problema?: string
-          Urgenza?: string
+          Urgenza?: boolean
           Numero?: string
           'Preferenza Ricontatto'?: string
           richiesta_at?: string
           stato?: 'Non letto' | 'Letto' | 'Contattato' | 'Completato'
-          spam_fuori_zo?: boolean
+          spam_fuori_zona?: boolean
         }
       }
       clients: {
