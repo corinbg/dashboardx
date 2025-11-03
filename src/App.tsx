@@ -168,7 +168,7 @@ function MainApp() {
 
   // Show subscription loading state
   if (subscriptionLoading) {
-    return <LoadingScreen message="..." />;
+    return <LoadingScreen message="" />;
   }
 
   // Show subscription error
