@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Clock, Star, MessageCircle, Phone } from 'lucide-react';
+import { User, Clock, Star, MessageCircle, Phone, Globe, Facebook, Instagram } from 'lucide-react';
 
 interface ConversationCardProps {
   conversation: {
@@ -18,30 +18,32 @@ interface ConversationCardProps {
   unreadCount?: number;
   isStarred?: boolean;
   assignedAgent?: string;
+  social?: 'sito' | 'facebook' | 'instagram' | 'whatsapp';
   onClick: () => void;
   onToggleStar?: () => void;
 }
 
-export function ConversationCard({ 
-  conversation, 
-  lastMessage, 
-  clientName, 
+export function ConversationCard({
+  conversation,
+  lastMessage,
+  clientName,
   phoneNumber,
   unreadCount = 0,
   isStarred = false,
   assignedAgent,
+  social,
   onClick,
-  onToggleStar 
+  onToggleStar
 }: ConversationCardProps) {
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
+
     if (diffMinutes < 1) return 'Ora';
     if (diffMinutes < 60) return `${diffMinutes} min fa`;
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}h fa`;
-    
+
     return date.toLocaleDateString('it-IT', {
       day: '2-digit',
       month: '2-digit',
@@ -53,6 +55,53 @@ export function ConversationCard({
 
   const truncateMessage = (text: string, maxLength = 60) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  };
+
+  const getSocialBadge = () => {
+    if (!social) return null;
+
+    const configs = {
+      sito: {
+        icon: Globe,
+        label: 'Sito',
+        bgColor: 'bg-blue-100 dark:bg-blue-900/50',
+        textColor: 'text-blue-700 dark:text-blue-300',
+        iconColor: 'text-blue-600 dark:text-blue-400'
+      },
+      facebook: {
+        icon: Facebook,
+        label: 'Facebook',
+        bgColor: 'bg-blue-100 dark:bg-blue-900/50',
+        textColor: 'text-blue-700 dark:text-blue-300',
+        iconColor: 'text-blue-600 dark:text-blue-400'
+      },
+      instagram: {
+        icon: Instagram,
+        label: 'Instagram',
+        bgColor: 'bg-pink-100 dark:bg-pink-900/50',
+        textColor: 'text-pink-700 dark:text-pink-300',
+        iconColor: 'text-pink-600 dark:text-pink-400'
+      },
+      whatsapp: {
+        icon: MessageCircle,
+        label: 'WhatsApp',
+        bgColor: 'bg-green-100 dark:bg-green-900/50',
+        textColor: 'text-green-700 dark:text-green-300',
+        iconColor: 'text-green-600 dark:text-green-400'
+      }
+    };
+
+    const config = configs[social];
+    if (!config) return null;
+
+    const Icon = config.icon;
+
+    return (
+      <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${config.bgColor} ${config.textColor}`}>
+        <Icon className={`h-3 w-3 ${config.iconColor}`} />
+        <span>{config.label}</span>
+      </span>
+    );
   };
 
   return (
@@ -128,7 +177,7 @@ export function ConversationCard({
           </div>
 
           {/* Status Badge */}
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-col items-end space-y-1">
             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
               conversation.is_closed
                 ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
@@ -136,6 +185,7 @@ export function ConversationCard({
             }`}>
               {conversation.is_closed ? 'Chiusa' : 'Aperta'}
             </span>
+            {getSocialBadge()}
           </div>
 
           {/* Action Icons */}

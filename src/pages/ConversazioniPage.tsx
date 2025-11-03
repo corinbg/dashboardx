@@ -888,6 +888,7 @@ export function ConversazioniPage({ initialPhoneNumber, onPhoneNumberCleared }: 
                       phoneNumber={conversation.user_id}
                       unreadCount={conversation.unreadCount}
                       isStarred={conversation.is_favorite || false}
+                      social={conversation.social}
                       onToggleStar={() => handleToggleFavorite(conversation.id, conversation.is_favorite || false)}
                       onClick={() => handleConversationClick(conversation)}
                     />

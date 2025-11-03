@@ -8,6 +8,7 @@ export interface Conversation {
   is_closed: boolean;
   closed_at?: string;
   is_favorite?: boolean;
+  social?: 'sito' | 'facebook' | 'instagram' | 'whatsapp';
 }
 
 export interface Message {
